@@ -2,286 +2,334 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student CBT Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CBT Student Portal</title>
   <style>
-    :root{
-      --bg:#eef2ff;--panel:#ffffff;--text:#0f172a;--muted:#475569;--primary:#1e1b4b;--success:#15803d;--danger:#dc2626;--line:#dbe3f1;
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #eef2ff; color: #0f172a; }
+    header {
+      background: #1e1b4b;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    header a{color:#facc15;text-decoration:none;font-weight:700}
-    .container{max-width:980px;margin:24px auto;padding:0 16px}
-    .card{background:var(--panel);border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.08);padding:22px;margin-bottom:18px}
-    h1,h2,h3{margin-top:0}
-    label{display:block;margin-bottom:7px;font-weight:700}
-    input[type="text"]{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;font-size:15px;margin-bottom:14px}
-    button{border:none;background:var(--primary);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer}
-    button:hover{opacity:.95}
-    .success{background:var(--success)}
-    .danger{background:var(--danger)}
-    .muted{color:var(--muted)}
-    .hidden{display:none}
-    .status{padding:12px 14px;border-radius:12px;margin-bottom:14px;font-size:.95rem}
-    .status.info{background:#e0e7ff;color:#312e81}
-    .status.ok{background:#dcfce7;color:#166534}
-    .status.error{background:#fee2e2;color:#991b1b}
-    .timer{font-weight:700;color:var(--danger);margin-bottom:14px;font-size:1.05rem}
-    .question-block{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;background:#f8fafc}
-    .question-title{font-weight:700;margin-bottom:10px;line-height:1.5}
-    .option{display:block;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;margin-bottom:10px;cursor:pointer}
-    .option input{margin-right:8px}
-    .score-box{line-height:1.9;font-size:1.05rem}
-    .tag{display:inline-block;background:#ede9fe;color:#4c1d95;border-radius:999px;padding:7px 12px;font-size:.9rem;margin-bottom:14px}
+    header a { color: #facc15; text-decoration: none; font-weight: bold; }
+    .container { max-width: 950px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+    h1, h2 { margin-top: 0; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 15px;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background: #1e1b4b;
+      color: #fff;
+    }
+    .success { background: #15803d; }
+    .hidden { display: none; }
+    .status { font-size: 14px; margin-top: 6px; }
+    .error { color: #b91c1c; }
+    .ok { color: #166534; }
+    .timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #dc2626;
+      margin-bottom: 16px;
+    }
+    .question-block {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    .question-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .question-image-wrap {
+      margin: 12px 0;
+      text-align: center;
+    }
+    .question-image {
+      max-width: 100%;
+      max-height: 280px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    .option {
+      display: block;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .result-box {
+      line-height: 1.9;
+      font-size: 17px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1 style="margin:0" id="examTitleHeader">CBT Examination</h1>
-    </div>
+    <h1 id="examTitleHeader" style="margin:0;">CBT Examination</h1>
     <a href="index.html">← Back Home</a>
   </header>
 
   <div class="container">
     <div class="card" id="verifyCard">
-      <div class="tag">Step 1: Verify in Registration Sheet</div>
       <h2>Candidate Verification</h2>
-      <div id="verifyStatus" class="status info">Enter your full name and Registration ID exactly as registered.</div>
       <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" placeholder="e.g. Uwakmfon Hezekiah" />
+      <input type="text" id="fullName" placeholder="Enter your full name">
+
       <label for="regId">Registration ID</label>
-      <input type="text" id="regId" placeholder="e.g. GZM2026-0012" />
-      <button id="verifyBtn">Verify Details</button>
+      <input type="text" id="regId" placeholder="Enter your registration ID">
+
+      <button id="verifyBtn">Verify</button>
+      <div id="verifyStatus" class="status"></div>
     </div>
 
     <div class="card hidden" id="unlockCard">
-      <div class="tag">Step 2: Unlock CBT</div>
-      <h2>Unlock Exam</h2>
-      <p class="muted" id="unlockInfo"></p>
-      <div id="unlockStatus" class="status info">Re-enter your Registration ID to unlock the CBT.</div>
+      <h2>Unlock CBT</h2>
+      <p>Please re-enter your Registration ID to unlock the exam.</p>
       <label for="unlockRegId">Registration ID</label>
-      <input type="text" id="unlockRegId" placeholder="Enter your Registration ID again" />
+      <input type="text" id="unlockRegId" placeholder="Enter registration ID again">
+
       <button id="unlockBtn">Unlock Exam</button>
+      <div id="unlockStatus" class="status"></div>
     </div>
 
     <div class="card hidden" id="examCard">
-      <div class="tag">Step 3: Answer Questions</div>
       <div class="timer">Time Left: <span id="timeLeft">00:00</span></div>
       <form id="examForm"></form>
-      <button type="button" class="success" id="submitBtn">Submit Exam</button>
+      <button class="success" id="submitBtn" type="button">Submit Exam</button>
+      <div id="submitStatus" class="status"></div>
     </div>
 
     <div class="card hidden" id="resultCard">
-      <div class="tag">Submission Complete</div>
       <h2>Exam Submitted</h2>
-      <div id="resultBox" class="score-box"></div>
+      <div class="result-box" id="resultBox"></div>
     </div>
   </div>
 
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 
-    const state = {
-      verifiedName: "",
-      verifiedRegId: "",
-      questions: [],
-      durationMinutes: 20,
-      timer: null,
-      timeRemaining: 0,
-      started: false
-    };
+    let verifiedCandidate = null;
+    let currentQuestions = [];
+    let timer = null;
+    let timeRemaining = 0;
+    let examStarted = false;
 
-    const verifyCard = document.getElementById('verifyCard');
-    const unlockCard = document.getElementById('unlockCard');
-    const examCard = document.getElementById('examCard');
-    const resultCard = document.getElementById('resultCard');
-    const verifyStatus = document.getElementById('verifyStatus');
-    const unlockStatus = document.getElementById('unlockStatus');
-    const unlockInfo = document.getElementById('unlockInfo');
-    const examTitleHeader = document.getElementById('examTitleHeader');
-    const examForm = document.getElementById('examForm');
-    const timeLeft = document.getElementById('timeLeft');
-    const resultBox = document.getElementById('resultBox');
-
-    async function apiPost(action, payload = {}) {
-      const body = new URLSearchParams();
-      body.append('action', action);
-      body.append('payload', JSON.stringify(payload));
-
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body
-      });
-
-      const text = await response.text();
+    async function apiRequest(action, payload = null, method = "POST") {
       try {
-        return JSON.parse(text);
-      } catch (err) {
-        throw new Error('Invalid response from Apps Script. Check deployment URL and permissions.');
+        if (method === "GET") {
+          const url = new URL(APPS_SCRIPT_URL);
+          url.searchParams.set("action", action);
+          const res = await fetch(url.toString());
+          return await res.json();
+        }
+
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, payload })
+        });
+
+        return await res.json();
+      } catch (error) {
+        return { ok: false, message: error.message || "Network error." };
       }
     }
 
-    function setStatus(el, type, message) {
-      el.className = 'status ' + type;
+    function setStatus(id, message, ok = false) {
+      const el = document.getElementById(id);
+      el.className = "status " + (ok ? "ok" : "error");
       el.textContent = message;
     }
 
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
-      return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+      return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
     }
 
-    function renderQuestions() {
-      examForm.innerHTML = state.questions.map((q, index) => `
+    async function loadSettings() {
+      const res = await apiRequest("getSettings", null, "GET");
+      if (res.ok && res.data) {
+        document.getElementById("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
+      }
+    }
+
+    async function verifyCandidate() {
+      const payload = {
+        fullName: document.getElementById("fullName").value.trim(),
+        regId: document.getElementById("regId").value.trim()
+      };
+
+      const res = await apiRequest("verifyCandidate", payload, "POST");
+      setStatus("verifyStatus", res.message, res.ok);
+
+      if (res.ok) {
+        verifiedCandidate = {
+          fullName: payload.fullName,
+          regId: payload.regId
+        };
+        document.getElementById("unlockCard").classList.remove("hidden");
+        document.getElementById("unlockRegId").value = payload.regId;
+      }
+    }
+
+    function renderQuestions(questions) {
+      const form = document.getElementById("examForm");
+
+      form.innerHTML = questions.map((q, index) => `
         <div class="question-block">
           <div class="question-title">${index + 1}. ${q.question}</div>
-          <label class="option"><input type="radio" name="q_${q.id}" value="A"> A. ${q.optionA}</label>
-          <label class="option"><input type="radio" name="q_${q.id}" value="B"> B. ${q.optionB}</label>
-          <label class="option"><input type="radio" name="q_${q.id}" value="C"> C. ${q.optionC}</label>
-          <label class="option"><input type="radio" name="q_${q.id}" value="D"> D. ${q.optionD}</label>
+
+          ${q.imageUrl ? `
+            <div class="question-image-wrap">
+              <img src="${q.imageUrl}" alt="Question image" class="question-image">
+            </div>
+          ` : ""}
+
+          <label class="option">
+            <input type="radio" name="question_${index}" value="A">
+            A. ${q.optionA}
+          </label>
+
+          <label class="option">
+            <input type="radio" name="question_${index}" value="B">
+            B. ${q.optionB}
+          </label>
+
+          <label class="option">
+            <input type="radio" name="question_${index}" value="C">
+            C. ${q.optionC}
+          </label>
+
+          <label class="option">
+            <input type="radio" name="question_${index}" value="D">
+            D. ${q.optionD}
+          </label>
         </div>
-      `).join('');
+      `).join("");
     }
 
     function startTimer() {
-      timeLeft.textContent = formatTime(state.timeRemaining);
-      state.timer = setInterval(() => {
-        state.timeRemaining -= 1;
-        timeLeft.textContent = formatTime(state.timeRemaining);
-        if (state.timeRemaining <= 0) {
-          clearInterval(state.timer);
-          alert('Time is up. Your exam will now be submitted automatically.');
+      document.getElementById("timeLeft").textContent = formatTime(timeRemaining);
+
+      timer = setInterval(() => {
+        timeRemaining--;
+        document.getElementById("timeLeft").textContent = formatTime(timeRemaining);
+
+        if (timeRemaining <= 0) {
+          clearInterval(timer);
           submitExam();
         }
       }, 1000);
     }
 
-    async function verifyCandidate() {
-      const fullName = document.getElementById('fullName').value.trim();
-      const regId = document.getElementById('regId').value.trim();
+    async function unlockExam() {
+      const enteredRegId = document.getElementById("unlockRegId").value.trim();
 
-      if (!fullName || !regId) {
-        setStatus(verifyStatus, 'error', 'Enter both your full name and Registration ID.');
+      if (!verifiedCandidate) {
+        setStatus("unlockStatus", "Please verify first.");
         return;
       }
 
-      setStatus(verifyStatus, 'info', 'Checking your details...');
+      if (enteredRegId !== verifiedCandidate.regId) {
+        setStatus("unlockStatus", "Registration ID does not match the verified candidate.");
+        return;
+      }
 
-      try {
-        const res = await apiPost('verifyCandidate', { fullName, regId });
-        if (!res.ok) {
-          setStatus(verifyStatus, 'error', res.message || 'Verification failed.');
-          return;
-        }
+      const res = await apiRequest("unlockExam", { regId: enteredRegId }, "POST");
+      setStatus("unlockStatus", res.message, res.ok);
 
-        state.verifiedName = res.data.fullName;
-        state.verifiedRegId = res.data.regId;
-        examTitleHeader.textContent = res.data.examTitle || 'CBT Examination';
-
-        setStatus(verifyStatus, 'ok', 'Verification successful. Proceed to unlock the exam.');
-        unlockInfo.textContent = `Verified candidate: ${res.data.fullName} | Registration ID: ${res.data.regId}`;
-        unlockCard.classList.remove('hidden');
-        unlockCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch (error) {
-        setStatus(verifyStatus, 'error', error.message);
+      if (res.ok && res.data) {
+        currentQuestions = res.data.questions || [];
+        timeRemaining = (Number(res.data.durationMinutes || 20) * 60);
+        document.getElementById("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
+        renderQuestions(currentQuestions);
+        document.getElementById("examCard").classList.remove("hidden");
+        examStarted = true;
+        startTimer();
+        window.scrollTo({ top: document.getElementById("examCard").offsetTop - 20, behavior: "smooth" });
       }
     }
 
-    async function unlockExam() {
-      const unlockRegId = document.getElementById('unlockRegId').value.trim();
-      if (!unlockRegId) {
-        setStatus(unlockStatus, 'error', 'Enter your Registration ID again to unlock the CBT.');
-        return;
-      }
-      if (unlockRegId.toUpperCase() !== state.verifiedRegId.toUpperCase()) {
-        setStatus(unlockStatus, 'error', 'The Registration ID does not match the verified record.');
-        return;
-      }
-
-      setStatus(unlockStatus, 'info', 'Unlocking your exam...');
-
-      try {
-        const res = await apiPost('unlockExam', { regId: unlockRegId });
-        if (!res.ok) {
-          setStatus(unlockStatus, 'error', res.message || 'Unable to unlock exam.');
-          return;
-        }
-
-        state.questions = res.data.questions || [];
-        state.durationMinutes = Number(res.data.durationMinutes || 20);
-        state.timeRemaining = state.durationMinutes * 60;
-        examTitleHeader.textContent = res.data.examTitle || 'CBT Examination';
-
-        if (!state.questions.length) {
-          setStatus(unlockStatus, 'error', 'No questions are available yet. Contact the admin.');
-          return;
-        }
-
-        state.started = true;
-        renderQuestions();
-        examCard.classList.remove('hidden');
-        unlockCard.classList.add('hidden');
-        verifyCard.classList.add('hidden');
-        startTimer();
-        examCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch (error) {
-        setStatus(unlockStatus, 'error', error.message);
-      }
+    function collectAnswers() {
+      return currentQuestions.map((q, index) => {
+        const selected = document.querySelector(`input[name="question_${index}"]:checked`);
+        return {
+          questionId: q.id,
+          selected: selected ? selected.value : ""
+        };
+      });
     }
 
     async function submitExam() {
-      if (!state.started) return;
-      const answers = state.questions.map((q, index) => {
-        const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-        return {
-          questionId: q.id,
-          questionNo: index + 1,
-          selected: selected ? selected.value : ''
-        };
-      });
+      if (!examStarted) return;
 
-      clearInterval(state.timer);
-      document.getElementById('submitBtn').disabled = true;
-      document.getElementById('submitBtn').textContent = 'Submitting...';
+      clearInterval(timer);
+      examStarted = false;
 
-      try {
-        const res = await apiPost('submitExam', {
-          fullName: state.verifiedName,
-          regId: state.verifiedRegId,
-          answers
-        });
+      const payload = {
+        fullName: verifiedCandidate.fullName,
+        regId: verifiedCandidate.regId,
+        answers: collectAnswers()
+      };
 
-        if (!res.ok) {
-          alert(res.message || 'Submission failed.');
-          document.getElementById('submitBtn').disabled = false;
-          document.getElementById('submitBtn').textContent = 'Submit Exam';
-          return;
-        }
+      const res = await apiRequest("submitExam", payload, "POST");
+      setStatus("submitStatus", res.message, res.ok);
 
-        state.started = false;
-        examCard.classList.add('hidden');
-        resultCard.classList.remove('hidden');
-        resultBox.innerHTML = `
-          <strong>Candidate:</strong> ${res.data.fullName}<br>
-          <strong>Registration ID:</strong> ${res.data.regId}<br>
-          <strong>Score:</strong> ${res.data.score} / ${res.data.total}<br>
-          <strong>Percentage:</strong> ${res.data.percentage}%<br>
-          <strong>Passed Question Nos:</strong> ${res.data.passedNos || 'None'}<br>
-          <strong>Failed Question Nos:</strong> ${res.data.failedNos || 'None'}
-        `;
-      } catch (error) {
-        alert(error.message);
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').textContent = 'Submit Exam';
-      }
+      if (!res.ok) return;
+
+      document.getElementById("examCard").classList.add("hidden");
+      document.getElementById("resultCard").classList.remove("hidden");
+
+      const data = res.data || {};
+      document.getElementById("resultBox").innerHTML = `
+        <strong>Full Name:</strong> ${data.fullName || ""}<br>
+        <strong>Reg ID:</strong> ${data.regId || ""}<br>
+        <strong>Score:</strong> ${data.score || 0} / ${data.total || 0}<br>
+        <strong>Percentage:</strong> ${data.percentage || 0}%<br>
+        <strong>Passed Question Nos:</strong> ${data.passedNos || "None"}<br>
+        <strong>Failed Question Nos:</strong> ${data.failedNos || "None"}
+      `;
     }
 
-    document.getElementById('verifyBtn').addEventListener('click', verifyCandidate);
-    document.getElementById('unlockBtn').addEventListener('click', unlockExam);
-    document.getElementById('submitBtn').addEventListener('click', submitExam);
+    document.getElementById("verifyBtn").addEventListener("click", verifyCandidate);
+    document.getElementById("unlockBtn").addEventListener("click", unlockExam);
+    document.getElementById("submitBtn").addEventListener("click", submitExam);
+
+    loadSettings();
   </script>
 </body>
 </html>
