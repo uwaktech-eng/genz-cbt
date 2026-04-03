@@ -3,437 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CBT Admin Portal</title>
+  <title>CBT Portal</title>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background: #f8fafc; color: #0f172a; }
-    header {
-      background: #0f172a;
-      color: #fff;
-      padding: 16px 20px;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
     }
-    header a { color: #facc15; text-decoration: none; font-weight: bold; }
-    .container {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px;
+    .wrap {
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 12px;
+      font-size: 2.4rem;
+    }
+    p {
+      color: #cbd5e1;
+      margin-bottom: 30px;
+    }
+    .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 20px;
     }
     .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.08);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 28px 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
     }
-    .full { grid-column: 1 / -1; }
-    h2 { margin-top: 0; }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-      font-size: 14px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      font-size: 15px;
-    }
-    textarea { min-height: 90px; resize: vertical; }
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 8px;
-      margin-bottom: 8px;
-      background: #0f172a;
-      color: #fff;
-    }
-    .danger { background: #dc2626; }
-    .success { background: #15803d; }
-    .muted { background: #475569; }
-    .info-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-    .item {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid #0f172a;
-      border-radius: 10px;
-      padding: 12px;
+    .card h2 {
+      margin-top: 0;
       margin-bottom: 12px;
     }
-    .question-image-preview {
-      max-width: 220px;
-      max-height: 160px;
-      display: block;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+    .card p {
+      margin-bottom: 20px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      background: #facc15;
+      color: #111827;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: bold;
     }
-    th, td {
-      border: 1px solid #cbd5e1;
-      padding: 10px;
-      text-align: left;
-      font-size: 14px;
-    }
-    th { background: #e2e8f0; }
-    .status { font-size: 14px; margin-top: 8px; }
-    .error { color: #b91c1c; }
-    .ok { color: #166534; }
-    @media (max-width: 900px) {
-      .container { grid-template-columns: 1fr; }
-    }
+    .btn:hover { background: #eab308; }
   </style>
 </head>
 <body>
-  <header>
-    <h1 style="margin:0;">CBT Admin Portal</h1>
-    <a href="index.html">← Back Home</a>
-  </header>
+  <div class="wrap">
+    <h1>CBT Examination Portal</h1>
+    <p>Select the portal you want to enter.</p>
 
-  <div class="container">
-    <div class="card">
-      <h2>Exam Settings</h2>
-      <label for="examTitle">Exam Title</label>
-      <input type="text" id="examTitle" placeholder="Enter exam title">
-
-      <label for="durationMinutes">Duration (Minutes)</label>
-      <input type="number" id="durationMinutes" min="1" value="20">
-
-      <button class="success" id="saveSettingsBtn">Save Settings</button>
-      <div id="settingsStatus" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h2>Add Candidate</h2>
-      <label for="candidateName">Full Name</label>
-      <input type="text" id="candidateName" placeholder="Enter candidate full name">
-
-      <label for="candidateRegId">Reg ID</label>
-      <input type="text" id="candidateRegId" placeholder="Enter registration ID">
-
-      <button class="success" id="addCandidateBtn">Add Candidate</button>
-      <div id="candidateStatus" class="status"></div>
-    </div>
-
-    <div class="card full">
-      <h2>Add Question</h2>
-      <div class="info-box">
-        Image URL is optional. If you add an image link, the Questions sheet will support the Image URL column automatically.
+    <div class="grid">
+      <div class="card">
+        <h2>Student Portal</h2>
+        <p>Verify with full name and Reg ID, unlock the CBT, take the exam, and submit online.</p>
+        <a href="student.html" class="btn">Open Student Portal</a>
       </div>
 
-      <label for="questionText">Question</label>
-      <textarea id="questionText" placeholder="Enter question"></textarea>
-
-      <label for="imageUrl">Image URL (optional)</label>
-      <input type="text" id="imageUrl" placeholder="Paste direct image URL here">
-
-      <label for="optionA">Option A</label>
-      <input type="text" id="optionA" placeholder="Option A">
-
-      <label for="optionB">Option B</label>
-      <input type="text" id="optionB" placeholder="Option B">
-
-      <label for="optionC">Option C</label>
-      <input type="text" id="optionC" placeholder="Option C">
-
-      <label for="optionD">Option D</label>
-      <input type="text" id="optionD" placeholder="Option D">
-
-      <label for="correctAnswer">Correct Answer</label>
-      <select id="correctAnswer">
-        <option value="">Select answer</option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-      </select>
-
-      <button class="success" id="addQuestionBtn">Add Question</button>
-      <button class="danger" id="clearQuestionsBtn">Clear All Questions</button>
-      <div id="questionStatus" class="status"></div>
-    </div>
-
-    <div class="card full">
-      <h2>Candidates</h2>
-      <div id="candidatesBox">Loading candidates...</div>
-    </div>
-
-    <div class="card full">
-      <h2>Questions</h2>
-      <div id="questionsBox">Loading questions...</div>
-    </div>
-
-    <div class="card full">
-      <h2>Results Summary</h2>
-      <button class="danger" id="clearResultsBtn">Clear Results</button>
-      <div id="resultsBox">Loading results...</div>
+      <div class="card">
+        <h2>Admin Portal</h2>
+        <p>Manage settings, candidates, questions, image links, and results summary.</p>
+        <a href="admin.html" class="btn">Open Admin Portal</a>
+      </div>
     </div>
   </div>
-
-  <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
-
-    async function apiRequest(action, payload = null, method = "POST") {
-      try {
-        if (method === "GET") {
-          const url = new URL(APPS_SCRIPT_URL);
-          url.searchParams.set("action", action);
-          const res = await fetch(url.toString());
-          return await res.json();
-        }
-
-        const res = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action, payload })
-        });
-
-        return await res.json();
-      } catch (error) {
-        return { ok: false, message: error.message || "Network error." };
-      }
-    }
-
-    function setStatus(id, message, ok = false) {
-      const el = document.getElementById(id);
-      el.className = "status " + (ok ? "ok" : "error");
-      el.textContent = message;
-    }
-
-    async function loadSettings() {
-      const res = await apiRequest("getSettings", null, "GET");
-      if (res.ok && res.data) {
-        document.getElementById("examTitle").value = res.data.examTitle || "";
-        document.getElementById("durationMinutes").value = res.data.durationMinutes || 20;
-      }
-    }
-
-    async function saveSettings() {
-      const payload = {
-        examTitle: document.getElementById("examTitle").value.trim(),
-        durationMinutes: document.getElementById("durationMinutes").value.trim()
-      };
-
-      const res = await apiRequest("saveSettings", payload, "POST");
-      setStatus("settingsStatus", res.message, res.ok);
-    }
-
-    async function addCandidate() {
-      const payload = {
-        fullName: document.getElementById("candidateName").value.trim(),
-        regId: document.getElementById("candidateRegId").value.trim()
-      };
-
-      const res = await apiRequest("addCandidate", payload, "POST");
-      setStatus("candidateStatus", res.message, res.ok);
-
-      if (res.ok) {
-        document.getElementById("candidateName").value = "";
-        document.getElementById("candidateRegId").value = "";
-        loadCandidates();
-      }
-    }
-
-    async function addQuestion() {
-      const payload = {
-        question: document.getElementById("questionText").value.trim(),
-        imageUrl: document.getElementById("imageUrl").value.trim(),
-        optionA: document.getElementById("optionA").value.trim(),
-        optionB: document.getElementById("optionB").value.trim(),
-        optionC: document.getElementById("optionC").value.trim(),
-        optionD: document.getElementById("optionD").value.trim(),
-        answer: document.getElementById("correctAnswer").value
-      };
-
-      const res = await apiRequest("addQuestion", payload, "POST");
-      setStatus("questionStatus", res.message, res.ok);
-
-      if (res.ok) {
-        document.getElementById("questionText").value = "";
-        document.getElementById("imageUrl").value = "";
-        document.getElementById("optionA").value = "";
-        document.getElementById("optionB").value = "";
-        document.getElementById("optionC").value = "";
-        document.getElementById("optionD").value = "";
-        document.getElementById("correctAnswer").value = "";
-        loadQuestions();
-      }
-    }
-
-    async function clearQuestions() {
-      if (!confirm("Delete all questions?")) return;
-      const res = await apiRequest("clearQuestions", {}, "POST");
-      setStatus("questionStatus", res.message, res.ok);
-      loadQuestions();
-    }
-
-    async function clearResults() {
-      if (!confirm("Clear all results?")) return;
-      const res = await apiRequest("clearResults", {}, "POST");
-      alert(res.message);
-      loadResults();
-    }
-
-    async function loadCandidates() {
-      const box = document.getElementById("candidatesBox");
-      box.innerHTML = "Loading candidates...";
-      const res = await apiRequest("listCandidates", null, "GET");
-
-      if (!res.ok) {
-        box.innerHTML = `<div class="error">${res.message}</div>`;
-        return;
-      }
-
-      const list = res.data || [];
-      if (!list.length) {
-        box.innerHTML = "<p>No candidates added yet.</p>";
-        return;
-      }
-
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>S/N</th>
-              <th>Full Name</th>
-              <th>Reg ID</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      list.forEach((item, i) => {
-        html += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${item.fullName}</td>
-            <td>${item.regId}</td>
-          </tr>
-        `;
-      });
-
-      html += "</tbody></table>";
-      box.innerHTML = html;
-    }
-
-    async function loadQuestions() {
-      const box = document.getElementById("questionsBox");
-      box.innerHTML = "Loading questions...";
-      const res = await apiRequest("listQuestions", null, "GET");
-
-      if (!res.ok) {
-        box.innerHTML = `<div class="error">${res.message}</div>`;
-        return;
-      }
-
-      const list = res.data || [];
-      if (!list.length) {
-        box.innerHTML = "<p>No questions added yet.</p>";
-        return;
-      }
-
-      let html = "";
-      list.forEach((q, i) => {
-        html += `
-          <div class="item">
-            <strong>Question ${i + 1}:</strong> ${q.question}<br>
-            ${q.imageUrl ? `<img src="${q.imageUrl}" alt="Question image" class="question-image-preview">` : ""}
-            <strong>A:</strong> ${q.optionA}<br>
-            <strong>B:</strong> ${q.optionB}<br>
-            <strong>C:</strong> ${q.optionC}<br>
-            <strong>D:</strong> ${q.optionD}<br>
-            <strong>Correct Answer:</strong> ${q.answer}
-          </div>
-        `;
-      });
-
-      box.innerHTML = html;
-    }
-
-    async function loadResults() {
-      const box = document.getElementById("resultsBox");
-      box.innerHTML = "Loading results...";
-      const res = await apiRequest("listResults", null, "GET");
-
-      if (!res.ok) {
-        box.innerHTML = `<div class="error">${res.message}</div>`;
-        return;
-      }
-
-      const list = res.data || [];
-      if (!list.length) {
-        box.innerHTML = "<p>No results yet.</p>";
-        return;
-      }
-
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>S/N</th>
-              <th>Timestamp</th>
-              <th>Full Name</th>
-              <th>Reg ID</th>
-              <th>Score</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      list.forEach((item, i) => {
-        html += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${item.timestamp}</td>
-            <td>${item.fullName}</td>
-            <td>${item.regId}</td>
-            <td>${item.score}</td>
-            <td>${item.percentage}%</td>
-          </tr>
-        `;
-      });
-
-      html += "</tbody></table>";
-      box.innerHTML = html;
-    }
-
-    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
-    document.getElementById("addCandidateBtn").addEventListener("click", addCandidate);
-    document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
-    document.getElementById("clearQuestionsBtn").addEventListener("click", clearQuestions);
-    document.getElementById("clearResultsBtn").addEventListener("click", clearResults);
-
-    (async function init() {
-      await loadSettings();
-      await loadCandidates();
-      await loadQuestions();
-      await loadResults();
-    })();
-  </script>
 </body>
 </html>
