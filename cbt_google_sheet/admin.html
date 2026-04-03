@@ -2,77 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin CBT Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CBT Admin Portal</title>
   <style>
-    :root{
-      --bg:#f8fafc;--panel:#fff;--text:#0f172a;--muted:#475569;--primary:#0f172a;--success:#15803d;--danger:#dc2626;--line:#d9e2ef;
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f8fafc; color: #0f172a; }
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    header a{color:#facc15;text-decoration:none;font-weight:700}
-    .container{max-width:1200px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .card{background:var(--panel);border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.08);padding:22px}
-    .full{grid-column:1 / -1}
-    h1,h2,h3{margin-top:0}
-    label{display:block;margin-bottom:7px;font-weight:700}
-    input, textarea, select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;font-size:15px;margin-bottom:14px}
-    textarea{min-height:95px;resize:vertical}
-    button{border:none;background:var(--primary);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer;margin-right:8px;margin-bottom:8px}
-    .success{background:var(--success)}
-    .danger{background:var(--danger)}
-    .muted{background:#475569}
-    .pill{display:inline-block;background:#e2e8f0;color:#334155;border-radius:999px;padding:7px 12px;font-size:.88rem;margin-bottom:12px}
-    .list-item{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid var(--line);padding:10px;text-align:left;font-size:.93rem}
-    th{background:#eef2f7}
-    .status{padding:12px 14px;border-radius:12px;margin-bottom:12px;background:#e2e8f0;color:#334155}
-    .small{color:var(--muted);font-size:.95rem}
-    @media (max-width:900px){.container{grid-template-columns:1fr}}
+    header a { color: #facc15; text-decoration: none; font-weight: bold; }
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    }
+    .full { grid-column: 1 / -1; }
+    h2 { margin-top: 0; }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 15px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background: #0f172a;
+      color: #fff;
+    }
+    .danger { background: #dc2626; }
+    .success { background: #15803d; }
+    .muted { background: #475569; }
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0f172a;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .question-image-preview {
+      max-width: 220px;
+      max-height: 160px;
+      display: block;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th { background: #e2e8f0; }
+    .status { font-size: 14px; margin-top: 8px; }
+    .error { color: #b91c1c; }
+    .ok { color: #166534; }
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div><h1 style="margin:0">Admin CBT Portal</h1></div>
+    <h1 style="margin:0;">CBT Admin Portal</h1>
     <a href="index.html">← Back Home</a>
   </header>
 
   <div class="container">
     <div class="card">
-      <div class="pill">Exam Settings</div>
-      <div id="settingsStatus" class="status">Set your exam title and duration.</div>
+      <h2>Exam Settings</h2>
       <label for="examTitle">Exam Title</label>
-      <input type="text" id="examTitle" placeholder="e.g. Gen Z Maths CBT 2026" />
-      <label for="durationMinutes">Duration (minutes)</label>
-      <input type="number" id="durationMinutes" min="1" value="20" />
+      <input type="text" id="examTitle" placeholder="Enter exam title">
+
+      <label for="durationMinutes">Duration (Minutes)</label>
+      <input type="number" id="durationMinutes" min="1" value="20">
+
       <button class="success" id="saveSettingsBtn">Save Settings</button>
+      <div id="settingsStatus" class="status"></div>
     </div>
 
     <div class="card">
-      <div class="pill">Candidate Register</div>
-      <div id="candidateStatus" class="status">Add candidates that are allowed to take the exam.</div>
+      <h2>Add Candidate</h2>
       <label for="candidateName">Full Name</label>
-      <input type="text" id="candidateName" placeholder="e.g. Jane Doe" />
-      <label for="candidateRegId">Registration ID</label>
-      <input type="text" id="candidateRegId" placeholder="e.g. GZM2026-0001" />
+      <input type="text" id="candidateName" placeholder="Enter candidate full name">
+
+      <label for="candidateRegId">Reg ID</label>
+      <input type="text" id="candidateRegId" placeholder="Enter registration ID">
+
       <button class="success" id="addCandidateBtn">Add Candidate</button>
+      <div id="candidateStatus" class="status"></div>
     </div>
 
-    <div class="card">
-      <div class="pill">Question Builder</div>
-      <div id="questionStatus" class="status">Add questions that students will answer.</div>
+    <div class="card full">
+      <h2>Add Question</h2>
+      <div class="info-box">
+        Image URL is optional. If you add an image link, the Questions sheet will support the Image URL column automatically.
+      </div>
+
       <label for="questionText">Question</label>
-      <textarea id="questionText" placeholder="Type the question here"></textarea>
+      <textarea id="questionText" placeholder="Enter question"></textarea>
+
+      <label for="imageUrl">Image URL (optional)</label>
+      <input type="text" id="imageUrl" placeholder="Paste direct image URL here">
+
       <label for="optionA">Option A</label>
-      <input type="text" id="optionA" />
+      <input type="text" id="optionA" placeholder="Option A">
+
       <label for="optionB">Option B</label>
-      <input type="text" id="optionB" />
+      <input type="text" id="optionB" placeholder="Option B">
+
       <label for="optionC">Option C</label>
-      <input type="text" id="optionC" />
+      <input type="text" id="optionC" placeholder="Option C">
+
       <label for="optionD">Option D</label>
-      <input type="text" id="optionD" />
+      <input type="text" id="optionD" placeholder="Option D">
+
       <label for="correctAnswer">Correct Answer</label>
       <select id="correctAnswer">
         <option value="">Select answer</option>
@@ -81,174 +171,269 @@
         <option value="C">C</option>
         <option value="D">D</option>
       </select>
+
       <button class="success" id="addQuestionBtn">Add Question</button>
-    </div>
-
-    <div class="card">
-      <div class="pill">Quick Actions</div>
-      <p class="small">These actions affect the shared Google Sheet backend.</p>
-      <button class="muted" id="refreshBtn">Refresh Data</button>
-      <button class="danger" id="clearQuestionsBtn">Delete All Questions</button>
-      <button class="danger" id="clearResultsBtn">Clear All Results</button>
+      <button class="danger" id="clearQuestionsBtn">Clear All Questions</button>
+      <div id="questionStatus" class="status"></div>
     </div>
 
     <div class="card full">
-      <div class="pill">Candidates</div>
-      <div id="candidateList">Loading candidates...</div>
+      <h2>Candidates</h2>
+      <div id="candidatesBox">Loading candidates...</div>
     </div>
 
     <div class="card full">
-      <div class="pill">Questions</div>
-      <div id="questionList">Loading questions...</div>
+      <h2>Questions</h2>
+      <div id="questionsBox">Loading questions...</div>
     </div>
 
     <div class="card full">
-      <div class="pill">Results Summary</div>
-      <div id="resultsSummary">Loading results...</div>
+      <h2>Results Summary</h2>
+      <button class="danger" id="clearResultsBtn">Clear Results</button>
+      <div id="resultsBox">Loading results...</div>
     </div>
   </div>
 
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 
-    async function apiPost(action, payload = {}) {
-      const body = new URLSearchParams();
-      body.append('action', action);
-      body.append('payload', JSON.stringify(payload));
-      const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body });
-      const text = await response.text();
+    async function apiRequest(action, payload = null, method = "POST") {
       try {
-        return JSON.parse(text);
-      } catch (err) {
-        throw new Error('Invalid response from Apps Script. Check deployment URL and permissions.');
+        if (method === "GET") {
+          const url = new URL(APPS_SCRIPT_URL);
+          url.searchParams.set("action", action);
+          const res = await fetch(url.toString());
+          return await res.json();
+        }
+
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, payload })
+        });
+
+        return await res.json();
+      } catch (error) {
+        return { ok: false, message: error.message || "Network error." };
       }
     }
 
-    function setText(id, text) {
-      document.getElementById(id).textContent = text;
-    }
-
-    async function loadAll() {
-      await Promise.all([loadSettings(), loadCandidates(), loadQuestions(), loadResults()]);
+    function setStatus(id, message, ok = false) {
+      const el = document.getElementById(id);
+      el.className = "status " + (ok ? "ok" : "error");
+      el.textContent = message;
     }
 
     async function loadSettings() {
-      const res = await apiPost('getSettings');
-      if (res.ok) {
-        document.getElementById('examTitle').value = res.data.examTitle || 'CBT Examination';
-        document.getElementById('durationMinutes').value = res.data.durationMinutes || 20;
+      const res = await apiRequest("getSettings", null, "GET");
+      if (res.ok && res.data) {
+        document.getElementById("examTitle").value = res.data.examTitle || "";
+        document.getElementById("durationMinutes").value = res.data.durationMinutes || 20;
       }
     }
 
     async function saveSettings() {
-      const examTitle = document.getElementById('examTitle').value.trim();
-      const durationMinutes = document.getElementById('durationMinutes').value.trim();
-      const res = await apiPost('saveSettings', { examTitle, durationMinutes });
-      setText('settingsStatus', res.message || 'Done.');
+      const payload = {
+        examTitle: document.getElementById("examTitle").value.trim(),
+        durationMinutes: document.getElementById("durationMinutes").value.trim()
+      };
+
+      const res = await apiRequest("saveSettings", payload, "POST");
+      setStatus("settingsStatus", res.message, res.ok);
     }
 
     async function addCandidate() {
-      const fullName = document.getElementById('candidateName').value.trim();
-      const regId = document.getElementById('candidateRegId').value.trim();
-      const res = await apiPost('addCandidate', { fullName, regId });
-      setText('candidateStatus', res.message || 'Done.');
+      const payload = {
+        fullName: document.getElementById("candidateName").value.trim(),
+        regId: document.getElementById("candidateRegId").value.trim()
+      };
+
+      const res = await apiRequest("addCandidate", payload, "POST");
+      setStatus("candidateStatus", res.message, res.ok);
+
       if (res.ok) {
-        document.getElementById('candidateName').value = '';
-        document.getElementById('candidateRegId').value = '';
+        document.getElementById("candidateName").value = "";
+        document.getElementById("candidateRegId").value = "";
         loadCandidates();
       }
     }
 
     async function addQuestion() {
       const payload = {
-        question: document.getElementById('questionText').value.trim(),
-        optionA: document.getElementById('optionA').value.trim(),
-        optionB: document.getElementById('optionB').value.trim(),
-        optionC: document.getElementById('optionC').value.trim(),
-        optionD: document.getElementById('optionD').value.trim(),
-        answer: document.getElementById('correctAnswer').value
+        question: document.getElementById("questionText").value.trim(),
+        imageUrl: document.getElementById("imageUrl").value.trim(),
+        optionA: document.getElementById("optionA").value.trim(),
+        optionB: document.getElementById("optionB").value.trim(),
+        optionC: document.getElementById("optionC").value.trim(),
+        optionD: document.getElementById("optionD").value.trim(),
+        answer: document.getElementById("correctAnswer").value
       };
-      const res = await apiPost('addQuestion', payload);
-      setText('questionStatus', res.message || 'Done.');
+
+      const res = await apiRequest("addQuestion", payload, "POST");
+      setStatus("questionStatus", res.message, res.ok);
+
       if (res.ok) {
-        document.getElementById('questionText').value = '';
-        document.getElementById('optionA').value = '';
-        document.getElementById('optionB').value = '';
-        document.getElementById('optionC').value = '';
-        document.getElementById('optionD').value = '';
-        document.getElementById('correctAnswer').value = '';
+        document.getElementById("questionText").value = "";
+        document.getElementById("imageUrl").value = "";
+        document.getElementById("optionA").value = "";
+        document.getElementById("optionB").value = "";
+        document.getElementById("optionC").value = "";
+        document.getElementById("optionD").value = "";
+        document.getElementById("correctAnswer").value = "";
         loadQuestions();
       }
     }
 
-    async function loadCandidates() {
-      const res = await apiPost('listCandidates');
-      const box = document.getElementById('candidateList');
-      if (!res.ok || !(res.data || []).length) {
-        box.innerHTML = '<p>No candidates yet.</p>';
-        return;
-      }
-      box.innerHTML = res.data.map((c, i) => `
-        <div class="list-item"><strong>${i + 1}. ${c.fullName}</strong><br><span class="small">Reg ID: ${c.regId}</span></div>
-      `).join('');
-    }
-
-    async function loadQuestions() {
-      const res = await apiPost('listQuestions');
-      const box = document.getElementById('questionList');
-      if (!res.ok || !(res.data || []).length) {
-        box.innerHTML = '<p>No questions yet.</p>';
-        return;
-      }
-      box.innerHTML = res.data.map((q, i) => `
-        <div class="list-item">
-          <strong>Question ${i + 1}:</strong> ${q.question}<br><br>
-          A. ${q.optionA}<br>
-          B. ${q.optionB}<br>
-          C. ${q.optionC}<br>
-          D. ${q.optionD}<br>
-          <strong>Correct Answer:</strong> ${q.answer}
-        </div>
-      `).join('');
-    }
-
-    async function loadResults() {
-      const res = await apiPost('listResults');
-      const box = document.getElementById('resultsSummary');
-      if (!res.ok || !(res.data || []).length) {
-        box.innerHTML = '<p>No results yet.</p>';
-        return;
-      }
-      let html = '<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Timestamp</th></tr></thead><tbody>';
-      res.data.forEach((r, i) => {
-        html += `<tr><td>${i + 1}</td><td>${r.fullName}</td><td>${r.regId}</td><td>${r.score}</td><td>${r.percentage}%</td><td>${r.timestamp}</td></tr>`;
-      });
-      html += '</tbody></table>';
-      box.innerHTML = html;
-    }
-
     async function clearQuestions() {
-      if (!confirm('Delete all questions?')) return;
-      const res = await apiPost('clearQuestions');
-      alert(res.message || 'Done.');
+      if (!confirm("Delete all questions?")) return;
+      const res = await apiRequest("clearQuestions", {}, "POST");
+      setStatus("questionStatus", res.message, res.ok);
       loadQuestions();
     }
 
     async function clearResults() {
-      if (!confirm('Clear all submitted results?')) return;
-      const res = await apiPost('clearResults');
-      alert(res.message || 'Done.');
+      if (!confirm("Clear all results?")) return;
+      const res = await apiRequest("clearResults", {}, "POST");
+      alert(res.message);
       loadResults();
     }
 
-    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-    document.getElementById('addCandidateBtn').addEventListener('click', addCandidate);
-    document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
-    document.getElementById('refreshBtn').addEventListener('click', loadAll);
-    document.getElementById('clearQuestionsBtn').addEventListener('click', clearQuestions);
-    document.getElementById('clearResultsBtn').addEventListener('click', clearResults);
+    async function loadCandidates() {
+      const box = document.getElementById("candidatesBox");
+      box.innerHTML = "Loading candidates...";
+      const res = await apiRequest("listCandidates", null, "GET");
 
-    loadAll();
+      if (!res.ok) {
+        box.innerHTML = `<div class="error">${res.message}</div>`;
+        return;
+      }
+
+      const list = res.data || [];
+      if (!list.length) {
+        box.innerHTML = "<p>No candidates added yet.</p>";
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Full Name</th>
+              <th>Reg ID</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      list.forEach((item, i) => {
+        html += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.fullName}</td>
+            <td>${item.regId}</td>
+          </tr>
+        `;
+      });
+
+      html += "</tbody></table>";
+      box.innerHTML = html;
+    }
+
+    async function loadQuestions() {
+      const box = document.getElementById("questionsBox");
+      box.innerHTML = "Loading questions...";
+      const res = await apiRequest("listQuestions", null, "GET");
+
+      if (!res.ok) {
+        box.innerHTML = `<div class="error">${res.message}</div>`;
+        return;
+      }
+
+      const list = res.data || [];
+      if (!list.length) {
+        box.innerHTML = "<p>No questions added yet.</p>";
+        return;
+      }
+
+      let html = "";
+      list.forEach((q, i) => {
+        html += `
+          <div class="item">
+            <strong>Question ${i + 1}:</strong> ${q.question}<br>
+            ${q.imageUrl ? `<img src="${q.imageUrl}" alt="Question image" class="question-image-preview">` : ""}
+            <strong>A:</strong> ${q.optionA}<br>
+            <strong>B:</strong> ${q.optionB}<br>
+            <strong>C:</strong> ${q.optionC}<br>
+            <strong>D:</strong> ${q.optionD}<br>
+            <strong>Correct Answer:</strong> ${q.answer}
+          </div>
+        `;
+      });
+
+      box.innerHTML = html;
+    }
+
+    async function loadResults() {
+      const box = document.getElementById("resultsBox");
+      box.innerHTML = "Loading results...";
+      const res = await apiRequest("listResults", null, "GET");
+
+      if (!res.ok) {
+        box.innerHTML = `<div class="error">${res.message}</div>`;
+        return;
+      }
+
+      const list = res.data || [];
+      if (!list.length) {
+        box.innerHTML = "<p>No results yet.</p>";
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Timestamp</th>
+              <th>Full Name</th>
+              <th>Reg ID</th>
+              <th>Score</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      list.forEach((item, i) => {
+        html += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.timestamp}</td>
+            <td>${item.fullName}</td>
+            <td>${item.regId}</td>
+            <td>${item.score}</td>
+            <td>${item.percentage}%</td>
+          </tr>
+        `;
+      });
+
+      html += "</tbody></table>";
+      box.innerHTML = html;
+    }
+
+    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
+    document.getElementById("addCandidateBtn").addEventListener("click", addCandidate);
+    document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
+    document.getElementById("clearQuestionsBtn").addEventListener("click", clearQuestions);
+    document.getElementById("clearResultsBtn").addEventListener("click", clearResults);
+
+    (async function init() {
+      await loadSettings();
+      await loadCandidates();
+      await loadQuestions();
+      await loadResults();
+    })();
   </script>
 </body>
 </html>
