@@ -179,80 +179,594 @@
 
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
+
 let lastGeneratedCsv = "", lastGeneratedFilename = "student_accounts_passwords.csv";
 let candidatesData = [], questionsData = [], resultsData = [], accountsData = [];
-const resultRegId=document.getElementById('resultRegId'), resultFullName=document.getElementById('resultFullName'), resultRawScore=document.getElementById('resultRawScore'), resultTotalQuestions=document.getElementById('resultTotalQuestions'), resultPassedNos=document.getElementById('resultPassedNos'), resultFailedNos=document.getElementById('resultFailedNos'), resultReason=document.getElementById('resultReason');
+
+const resultRegId=document.getElementById('resultRegId'),
+      resultFullName=document.getElementById('resultFullName'),
+      resultRawScore=document.getElementById('resultRawScore'),
+      resultTotalQuestions=document.getElementById('resultTotalQuestions'),
+      resultPassedNos=document.getElementById('resultPassedNos'),
+      resultFailedNos=document.getElementById('resultFailedNos'),
+      resultReason=document.getElementById('resultReason');
+
 function getToken(){ return localStorage.getItem("cbt_auth_token") || ""; }
-function setAuth(data){ localStorage.setItem("cbt_auth_token", data.token); localStorage.setItem("cbt_auth_role", data.role); localStorage.setItem("cbt_auth_username", data.username); }
-function clearAuth(){ localStorage.removeItem("cbt_auth_token"); localStorage.removeItem("cbt_auth_role"); localStorage.removeItem("cbt_auth_username"); }
+function setAuth(data){
+  localStorage.setItem("cbt_auth_token", data.token);
+  localStorage.setItem("cbt_auth_role", data.role);
+  localStorage.setItem("cbt_auth_username", data.username);
+}
+function clearAuth(){
+  localStorage.removeItem("cbt_auth_token");
+  localStorage.removeItem("cbt_auth_role");
+  localStorage.removeItem("cbt_auth_username");
+}
+
 async function apiRequest(action, payload=null, method="POST"){
   try{
     payload = payload || {};
-    if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
+
+    if (!payload.token && action !== "login" && action !== "signup") {
+      payload.token = getToken();
+    }
+
+    let response;
+
     if (method === "GET"){
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
-      url.searchParams.set("payload", JSON.stringify(payload));
-      const res = await fetch(url.toString());
-      return await res.json();
+
+      Object.keys(payload).forEach((key) => {
+        const value = payload[key];
+        if (value !== undefined && value !== null) {
+          url.searchParams.set(
+            key,
+            typeof value === "object" ? JSON.stringify(value) : String(value)
+          );
+        }
+      });
+
+      response = await fetch(url.toString(), { method: "GET" });
+    } else {
+      const form = new URLSearchParams();
+      form.set("action", action);
+      form.set("payload", JSON.stringify(payload));
+
+      response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body: form.toString()
+      });
     }
-    const res = await fetch(APPS_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action, payload})});
-    return await res.json();
-  }catch(error){ return {ok:false, message:error.message || "Network error."}; }
+
+    const text = await response.text();
+
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      return {
+        ok:false,
+        message:"Server returned non-JSON response.",
+        raw:text
+      };
+    }
+  }catch(error){
+    return {
+      ok:false,
+      message:error.message || "Failed to fetch."
+    };
+  }
 }
-function setStatus(id, message, ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
-function downloadText(filename, text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
-function splitCsvLine(line){ const result=[]; let current="", inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; } if(ch==='"'){ inQuotes=!inQuotes; continue; } if(ch===',' && !inQuotes){ result.push(current); current=""; continue; } current+=ch; } result.push(current); return result; }
-function parseCsv(text){ const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim()); if(!lines.length) return []; const rows=lines.map(splitCsvLine); const headers=rows[0].map(h=>h.trim()); return rows.slice(1).map(cols=>{ const obj={}; headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim()); return obj; }); }
+
+function setStatus(id, message, ok=false){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.className="status "+(ok?"ok":"error");
+  el.textContent=message||"";
+}
+
+function downloadText(filename, text){
+  const blob=new Blob([text], {type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function splitCsvLine(line){
+  const result=[]; let current="", inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; }
+    if(ch==='"'){ inQuotes=!inQuotes; continue; }
+    if(ch===',' && !inQuotes){ result.push(current); current=""; continue; }
+    current+=ch;
+  }
+  result.push(current);
+  return result;
+}
+
+function parseCsv(text){
+  const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim());
+  if(!lines.length) return [];
+  const rows=lines.map(splitCsvLine);
+  const headers=rows[0].map(h=>h.trim());
+  return rows.slice(1).map(cols=>{
+    const obj={};
+    headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim());
+    return obj;
+  });
+}
+
 async function fileToText(file){ return await file.text(); }
-async function validatePortal(role){ const token=getToken(); if(!token) return false; const res=await apiRequest("validateSession", {token}, "POST"); if(!res.ok || !res.data || res.data.role!==role){ clearAuth(); return false; } return true; }
-async function showPortal(){ authSection.classList.add("hidden"); portalSection.classList.remove("hidden"); logoutBtn.classList.remove("hidden"); await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadQuestions(), loadResults()]); }
-async function signupAdmin(){ const res=await apiRequest("signup", {fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value, role:"admin"}, "POST"); setStatus("signupStatus", res.message, res.ok); }
-async function loginAdmin(){ const res=await apiRequest("login", {username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"}, "POST"); setStatus("loginStatus", res.message, res.ok); if(res.ok && res.data){ setAuth(res.data); await showPortal(); } }
-async function logoutCurrent(){ await apiRequest("logout", {token:getToken()}, "POST"); clearAuth(); location.reload(); }
-async function loadSettings(){ const res=await apiRequest("getSettings", {}, "GET"); if(res.ok && res.data){ examTitle.value=res.data.examTitle||""; durationMinutes.value=res.data.durationMinutes||20; portalLocked.checked=!!res.data.portalLocked; portalNotice.value=res.data.portalNotice||""; } }
-async function saveSettings(){ const res=await apiRequest("saveSettings", {examTitle:examTitle.value.trim(), durationMinutes:durationMinutes.value.trim(), portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()}, "POST"); setStatus("settingsStatus", res.message, res.ok); }
 
-function resetCandidateForm(){ candidateFormTitle.textContent="Add Candidate Manually"; candidateOldRegId.value=""; candidateName.value=""; candidateRegId.value=""; addCandidateBtn.classList.remove("hidden"); updateCandidateBtn.classList.add("hidden"); cancelCandidateEditBtn.classList.add("hidden"); }
-async function addCandidate(){ const res=await apiRequest("addCandidate", {fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ resetCandidateForm(); loadCandidates(); loadStudentAccounts(); } }
-window.startCandidateEdit = function(regId){ const item=candidatesData.find(x=>String(x.regId)===String(regId)); if(!item) return; candidateFormTitle.textContent="Edit Candidate"; candidateOldRegId.value=item.regId; candidateName.value=item.fullName; candidateRegId.value=item.regId; addCandidateBtn.classList.add("hidden"); updateCandidateBtn.classList.remove("hidden"); cancelCandidateEditBtn.classList.remove("hidden"); window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function updateCandidate(){ const res=await apiRequest("updateCandidate", {oldRegId:candidateOldRegId.value.trim(), fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ resetCandidateForm(); loadCandidates(); loadStudentAccounts(); loadResults(); } }
-window.deleteCandidateItem = async function(regId){ if(!confirm(`Delete candidate ${regId}? This also removes the linked student account, but keeps any old results.`)) return; const res=await apiRequest("deleteCandidate", {regId}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ loadCandidates(); loadStudentAccounts(); } }
-async function importCandidates(){ const file=candidateCsvFile.files[0]; if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first."); const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importCandidates", {rows}, "POST"); setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok); if(res.ok) loadCandidates(); }
-async function loadCandidates(){ candidatesBox.innerHTML="Loading candidates..."; const res=await apiRequest("listCandidates", {}, "GET"); if(!res.ok){ candidatesBox.innerHTML=`<div class="error">${res.message}</div>`; return; } candidatesData = res.data || []; renderCandidates(); }
-function renderCandidates(){ const q=(candidateSearch.value||"").trim().toLowerCase(); const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q)); if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safeReg=String(item.regId).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger nowrap" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`; }); candidatesBox.innerHTML = html + "</tbody></table>"; }
+async function validatePortal(role){
+  const token=getToken();
+  if(!token) return false;
+  const res=await apiRequest("validateSession", {token}, "POST");
+  if(!res.ok || !res.data || res.data.role!==role){
+    clearAuth();
+    return false;
+  }
+  return true;
+}
 
-async function loadStudentAccounts(){ accountsListBox.innerHTML="Loading student accounts..."; const res=await apiRequest("listStudentAccounts", {}, "GET"); if(!res.ok){ accountsListBox.innerHTML=`<div class="error">${res.message}</div>`; return; } accountsData = res.data || []; renderAccounts(); }
-function renderAccounts(){ const q=(accountSearch.value||"").trim().toLowerCase(); const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td>${item.isActive ? 'Active' : 'Inactive'}</td><td><button type="button" class="muted nowrap" onclick="prefillReset('${String(item.username).replace(/'/g, "&#39;")}')">Use Username</button></td></tr>`); accountsListBox.innerHTML = html + "</tbody></table>"; }
-window.prefillReset = function(username){ resetUsername.value = username; resetPassword.focus(); window.scrollTo({top: resetUsername.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function resetStudentPassword(){ const payload={username:resetUsername.value.trim(), newPassword:resetPassword.value.trim(), autoGenerate: !resetPassword.value.trim(), passwordLength: passwordLength.value}; const res=await apiRequest("resetStudentPassword", payload, "POST"); if(res.ok && res.data){ const msg = `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`; setStatus("resetPasswordStatus", msg, true); resetPassword.value=""; resetUsername.value=""; } else { setStatus("resetPasswordStatus", res.message, false); } }
+async function showPortal(){
+  authSection.classList.add("hidden");
+  portalSection.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+  await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadQuestions(), loadResults()]);
+}
 
-function resetQuestionForm(){ questionFormTitle.textContent="Add Question Manually"; questionId.value=""; [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value=""); correctAnswer.value=""; addQuestionBtn.classList.remove("hidden"); updateQuestionBtn.classList.add("hidden"); cancelQuestionEditBtn.classList.add("hidden"); }
-async function addQuestion(){ const res=await apiRequest("addQuestion", {question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ resetQuestionForm(); loadQuestions(); } }
-window.startQuestionEdit = function(id){ const item=questionsData.find(x=>String(x.id)===String(id)); if(!item) return; questionFormTitle.textContent="Edit Question"; questionId.value=item.id; questionText.value=item.question||""; imageUrl.value=item.imageUrl||""; optionA.value=item.optionA||""; optionB.value=item.optionB||""; optionC.value=item.optionC||""; optionD.value=item.optionD||""; correctAnswer.value=item.answer||""; addQuestionBtn.classList.add("hidden"); updateQuestionBtn.classList.remove("hidden"); cancelQuestionEditBtn.classList.remove("hidden"); window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function updateQuestion(){ const res=await apiRequest("updateQuestion", {id:questionId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ resetQuestionForm(); loadQuestions(); } }
-window.deleteQuestionItem = async function(id){ if(!confirm("Delete this question?")) return; const res=await apiRequest("deleteQuestion", {id}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ loadQuestions(); } }
-async function importQuestions(){ const file=questionCsvFile.files[0]; if(!file) return setStatus("questionImportStatus", "Choose a CSV file first."); const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importQuestions", {rows}, "POST"); setStatus("questionImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok); if(res.ok) loadQuestions(); }
-async function clearQuestions(){ if(!confirm("Delete all questions?")) return; const res=await apiRequest("clearQuestions", {}, "POST"); setStatus("questionStatus", res.message, res.ok); loadQuestions(); }
-async function loadQuestions(){ questionsBox.innerHTML="Loading questions..."; const res=await apiRequest("listQuestions", {}, "GET"); if(!res.ok){ questionsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } questionsData = res.data || []; renderQuestions(); }
-function renderQuestions(){ const q=(questionSearch.value||"").trim().toLowerCase(); const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q)); if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>"; questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join(""); }
+async function signupAdmin(){
+  const res=await apiRequest("signup", {
+    fullName:signupFullName.value.trim(),
+    username:signupUsername.value.trim(),
+    password:signupPassword.value,
+    adminKey:signupAdminKey.value,
+    role:"admin"
+  }, "POST");
+  setStatus("signupStatus", res.message, res.ok);
+}
 
-function resetResultForm(){ [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value=''); }
-async function loadResults(){ resultsBox.innerHTML="Loading results..."; const res=await apiRequest("listResults", {}, "GET"); if(!res.ok){ resultsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } resultsData = res.data || []; renderResults(); }
-function renderResults(){ const q=(resultsSearch.value||"").trim().toLowerCase(); const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q)); if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger nowrap" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted nowrap" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`); resultsBox.innerHTML = html + "</tbody></table>"; }
-window.startResultEdit = function(regId){ const item=resultsData.find(x=>String(x.regId)===String(regId)); if(!item) return; resultRegId.value=item.regId||''; resultFullName.value=item.fullName||''; resultRawScore.value=item.rawScore||0; resultTotalQuestions.value=item.totalQuestions||0; resultPassedNos.value=item.passedNos||''; resultFailedNos.value=item.failedNos||''; resultReason.value=''; window.scrollTo({top: resultRegId.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function updateResult(){ const res=await apiRequest('updateResult', {regId:resultRegId.value.trim(), fullName:resultFullName.value.trim(), rawScore:resultRawScore.value, totalQuestions:resultTotalQuestions.value, passedNos:resultPassedNos.value.trim(), failedNos:resultFailedNos.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
-window.invalidateResultItem = async function(regId){ const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || ''; const res=await apiRequest('invalidateResult', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); loadResults(); } }
-async function invalidateResult(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
-window.reopenCandidateItem = async function(regId){ const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || ''; const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); loadResults(); } }
-async function reopenCandidateExam(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
-async function clearResults(){ if(!confirm("Clear all results?")) return; const res=await apiRequest("clearResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); loadResults(); }
-async function exportResults(){ const res=await apiRequest("exportResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv); }
-async function generateAccounts(){ const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST"); setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok); if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv"; downloadText(lastGeneratedFilename, lastGeneratedCsv); loadStudentAccounts(); } }
-function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet."); downloadText(lastGeneratedFilename, lastGeneratedCsv); }
+async function loginAdmin(){
+  const res=await apiRequest("login", {
+    username:loginUsername.value.trim(),
+    password:loginPassword.value,
+    role:"admin"
+  }, "POST");
+  setStatus("loginStatus", res.message, res.ok);
+  if(res.ok && res.data){
+    setAuth(res.data);
+    await showPortal();
+  }
+}
 
-signupBtn.addEventListener("click", signupAdmin); loginBtn.addEventListener("click", loginAdmin); logoutBtn.addEventListener("click", logoutCurrent); saveSettingsBtn.addEventListener("click", saveSettings); addCandidateBtn.addEventListener("click", addCandidate); updateCandidateBtn.addEventListener("click", updateCandidate); cancelCandidateEditBtn.addEventListener("click", resetCandidateForm); importCandidatesBtn.addEventListener("click", importCandidates); addQuestionBtn.addEventListener("click", addQuestion); updateQuestionBtn.addEventListener("click", updateQuestion); cancelQuestionEditBtn.addEventListener("click", resetQuestionForm); importQuestionsBtn.addEventListener("click", importQuestions); clearQuestionsBtn.addEventListener("click", clearQuestions); clearResultsBtn.addEventListener("click", clearResults); exportResultsBtn.addEventListener("click", exportResults); generateAccountsBtn.addEventListener("click", generateAccounts); downloadGeneratedBtn.addEventListener("click", downloadLastGenerated); resetPasswordBtn.addEventListener("click", resetStudentPassword); candidateSearch.addEventListener("input", renderCandidates); accountSearch.addEventListener("input", renderAccounts); questionSearch.addEventListener("input", renderQuestions); resultsSearch.addEventListener("input", renderResults); updateResultBtn.addEventListener("click", updateResult); invalidateResultBtn.addEventListener("click", invalidateResult); reopenExamBtn.addEventListener("click", reopenCandidateExam); cancelResultEditBtn.addEventListener("click", resetResultForm);
-(async function init(){ if(await validatePortal("admin")) await showPortal(); })();
+async function logoutCurrent(){
+  await apiRequest("logout", {token:getToken()}, "POST");
+  clearAuth();
+  location.reload();
+}
+
+async function loadSettings(){
+  const res=await apiRequest("getSettings", {}, "GET");
+  if(res.ok && res.data){
+    examTitle.value=res.data.examTitle||"";
+    durationMinutes.value=res.data.durationMinutes||20;
+    portalLocked.checked=!!res.data.portalLocked;
+    portalNotice.value=res.data.portalNotice||"";
+  }
+}
+
+async function saveSettings(){
+  const res=await apiRequest("saveSettings", {
+    examTitle:examTitle.value.trim(),
+    durationMinutes:durationMinutes.value.trim(),
+    portalLocked:portalLocked.checked,
+    portalNotice:portalNotice.value.trim()
+  }, "POST");
+  setStatus("settingsStatus", res.message, res.ok);
+}
+
+function resetCandidateForm(){
+  candidateFormTitle.textContent="Add Candidate Manually";
+  candidateOldRegId.value="";
+  candidateName.value="";
+  candidateRegId.value="";
+  addCandidateBtn.classList.remove("hidden");
+  updateCandidateBtn.classList.add("hidden");
+  cancelCandidateEditBtn.classList.add("hidden");
+}
+
+async function addCandidate(){
+  const res=await apiRequest("addCandidate", {
+    fullName:candidateName.value.trim(),
+    regId:candidateRegId.value.trim()
+  }, "POST");
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){
+    resetCandidateForm();
+    loadCandidates();
+    loadStudentAccounts();
+  }
+}
+
+window.startCandidateEdit = function(regId){
+  const item=candidatesData.find(x=>String(x.regId)===String(regId));
+  if(!item) return;
+  candidateFormTitle.textContent="Edit Candidate";
+  candidateOldRegId.value=item.regId;
+  candidateName.value=item.fullName;
+  candidateRegId.value=item.regId;
+  addCandidateBtn.classList.add("hidden");
+  updateCandidateBtn.classList.remove("hidden");
+  cancelCandidateEditBtn.classList.remove("hidden");
+  window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
+}
+
+async function updateCandidate(){
+  const res=await apiRequest("updateCandidate", {
+    oldRegId:candidateOldRegId.value.trim(),
+    fullName:candidateName.value.trim(),
+    regId:candidateRegId.value.trim()
+  }, "POST");
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){
+    resetCandidateForm();
+    loadCandidates();
+    loadStudentAccounts();
+    loadResults();
+  }
+}
+
+window.deleteCandidateItem = async function(regId){
+  if(!confirm(`Delete candidate ${regId}? This also removes the linked student account, but keeps any old results.`)) return;
+  const res=await apiRequest("deleteCandidate", {regId}, "POST");
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){
+    loadCandidates();
+    loadStudentAccounts();
+  }
+}
+
+async function importCandidates(){
+  const file=candidateCsvFile.files[0];
+  if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first.");
+  const rows=parseCsv(await fileToText(file));
+  const res=await apiRequest("importCandidates", {rows}, "POST");
+  setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
+  if(res.ok) loadCandidates();
+}
+
+async function loadCandidates(){
+  candidatesBox.innerHTML="Loading candidates...";
+  const res=await apiRequest("listCandidates", {}, "GET");
+  if(!res.ok){
+    candidatesBox.innerHTML=`<div class="error">${res.message}</div>`;
+    return;
+  }
+  candidatesData = res.data || [];
+  renderCandidates();
+}
+
+function renderCandidates(){
+  const q=(candidateSearch.value||"").trim().toLowerCase();
+  const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q));
+  if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>";
+  let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`;
+  list.forEach((item,i)=> {
+    const safeReg=String(item.regId).replace(/'/g, "&#39;");
+    html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger nowrap" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`;
+  });
+  candidatesBox.innerHTML = html + "</tbody></table>";
+}
+
+async function loadStudentAccounts(){
+  accountsListBox.innerHTML="Loading student accounts...";
+  const res=await apiRequest("listStudentAccounts", {}, "GET");
+  if(!res.ok){
+    accountsListBox.innerHTML=`<div class="error">${res.message}</div>`;
+    return;
+  }
+  accountsData = res.data || [];
+  renderAccounts();
+}
+
+function renderAccounts(){
+  const q=(accountSearch.value||"").trim().toLowerCase();
+  const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q));
+  if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>";
+  let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+  list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td>${item.isActive ? 'Active' : 'Inactive'}</td><td><button type="button" class="muted nowrap" onclick="prefillReset('${String(item.username).replace(/'/g, "&#39;")}')">Use Username</button></td></tr>`);
+  accountsListBox.innerHTML = html + "</tbody></table>";
+}
+
+window.prefillReset = function(username){
+  resetUsername.value = username;
+  resetPassword.focus();
+  window.scrollTo({top: resetUsername.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
+}
+
+async function resetStudentPassword(){
+  const payload={
+    username:resetUsername.value.trim(),
+    newPassword:resetPassword.value.trim(),
+    autoGenerate: !resetPassword.value.trim(),
+    passwordLength: passwordLength.value
+  };
+  const res=await apiRequest("resetStudentPassword", payload, "POST");
+  if(res.ok && res.data){
+    const msg = `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`;
+    setStatus("resetPasswordStatus", msg, true);
+    resetPassword.value="";
+    resetUsername.value="";
+  } else {
+    setStatus("resetPasswordStatus", res.message, false);
+  }
+}
+
+function resetQuestionForm(){
+  questionFormTitle.textContent="Add Question Manually";
+  questionId.value="";
+  [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value="");
+  correctAnswer.value="";
+  addQuestionBtn.classList.remove("hidden");
+  updateQuestionBtn.classList.add("hidden");
+  cancelQuestionEditBtn.classList.add("hidden");
+}
+
+async function addQuestion(){
+  const res=await apiRequest("addQuestion", {
+    question:questionText.value.trim(),
+    imageUrl:imageUrl.value.trim(),
+    optionA:optionA.value.trim(),
+    optionB:optionB.value.trim(),
+    optionC:optionC.value.trim(),
+    optionD:optionD.value.trim(),
+    answer:correctAnswer.value
+  }, "POST");
+  setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){
+    resetQuestionForm();
+    loadQuestions();
+  }
+}
+
+window.startQuestionEdit = function(id){
+  const item=questionsData.find(x=>String(x.id)===String(id));
+  if(!item) return;
+  questionFormTitle.textContent="Edit Question";
+  questionId.value=item.id;
+  questionText.value=item.question||"";
+  imageUrl.value=item.imageUrl||"";
+  optionA.value=item.optionA||"";
+  optionB.value=item.optionB||"";
+  optionC.value=item.optionC||"";
+  optionD.value=item.optionD||"";
+  correctAnswer.value=item.answer||"";
+  addQuestionBtn.classList.add("hidden");
+  updateQuestionBtn.classList.remove("hidden");
+  cancelQuestionEditBtn.classList.remove("hidden");
+  window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
+}
+
+async function updateQuestion(){
+  const res=await apiRequest("updateQuestion", {
+    id:questionId.value.trim(),
+    question:questionText.value.trim(),
+    imageUrl:imageUrl.value.trim(),
+    optionA:optionA.value.trim(),
+    optionB:optionB.value.trim(),
+    optionC:optionC.value.trim(),
+    optionD:optionD.value.trim(),
+    answer:correctAnswer.value
+  }, "POST");
+  setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){
+    resetQuestionForm();
+    loadQuestions();
+  }
+}
+
+window.deleteQuestionItem = async function(id){
+  if(!confirm("Delete this question?")) return;
+  const res=await apiRequest("deleteQuestion", {id}, "POST");
+  setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){
+    loadQuestions();
+  }
+}
+
+async function importQuestions(){
+  const file=questionCsvFile.files[0];
+  if(!file) return setStatus("questionImportStatus", "Choose a CSV file first.");
+  const rows=parseCsv(await fileToText(file));
+  const res=await apiRequest("importQuestions", {rows}, "POST");
+  setStatus("questionImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
+  if(res.ok) loadQuestions();
+}
+
+async function clearQuestions(){
+  if(!confirm("Delete all questions?")) return;
+  const res=await apiRequest("clearQuestions", {}, "POST");
+  setStatus("questionStatus", res.message, res.ok);
+  loadQuestions();
+}
+
+async function loadQuestions(){
+  questionsBox.innerHTML="Loading questions...";
+  const res=await apiRequest("listQuestions", {}, "GET");
+  if(!res.ok){
+    questionsBox.innerHTML=`<div class="error">${res.message}</div>`;
+    return;
+  }
+  questionsData = res.data || [];
+  renderQuestions();
+}
+
+function renderQuestions(){
+  const q=(questionSearch.value||"").trim().toLowerCase();
+  const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
+  if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>";
+  questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join("");
+}
+
+function resetResultForm(){
+  [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value='');
+}
+
+async function loadResults(){
+  resultsBox.innerHTML="Loading results...";
+  const res=await apiRequest("listResults", {}, "GET");
+  if(!res.ok){
+    resultsBox.innerHTML=`<div class="error">${res.message}</div>`;
+    return;
+  }
+  resultsData = res.data || [];
+  renderResults();
+}
+
+function renderResults(){
+  const q=(resultsSearch.value||"").trim().toLowerCase();
+  const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q));
+  if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>";
+  let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`;
+  list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger nowrap" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted nowrap" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`);
+  resultsBox.innerHTML = html + "</tbody></table>";
+}
+
+window.startResultEdit = function(regId){
+  const item=resultsData.find(x=>String(x.regId)===String(regId));
+  if(!item) return;
+  resultRegId.value=item.regId||'';
+  resultFullName.value=item.fullName||'';
+  resultRawScore.value=item.rawScore||0;
+  resultTotalQuestions.value=item.totalQuestions||0;
+  resultPassedNos.value=item.passedNos||'';
+  resultFailedNos.value=item.failedNos||'';
+  resultReason.value='';
+  window.scrollTo({top: resultRegId.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
+}
+
+async function updateResult(){
+  const res=await apiRequest('updateResult', {
+    regId:resultRegId.value.trim(),
+    fullName:resultFullName.value.trim(),
+    rawScore:resultRawScore.value,
+    totalQuestions:resultTotalQuestions.value,
+    passedNos:resultPassedNos.value.trim(),
+    failedNos:resultFailedNos.value.trim()
+  }, 'POST');
+  setStatus('resultsStatus', res.message, res.ok);
+  if(res.ok){
+    resetResultForm();
+    loadResults();
+  }
+}
+
+window.invalidateResultItem = async function(regId){
+  const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || '';
+  const res=await apiRequest('invalidateResult', {regId, reason}, 'POST');
+  setStatus('resultsStatus', res.message, res.ok);
+  if(res.ok){
+    if(resultRegId.value===regId) resetResultForm();
+    loadResults();
+  }
+}
+
+async function invalidateResult(){
+  if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.');
+  const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST');
+  setStatus('resultsStatus', res.message, res.ok);
+  if(res.ok){
+    resetResultForm();
+    loadResults();
+  }
+}
+
+window.reopenCandidateItem = async function(regId){
+  const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || '';
+  const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST');
+  setStatus('resultsStatus', res.message, res.ok);
+  if(res.ok){
+    if(resultRegId.value===regId) resetResultForm();
+    loadResults();
+  }
+}
+
+async function reopenCandidateExam(){
+  if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.');
+  const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST');
+  setStatus('resultsStatus', res.message, res.ok);
+  if(res.ok){
+    resetResultForm();
+    loadResults();
+  }
+}
+
+async function clearResults(){
+  if(!confirm("Clear all results?")) return;
+  const res=await apiRequest("clearResults", {}, "POST");
+  setStatus("resultsStatus", res.message, res.ok);
+  loadResults();
+}
+
+async function exportResults(){
+  const res=await apiRequest("exportResults", {}, "POST");
+  setStatus("resultsStatus", res.message, res.ok);
+  if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv);
+}
+
+async function generateAccounts(){
+  const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST");
+  setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok);
+  if(res.ok && res.data && res.data.csv){
+    lastGeneratedCsv=res.data.csv;
+    lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv";
+    downloadText(lastGeneratedFilename, lastGeneratedCsv);
+    loadStudentAccounts();
+  }
+}
+
+function downloadLastGenerated(){
+  if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet.");
+  downloadText(lastGeneratedFilename, lastGeneratedCsv);
+}
+
+signupBtn.addEventListener("click", signupAdmin);
+loginBtn.addEventListener("click", loginAdmin);
+logoutBtn.addEventListener("click", logoutCurrent);
+saveSettingsBtn.addEventListener("click", saveSettings);
+addCandidateBtn.addEventListener("click", addCandidate);
+updateCandidateBtn.addEventListener("click", updateCandidate);
+cancelCandidateEditBtn.addEventListener("click", resetCandidateForm);
+importCandidatesBtn.addEventListener("click", importCandidates);
+addQuestionBtn.addEventListener("click", addQuestion);
+updateQuestionBtn.addEventListener("click", updateQuestion);
+cancelQuestionEditBtn.addEventListener("click", resetQuestionForm);
+importQuestionsBtn.addEventListener("click", importQuestions);
+clearQuestionsBtn.addEventListener("click", clearQuestions);
+clearResultsBtn.addEventListener("click", clearResults);
+exportResultsBtn.addEventListener("click", exportResults);
+generateAccountsBtn.addEventListener("click", generateAccounts);
+downloadGeneratedBtn.addEventListener("click", downloadLastGenerated);
+resetPasswordBtn.addEventListener("click", resetStudentPassword);
+candidateSearch.addEventListener("input", renderCandidates);
+accountSearch.addEventListener("input", renderAccounts);
+questionSearch.addEventListener("input", renderQuestions);
+resultsSearch.addEventListener("input", renderResults);
+updateResultBtn.addEventListener("click", updateResult);
+invalidateResultBtn.addEventListener("click", invalidateResult);
+reopenExamBtn.addEventListener("click", reopenCandidateExam);
+cancelResultEditBtn.addEventListener("click", resetResultForm);
+
+(async function init(){
+  if(await validatePortal("admin")) await showPortal();
+})();
 </script>
 </body>
 </html>
