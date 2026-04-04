@@ -39,7 +39,20 @@ button:hover{transform:translateY(-1px)}
 .question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
 .option{display:block;padding:12px;margin-bottom:10px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer;line-height:1.5}
 .option input{margin-right:8px}
-.result-box{line-height:1.9;font-size:16px}
+.result-box{line-height:1.8;font-size:15px}
+.report-card{border:1px solid #dbe4f3;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#ffffff,#f8fbff);box-shadow:0 18px 44px rgba(37,99,235,.10)}
+.report-head{background:linear-gradient(135deg,#1e3a8a,#4338ca 60%,#0ea5e9);color:#fff;padding:22px 18px}
+.report-brand{font-size:1.15rem;font-weight:800;letter-spacing:.3px}
+.report-sub{opacity:.92;margin-top:4px;font-size:13px}
+.report-status{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;font-weight:800;font-size:12px;margin-top:14px}
+.report-status.pass{background:#dcfce7;color:#166534}
+.report-status.fail{background:#fee2e2;color:#b91c1c}
+.report-body{padding:18px}
+.report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.report-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+.report-item-label{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:4px}
+.report-item-value{font-weight:800;font-size:1rem;color:var(--text)}
+.report-message{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:14px;margin-top:10px}
 .review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
 .pass{color:#166534;font-weight:700}
 .fail{color:#b91c1c;font-weight:700}
@@ -50,7 +63,7 @@ button:hover{transform:translateY(-1px)}
 .spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:#4338ca;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:900px){.auth-wrap{grid-template-columns:1fr}}
-@media (max-width:640px){.container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px}.timer{top:70px}.actions{flex-direction:column}.actions>*{width:100%}}
+@media (max-width:640px){.container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px}.timer{top:70px}.actions{flex-direction:column}.actions>*{width:100%}.report-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -125,6 +138,9 @@ button:hover{transform:translateY(-1px)}
     <div class="card hidden" id="resultCard">
       <h2>Exam Submitted</h2>
       <div class="result-box" id="resultBox"></div>
+      <div class="actions" style="margin-top:14px">
+        <button id="printResultBtn" type="button" class="ghost">Print Result</button>
+      </div>
       <div id="reviewSection" class="hidden" style="margin-top:18px">
         <h3>Answer Review</h3>
         <div id="reviewList"></div>
@@ -423,29 +439,36 @@ async function submitExam(){
   $("resultCard").classList.remove("hidden");
 
   const d = res.data || {};
-  let html = `
-    <strong>Full Name:</strong> ${esc(d.fullName || "")}<br>
-    <strong>Reg ID:</strong> ${esc(d.regId || "")}<br>
-    <strong>Exam Code:</strong> ${esc(d.examCode || "")}<br>
-    <strong>Attempt:</strong> ${esc(d.attemptNo || "")}<br>
-    <strong>Pass Mark:</strong> ${esc(d.passMark || 0)}%<br>
-    <strong>Result Status:</strong> ${esc(d.passedStatus || "")}<br>
-    <strong>Message:</strong> ${esc(d.statusMessage || "")}<br>
-  `;
+  const passed = String(d.passedStatus || '').toUpperCase() === 'PASSED';
+  let scoreCards = d.showScoreSummary ? `
+    <div class="report-grid">
+      <div class="report-item"><div class="report-item-label">Score</div><div class="report-item-value">${esc(d.score || 0)} / ${esc(d.total || 0)}</div></div>
+      <div class="report-item"><div class="report-item-label">Percentage</div><div class="report-item-value">${esc(d.percentage || 0)}%</div></div>
+      <div class="report-item"><div class="report-item-label">Pass Mark</div><div class="report-item-value">${esc(d.passMark || 0)}%</div></div>
+      <div class="report-item"><div class="report-item-label">Ranking</div><div class="report-item-value">${esc(d.ranking || '—')}</div></div>
+      <div class="report-item"><div class="report-item-label">Passed Questions</div><div class="report-item-value">${esc(d.passedNos || 'None')}</div></div>
+      <div class="report-item"><div class="report-item-label">Failed Questions</div><div class="report-item-value">${esc(d.failedNos || 'None')}</div></div>
+    </div>` : `
+    <div class="report-message">Your score summary is hidden for this exam. Contact the exam administrator if you need more details.</div>`;
 
-  if(d.showScoreSummary){
-    html += `
-      <strong>Score:</strong> ${esc(d.score || 0)} / ${esc(d.total || 0)}<br>
-      <strong>Percentage:</strong> ${esc(d.percentage || 0)}%<br>
-      <strong>Ranking:</strong> ${esc(d.ranking || "")}<br>
-      <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
-      <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}<br>
-    `;
-  } else {
-    html += `<strong>Notice:</strong> Your score summary is hidden for this exam.<br>`;
-  }
-
-  $("resultBox").innerHTML = html;
+  $("resultBox").innerHTML = `
+    <div class="report-card">
+      <div class="report-head">
+        <div class="report-brand">Genz Edutech Innovation</div>
+        <div class="report-sub">Student Result Report</div>
+        <div class="report-status ${passed ? 'pass' : 'fail'}">${esc(d.passedStatus || '')}</div>
+      </div>
+      <div class="report-body">
+        <div class="report-grid">
+          <div class="report-item"><div class="report-item-label">Student Name</div><div class="report-item-value">${esc(d.fullName || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Registration ID</div><div class="report-item-value">${esc(d.regId || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Exam Code</div><div class="report-item-value">${esc(d.examCode || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Attempt</div><div class="report-item-value">${esc(d.attemptNo || '')}</div></div>
+        </div>
+        ${scoreCards}
+        <div class="report-message"><strong>Remark:</strong> ${esc(d.statusMessage || '')}</div>
+      </div>
+    </div>`;
   renderReview(d.allowReview ? (d.review || []) : []);
 }
 
@@ -459,6 +482,7 @@ $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
 $("prevBtn").addEventListener("click", prevQuestion);
 $("nextBtn").addEventListener("click", nextQuestion);
+$("printResultBtn").addEventListener("click", function(){ window.print(); });
 
 (async function init(){ if(await validatePortal("student")) await showPortal(); })();
 </script>
