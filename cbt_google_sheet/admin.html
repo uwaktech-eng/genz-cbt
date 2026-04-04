@@ -265,6 +265,7 @@ button[disabled]{transform:none!important;box-shadow:none!important}
           <button class="ghost" id="importQuestionsBtn" type="button">Import Questions CSV</button>
           <button class="danger" id="deleteSelectedQuestionsBtn" type="button">Delete Selected</button>
           <button class="success" id="restoreSelectedQuestionsBtn" type="button">Restore Selected</button>
+          <button class="danger" id="hardDeleteSelectedQuestionsBtn" type="button">Delete Selected Forever</button>
           <button class="danger" id="clearQuestionsBtn" type="button">Delete All Active Questions</button>
         </div>
         <div id="questionStatus" class="status"></div>
@@ -327,7 +328,12 @@ button[disabled]{transform:none!important;box-shadow:none!important}
       </div>
 
       <div class="card full">
-        <h2>Permission Codes</h2>
+        <div class="actions" style="justify-content:space-between;align-items:center">
+          <h2>Permission Codes</h2>
+          <div class="actions">
+            <button class="danger" id="clearPermissionCodesBtn" type="button">Delete All Permission Codes</button>
+          </div>
+        </div>
         <div id="permissionCodesBox"></div>
       </div>
 
@@ -956,6 +962,27 @@ async function bulkRestoreSelectedQuestions(){
   hideLoader(); setStatus("questionStatus", res.message, res.ok);
   if(res.ok){ selectedQuestionIds.clear(); await loadQuestionsForSelectedExam(); }
 }
+async function bulkHardDeleteSelectedQuestions(){
+  const examCode=$("questionExamSelect").value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  const ids = Array.from(selectedQuestionIds);
+  if(!ids.length) return setStatus("questionStatus","Select at least one question.");
+  if(!confirm(`Delete ${ids.length} selected deleted question(s) forever? This cannot be undone.`)) return;
+  showLoader("Deleting selected questions forever...");
+  const res=await apiRequest("bulkHardDeleteQuestionsByExam",{examCode, questionIds: ids},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ selectedQuestionIds.clear(); await loadQuestionsForSelectedExam(); }
+}
+
+async function hardDeleteQuestionItem(questionId){
+  const examCode=$("questionExamSelect").value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  if(!confirm("Delete this question forever? This cannot be undone.")) return;
+  showLoader("Deleting question forever...");
+  const res=await apiRequest("hardDeleteQuestionByExam",{examCode, questionId},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ selectedQuestionIds.delete(String(questionId)); if($("questionEditId").value===String(questionId)) resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+}
 async function loadQuestionsForSelectedExam(){
   const examCode=$("questionExamSelect").value.trim();
   $("selectedExamBadge").textContent = examCode || 'None';
@@ -972,7 +999,7 @@ function renderQuestions(){
   const list=getVisibleQuestions();
   updateQuestionsSelectionInfo();
   if(!list.length){ $("questionsBox").innerHTML='<div class="muted" style="margin-top:12px">No questions found for this exam.</div>'; return; }
-  $("questionsBox").innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px;${item.isDeleted ? 'opacity:.72;border-style:dashed;' : ''}"><div class="actions" style="justify-content:space-between;align-items:center"><div class="actions" style="align-items:center"><label class="pill" style="cursor:pointer"><input type="checkbox" ${selectedQuestionIds.has(String(item.id)) ? 'checked' : ''} onchange="toggleQuestionSelection('${esc(String(item.id))}', this.checked)" style="margin:0 6px 0 0">Select</label><div class="pill">Question ${i+1}</div>${item.isDeleted ? '<div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Deleted</div>' : '<div class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</div>'}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${esc(String(item.id))}')">Edit</button>${item.isDeleted ? `<button class="small-btn success" type="button" onclick="restoreQuestionItem('${esc(String(item.id))}')">Restore</button>` : `<button class="small-btn danger" type="button" onclick="deleteQuestionItem('${esc(String(item.id))}')">Delete</button>`}</div></div><h3 style="margin:10px 0 8px;font-size:1rem">${esc(item.question)}</h3>${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="Question image" style="max-width:100%;max-height:240px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${esc(item.optionA)}<br>B. ${esc(item.optionB)}<br>C. ${esc(item.optionC)}<br>D. ${esc(item.optionD)}<br><b>Answer:</b> ${esc(item.answer)}</div></div>`).join('');
+  $("questionsBox").innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px;${item.isDeleted ? 'opacity:.72;border-style:dashed;' : ''}"><div class="actions" style="justify-content:space-between;align-items:center"><div class="actions" style="align-items:center"><label class="pill" style="cursor:pointer"><input type="checkbox" ${selectedQuestionIds.has(String(item.id)) ? 'checked' : ''} onchange="toggleQuestionSelection('${esc(String(item.id))}', this.checked)" style="margin:0 6px 0 0">Select</label><div class="pill">Question ${i+1}</div>${item.isDeleted ? '<div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Deleted</div>' : '<div class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</div>'}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${esc(String(item.id))}')">Edit</button>${item.isDeleted ? `<button class="small-btn success" type="button" onclick="restoreQuestionItem('${esc(String(item.id))}')">Restore</button><button class="small-btn danger" type="button" onclick="hardDeleteQuestionItem('${esc(String(item.id))}')">Delete Forever</button>` : `<button class="small-btn danger" type="button" onclick="deleteQuestionItem('${esc(String(item.id))}')">Delete</button>`}</div></div><h3 style="margin:10px 0 8px;font-size:1rem">${esc(item.question)}</h3>${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="Question image" style="max-width:100%;max-height:240px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${esc(item.optionA)}<br>B. ${esc(item.optionB)}<br>C. ${esc(item.optionC)}<br>D. ${esc(item.optionD)}<br><b>Answer:</b> ${esc(item.answer)}</div></div>`).join('');
 }
 async function createPermissionCode(){
   showLoader("Creating permission code...");
@@ -986,9 +1013,27 @@ async function loadPermissionCodes(){
   if(!res.ok){ $("permissionCodesBox").innerHTML=`<div class="status error">${esc(res.message)}</div>`; return; }
   const list=res.data||[];
   if(!list.length){ $("permissionCodesBox").innerHTML='<div class="muted">No permission codes yet.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Code</th><th>Exam</th><th>Reg ID</th><th>Username</th><th>Status</th><th>Reason</th></tr></thead><tbody>`;
-  list.forEach(p=> html += `<tr><td><span class="code">${esc(p.permissionCode)}</span></td><td>${esc(p.examCode)}</td><td>${esc(p.regId)}</td><td>${esc(p.username)}</td><td>${esc(p.status)}</td><td>${esc(p.reason)}</td></tr>`);
+  let html=`<div class="table-wrap"><table><thead><tr><th>Code</th><th>Exam</th><th>Reg ID</th><th>Username</th><th>Status</th><th>Reason</th><th>Action</th></tr></thead><tbody>`;
+  list.forEach(p=> html += `<tr><td><span class="code">${esc(p.permissionCode)}</span></td><td>${esc(p.examCode)}</td><td>${esc(p.regId)}</td><td>${esc(p.username)}</td><td>${esc(p.status)}</td><td>${esc(p.reason)}</td><td><button class="small-btn danger" type="button" onclick="deletePermissionCode('${esc(p.permissionCode)}')">Delete</button></td></tr>`);
   $("permissionCodesBox").innerHTML = html + '</tbody></table></div>';
+}
+
+async function deletePermissionCode(permissionCode){
+  if(!confirm(`Delete permission code ${permissionCode}?`)) return;
+  showLoader("Deleting permission code...");
+  const res=await apiRequest("deletePermissionCode",{permissionCode},"POST");
+  hideLoader();
+  setStatus("permissionStatus", res.message, res.ok);
+  if(res.ok) await loadPermissionCodes();
+}
+
+async function clearPermissionCodes(){
+  if(!confirm("Delete all permission codes? This cannot be undone.")) return;
+  showLoader("Deleting all permission codes...");
+  const res=await apiRequest("clearPermissionCodes",{},"POST");
+  hideLoader();
+  setStatus("permissionStatus", res.message, res.ok);
+  if(res.ok) await loadPermissionCodes();
 }
 async function loadResultsByExam(){
   const examCode=$("resultsExamCode").value.trim();
@@ -1066,8 +1111,10 @@ $("cancelQuestionEditBtn").addEventListener("click", resetQuestionForm);
 $("importQuestionsBtn").addEventListener("click", importQuestions);
 $("deleteSelectedQuestionsBtn").addEventListener("click", bulkDeleteSelectedQuestions);
 $("restoreSelectedQuestionsBtn").addEventListener("click", bulkRestoreSelectedQuestions);
+$("hardDeleteSelectedQuestionsBtn").addEventListener("click", bulkHardDeleteSelectedQuestions);
 $("clearQuestionsBtn").addEventListener("click", clearQuestionsByExam);
 $("createPermissionBtn").addEventListener("click", createPermissionCode);
+$("clearPermissionCodesBtn").addEventListener("click", clearPermissionCodes);
 $("loadResultsBtn").addEventListener("click", loadResultsByExam);
 $("exportResultsBtn").addEventListener("click", exportResultsByExam);
 $("exportResultsPdfBtn").addEventListener("click", exportResultsPdf);
