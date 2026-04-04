@@ -152,6 +152,7 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
 
       <div class="card">
         <h2>Result Checker Link</h2>
+        <div class="muted" style="margin:8px 0 12px">Students will use this link with their <b>Registration ID</b> and <b>student password</b> to view the result report.</div>
         <label>Select Exam</label>
         <select id="resultLinkExamSelect"></select>
         <label>Generated Link</label>
@@ -609,8 +610,11 @@ function renderUserTable(data){
   if(!data.length) return '<div class="muted">No users.</div>';
   let html=`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
   data.forEach(u=>{
-    html += `<tr><td>${esc(u.fullName)}</td><td>${esc(u.username)}</td><td>${u.isActive ? 'Active':'Inactive'}</td><td><div class="actions">
-      <button class="small-btn ${u.isActive ? 'warn':'success'}" type="button" onclick="toggleUser('${esc(u.username)}', ${u.isActive ? 'false':'true'})">${u.isActive ? 'Deactivate':'Activate'}</button>
+    const badge = u.isActive ? '<span class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</span>' : '<span class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Inactive</span>';
+    html += `<tr><td>${esc(u.fullName)}</td><td>${esc(u.username)}</td><td>${badge}</td><td><div class="actions">
+      ${u.isActive
+        ? `<button class="small-btn warn" type="button" onclick="toggleUser('${esc(u.username)}', false)">Deactivate</button>`
+        : `<button class="small-btn success" type="button" onclick="toggleUser('${esc(u.username)}', true)">Activate</button>`}
       <button class="small-btn danger" type="button" onclick="deleteUser('${esc(u.username)}')">Delete</button>
     </div></td></tr>`;
   });
