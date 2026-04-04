@@ -2,66 +2,269 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CBT Admin Dashboard</title>
 <style>
-:root{--bg:#071122;--panel:#ffffff;--soft:#f4f7ff;--line:#d9e2f3;--text:#0f172a;--muted:#64748b;--primary:#6d5efc;--accent:#0ea5e9;--success:#15803d;--danger:#dc2626;--warn:#b45309}
-*{box-sizing:border-box;font-family:Inter,Arial,sans-serif} body{margin:0;background:linear-gradient(180deg,#eef4ff,#f8fbff);color:var(--text)}
-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top{max-width:1280px;margin:auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.brand{display:flex;gap:12px;align-items:center}.brand-badge{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent))}
-h1,h2,h3{margin:0} .muted{color:var(--muted)}
-.wrap{max-width:1280px;margin:auto;padding:18px 16px 34px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
-.card{grid-column:span 6;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 12px 34px rgba(15,23,42,.06)}
+:root{
+  --bg:#eef4ff;
+  --bg-2:#f8fbff;
+  --panel:#ffffff;
+  --line:#dbe4f3;
+  --text:#0f172a;
+  --muted:#64748b;
+  --primary:#6d5efc;
+  --primary-2:#4f8cff;
+  --success:#15803d;
+  --danger:#dc2626;
+  --warn:#b45309;
+  --soft:#eef2ff;
+  --shadow:0 12px 34px rgba(15,23,42,.08);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  color:var(--text);
+  background:linear-gradient(180deg,var(--bg),var(--bg-2));
+}
+button,input,textarea,select{font:inherit}
+header{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.top{
+  max-width:1280px;
+  margin:auto;
+  padding:14px 16px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.brand-badge{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),#22c1ff);
+  flex:0 0 auto;
+}
+h1,h2,h3{margin:0}
+.muted{color:var(--muted)}
+.wrap{max-width:1280px;margin:auto;padding:18px 16px 40px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:18px;
+}
+.card{
+  grid-column:span 6;
+  min-width:0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+}
 .full{grid-column:1/-1}
-label{display:block;font-size:14px;font-weight:700;margin:0 0 6px}
-input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;margin:0 0 12px}
-textarea{min-height:92px;resize:vertical}
+label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin:0 0 6px;
+}
+input,textarea,select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px 14px;
+  font-size:15px;
+  background:#fff;
+  color:var(--text);
+  margin:0 0 12px;
+}
+textarea{min-height:96px;resize:vertical}
 input[type="checkbox"]{width:auto;margin-right:8px}
-.row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.actions{display:flex;flex-wrap:wrap;gap:10px}
-button,.btn{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;transition:.2s transform,.2s opacity,.2s background}
+.row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+button,.btn{
+  border:none;
+  border-radius:12px;
+  min-height:44px;
+  padding:0 16px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:.2s transform,.2s opacity,.2s box-shadow;
+}
 button:hover,.btn:hover{transform:translateY(-1px)}
-.primary{background:linear-gradient(135deg,var(--primary),#4f8cff);color:#fff}
+.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
 .success{background:var(--success);color:#fff}
 .danger{background:var(--danger);color:#fff}
 .warn{background:var(--warn);color:#fff}
-.ghost{background:#eef2ff;color:#243b67}
-.status{font-size:14px;margin-top:8px;min-height:20px}.ok{color:var(--success)} .error{color:var(--danger)}
+.ghost{background:var(--soft);color:#243b67}
+.status{font-size:14px;margin-top:8px;min-height:20px}
+.ok{color:var(--success)}
+.error{color:var(--danger)}
 .hidden{display:none!important}
-.pill{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;font-size:12px;background:#eef2ff;color:#334155;border:1px solid var(--line);gap:6px}
-.info{padding:12px 14px;border-radius:14px;background:#f6faff;border:1px solid #cfe6ff;color:#175b9e;font-size:14px}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  background:#eef2ff;
+  color:#334155;
+  border:1px solid var(--line);
+}
+.info{
+  padding:12px 14px;
+  border-radius:14px;
+  background:#f6faff;
+  border:1px solid #cfe6ff;
+  color:#175b9e;
+  font-size:14px;
+}
 .search{max-width:420px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:12px}
-table{width:100%;border-collapse:collapse;min-width:720px}
-th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
-th{background:#f8fbff;position:sticky;top:0}
-.small-btn{min-height:34px;padding:0 12px;border-radius:10px;font-size:13px}
-.auth-shell{max-width:980px;margin:36px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.loader-overlay{position:fixed;inset:0;background:rgba(7,17,34,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999}
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:16px;
+  margin-top:12px;
+  background:#fff;
+}
+table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  font-size:14px;
+  vertical-align:top;
+}
+th{
+  background:#f8fbff;
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+.small-btn{
+  min-height:34px;
+  padding:0 12px;
+  border-radius:10px;
+  font-size:13px;
+}
+.auth-shell{
+  max-width:980px;
+  margin:36px auto;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.loader-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(7,17,34,.35);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  padding:16px;
+}
 .loader-overlay.show{display:flex}
-.loader-card{background:#fff;padding:18px 20px;border-radius:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12)}
-.spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+.loader-card{
+  width:min(100%,360px);
+  background:#fff;
+  padding:18px 20px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid var(--line);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+.spinner{
+  width:20px;height:20px;
+  border:3px solid #dbe5f4;
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+.exam-card{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(15,23,42,.04);
+}
+.stack{display:grid;gap:12px}
+.code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  padding:2px 8px;
+  border-radius:999px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media (max-width:980px){.card{grid-column:1/-1}.row{grid-template-columns:1fr}.auth-shell{grid-template-columns:1fr}}
-@media (max-width:640px){.wrap{padding:14px}.card{padding:15px;border-radius:16px}.top{padding:12px 14px}table{min-width:640px}}
+
+@media (max-width:1080px){
+  .card{grid-column:1/-1}
+}
+@media (max-width:780px){
+  .row{grid-template-columns:1fr}
+  .auth-shell{grid-template-columns:1fr}
+  .top{padding:12px 14px}
+  .wrap{padding:14px}
+  .card{padding:16px;border-radius:16px}
+}
+@media (max-width:520px){
+  h1{font-size:1.05rem}
+  .actions{flex-direction:column;align-items:stretch}
+  .actions > *{width:100%}
+  table{min-width:640px}
+}
 </style>
 </head>
 <body>
-<div class="loader-overlay" id="loader"><div class="loader-card"><div class="spinner"></div><div id="loaderText">Loading...</div></div></div>
+<div class="loader-overlay" id="loader">
+  <div class="loader-card">
+    <div class="spinner"></div>
+    <div id="loaderText">Loading...</div>
+  </div>
+</div>
 
 <header>
   <div class="top">
     <div class="brand">
       <div class="brand-badge"></div>
       <div>
-        <h1 style="font-size:1.25rem">CBT Admin Dashboard</h1>
+        <h1>CBT Admin Dashboard</h1>
         <div class="muted">Multi-exam control, current exam selection, archiving, duplicate, permissions</div>
       </div>
     </div>
     <div class="actions">
-      <a class="btn ghost" href="index.html" style="text-decoration:none">Home</a>
+      <a class="btn ghost" href="index.html">Home</a>
       <button class="ghost hidden" id="logoutBtn" type="button">Logout</button>
     </div>
   </div>
@@ -72,11 +275,12 @@ th{background:#f8fbff;position:sticky;top:0}
     <div class="card">
       <h2>Admin Login</h2>
       <p class="muted" style="margin:8px 0 16px">Sign in to manage exams and students.</p>
-      <label>Username</label><input id="loginUsername" type="text">
-      <label>Password</label><input id="loginPassword" type="password">
+      <label>Username</label><input id="loginUsername" type="text" autocomplete="username">
+      <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password">
       <button class="primary" id="loginBtn" type="button">Login</button>
       <div id="loginStatus" class="status"></div>
     </div>
+
     <div class="card">
       <h2>Create Admin Account</h2>
       <p class="muted" style="margin:8px 0 16px">Use your private admin signup key once.</p>
@@ -95,39 +299,53 @@ th{background:#f8fbff;position:sticky;top:0}
     <div class="grid">
       <div class="card">
         <h2>Portal Settings</h2>
-        <div class="info" style="margin:10px 0 14px">Portal lock affects every student. Current exam is selected below in the Exams table.</div>
+        <div class="info" style="margin:10px 0 14px">
+          Portal lock affects every student. Current exam is selected below in the Exams section.
+        </div>
         <label><input id="portalLocked" type="checkbox"> Lock Entire CBT Portal</label>
-        <label>Portal Notice</label><textarea id="portalNotice" placeholder="What students should see when the portal is locked"></textarea>
+        <label>Portal Notice</label>
+        <textarea id="portalNotice" placeholder="What students should see when the portal is locked"></textarea>
         <button class="primary" id="saveSettingsBtn" type="button">Save Portal Settings</button>
         <div id="settingsStatus" class="status"></div>
       </div>
 
       <div class="card">
         <h2>Create New Exam</h2>
-        <label>Exam Title</label><input id="examTitle" type="text" placeholder="e.g. Mock Mathematics CBT">
+        <label>Exam Title</label>
+        <input id="examTitle" type="text" placeholder="e.g. Mock Mathematics CBT">
         <div class="row">
-          <div><label>Unique Exam Code</label><input id="examCode" type="text" placeholder="e.g. MATH-MOCK-01"></div>
-          <div><label>Duration (Minutes)</label><input id="examDuration" type="number" min="1" value="20"></div>
+          <div>
+            <label>Unique Exam Code</label>
+            <input id="examCode" type="text" placeholder="e.g. MATH-MOCK-01">
+          </div>
+          <div>
+            <label>Duration (Minutes)</label>
+            <input id="examDuration" type="number" min="1" value="20">
+          </div>
         </div>
         <button class="success" id="createExamBtn" type="button">Create Exam</button>
         <div id="createExamStatus" class="status"></div>
       </div>
 
       <div class="card full">
-        <div class="actions" style="justify-content:space-between">
-          <div>
-            <h2>Exams</h2>
-            <div class="muted" style="margin-top:6px">Set one exam as current, archive old exams, or duplicate an old exam with all its questions.</div>
-          </div>
+        <h2>Exams</h2>
+        <div class="muted" style="margin-top:6px">
+          Set one exam as current, archive old exams, lock/unlock per exam, or duplicate an exam with all its questions.
         </div>
-        <div id="examsBox"></div>
+        <div id="examsBox" style="margin-top:12px"></div>
       </div>
 
       <div class="card">
         <h2>Add Candidates</h2>
         <div class="row">
-          <div><label>Full Name</label><input id="candidateName" type="text"></div>
-          <div><label>Reg ID</label><input id="candidateRegId" type="text"></div>
+          <div>
+            <label>Full Name</label>
+            <input id="candidateName" type="text">
+          </div>
+          <div>
+            <label>Reg ID</label>
+            <input id="candidateRegId" type="text">
+          </div>
         </div>
         <div class="actions">
           <button class="primary" id="addCandidateBtn" type="button">Add Candidate</button>
@@ -141,7 +359,8 @@ th{background:#f8fbff;position:sticky;top:0}
 
       <div class="card">
         <h2>Student Accounts</h2>
-        <label>Generated Password Length</label><input id="passwordLength" type="number" min="6" value="8">
+        <label>Generated Password Length</label>
+        <input id="passwordLength" type="number" min="6" value="8">
         <div class="actions">
           <button class="success" id="generateAccountsBtn" type="button">Generate Student Passwords</button>
           <button class="ghost" id="downloadGeneratedBtn" type="button">Download Last CSV</button>
@@ -157,6 +376,7 @@ th{background:#f8fbff;position:sticky;top:0}
           </div>
           <div class="pill">Selected exam: <span id="selectedExamBadge">None</span></div>
         </div>
+
         <div class="row" style="margin-top:14px">
           <div>
             <label>Exam For New Questions</label>
@@ -167,18 +387,33 @@ th{background:#f8fbff;position:sticky;top:0}
             <input id="questionCsvFile" type="file" accept=".csv">
           </div>
         </div>
-        <div class="muted" style="margin:-2px 0 10px">Question CSV headers: <b>question,imageUrl,optionA,optionB,optionC,optionD,answer</b></div>
+
+        <div class="muted" style="margin:-2px 0 10px">
+          Question CSV headers: <b>question,imageUrl,optionA,optionB,optionC,optionD,answer</b>
+        </div>
+
         <input id="questionEditId" type="hidden">
-        <label>Question</label><textarea id="questionText"></textarea>
-        <label>Image URL (optional)</label><input id="imageUrl" type="text" placeholder="Paste direct image URL">
+        <label>Question</label>
+        <textarea id="questionText"></textarea>
+        <label>Image URL (optional)</label>
+        <input id="imageUrl" type="text" placeholder="Paste direct image URL">
+
         <div class="row">
           <div><label>Option A</label><input id="optionA" type="text"></div>
           <div><label>Option B</label><input id="optionB" type="text"></div>
           <div><label>Option C</label><input id="optionC" type="text"></div>
           <div><label>Option D</label><input id="optionD" type="text"></div>
         </div>
+
         <label>Correct Answer</label>
-        <select id="correctAnswer"><option value="">Select answer</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+        <select id="correctAnswer">
+          <option value="">Select answer</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+          <option>D</option>
+        </select>
+
         <div class="actions">
           <button class="primary" id="addQuestionBtn" type="button">Add Question</button>
           <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
@@ -200,19 +435,28 @@ th{background:#f8fbff;position:sticky;top:0}
       <div class="card">
         <h2>Permission Code</h2>
         <div class="muted" style="margin:8px 0 14px">Give one student permission to rewrite a particular exam once.</div>
-        <label>Exam Code</label><input id="permExamCode" type="text" placeholder="e.g. MATH-MOCK-01">
+        <label>Exam Code</label>
+        <input id="permExamCode" type="text" placeholder="e.g. MATH-MOCK-01">
         <div class="row">
-          <div><label>Reg ID</label><input id="permRegId" type="text"></div>
-          <div><label>Username (optional)</label><input id="permUsername" type="text"></div>
+          <div>
+            <label>Reg ID</label>
+            <input id="permRegId" type="text">
+          </div>
+          <div>
+            <label>Username (optional)</label>
+            <input id="permUsername" type="text">
+          </div>
         </div>
-        <label>Reason</label><input id="permReason" type="text" placeholder="e.g. power outage">
+        <label>Reason</label>
+        <input id="permReason" type="text" placeholder="e.g. power outage">
         <button class="warn" id="createPermissionBtn" type="button">Create Permission Code</button>
         <div id="permissionStatus" class="status"></div>
       </div>
 
       <div class="card">
         <h2>Results By Exam</h2>
-        <label>Exam Code</label><input id="resultsExamCode" type="text" placeholder="Type exam code to load/export results">
+        <label>Exam Code</label>
+        <input id="resultsExamCode" type="text" placeholder="Type exam code to load/export results">
         <div class="actions">
           <button class="primary" id="loadResultsBtn" type="button">Load Results</button>
           <button class="success" id="exportResultsBtn" type="button">Export Results CSV</button>
@@ -256,385 +500,855 @@ th{background:#f8fbff;position:sticky;top:0}
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 const ADMIN_TOKEN_KEY = "cbt_admin_token_v2";
-let examsData=[], questionsData=[], resultsData=[], lastGeneratedCsv="", lastGeneratedFilename="student_passwords.csv";
 
-function showLoader(text="Loading..."){ loaderText.textContent=text; loader.classList.add('show'); }
-function hideLoader(){ loader.classList.remove('show'); }
+let examsData = [];
+let questionsData = [];
+let resultsData = [];
+let candidatesData = [];
+let adminsData = [];
+let studentsData = [];
+let lastGeneratedCsv = "";
+let lastGeneratedFilename = "student_passwords.csv";
 
-function getToken(){ return localStorage.getItem(ADMIN_TOKEN_KEY) || ""; }
-function setAuth(data){ localStorage.setItem(ADMIN_TOKEN_KEY, data.token); }
-function clearAuth(){ localStorage.removeItem(ADMIN_TOKEN_KEY); }
+const $ = id => document.getElementById(id);
+const loader = $("loader");
+const loaderText = $("loaderText");
 
-async function apiRequest(action, payload={}, method="POST"){
+function showLoader(text = "Loading...") {
+  loaderText.textContent = text;
+  loader.classList.add("show");
+}
+function hideLoader() {
+  loader.classList.remove("show");
+}
+
+function getToken() {
+  return localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+}
+function setAuth(data) {
+  localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+}
+function clearAuth() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+}
+
+function esc(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function apiRequest(action, payload = {}, method = "POST") {
   payload = payload || {};
-  if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
-  try{
+  if (!payload.token && action !== "login" && action !== "signup" && action !== "getCurrentExamPublic") {
+    payload.token = getToken();
+  }
+
+  try {
     let response;
-    if (method === "GET"){
+
+    if (method === "GET") {
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
-      Object.keys(payload).forEach(k => url.searchParams.set(k, typeof payload[k] === "object" ? JSON.stringify(payload[k]) : String(payload[k])));
-      response = await fetch(url.toString(), {method:"GET"});
-    }else{
+
+      Object.keys(payload).forEach(k => {
+        const v = payload[k];
+        if (v !== undefined && v !== null) {
+          url.searchParams.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+        }
+      });
+
+      response = await fetch(url.toString(), { method: "GET" });
+    } else {
       const form = new URLSearchParams();
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
-      response = await fetch(APPS_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:form.toString()});
-    }
-    const text = await response.text();
-    try{ return JSON.parse(text); }catch(err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
-  }catch(err){ return {ok:false, message:err.message || "Failed to fetch."}; }
-}
-function setStatus(id,msg,ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=msg||""; }
-function splitCsvLine(line){ const result=[]; let current="", inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; } if(ch==='"'){ inQuotes=!inQuotes; continue; } if(ch===',' && !inQuotes){ result.push(current); current=""; continue; } current+=ch; } result.push(current); return result; }
-function parseCsv(text){ const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim()); if(!lines.length) return []; const rows=lines.map(splitCsvLine); const headers=rows[0].map(h=>h.trim()); return rows.slice(1).map(cols=>{ const obj={}; headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim()); return obj; }); }
-async function fileToText(file){ return await file.text(); }
-function downloadText(filename,text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
 
-async function loginAdmin(){
-  showLoader("Signing in...");
-  const res = await apiRequest("login",{username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"},"POST");
-  hideLoader();
-  setStatus("loginStatus", res.message, res.ok);
-  if(res.ok && res.data){ setAuth(res.data); await showPortal(); }
+      response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: form.toString()
+      });
+    }
+
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      return { ok: false, message: "Server returned non-JSON response.", raw: text };
+    }
+  } catch (err) {
+    return { ok: false, message: err.message || "Failed to fetch." };
+  }
 }
-async function signupAdmin(){
+
+function setStatus(id, msg, ok = false) {
+  const el = $(id);
+  if (!el) return;
+  el.className = "status " + (ok ? "ok" : "error");
+  el.textContent = msg || "";
+}
+
+function splitCsvLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"' && line[i + 1] === '"') {
+      current += '"';
+      i++;
+      continue;
+    }
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (ch === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+
+  result.push(current);
+  return result;
+}
+
+function parseCsv(text) {
+  const lines = text.replace(/\r/g, "").split("\n").filter(x => x.trim());
+  if (!lines.length) return [];
+  const rows = lines.map(splitCsvLine);
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(cols => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (cols[i] || "").trim());
+    return obj;
+  });
+}
+
+async function fileToText(file) {
+  return await file.text();
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function loginAdmin() {
+  showLoader("Signing in...");
+  const res = await apiRequest("login", {
+    username: $("loginUsername").value.trim(),
+    password: $("loginPassword").value,
+    role: "admin"
+  }, "POST");
+  hideLoader();
+
+  setStatus("loginStatus", res.message, res.ok);
+  if (res.ok && res.data) {
+    setAuth(res.data);
+    await showPortal();
+  }
+}
+
+async function signupAdmin() {
   showLoader("Creating admin account...");
-  const res = await apiRequest("signup",{fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value.trim(), role:"admin"},"POST");
+  const res = await apiRequest("signup", {
+    fullName: $("signupFullName").value.trim(),
+    username: $("signupUsername").value.trim(),
+    password: $("signupPassword").value,
+    adminKey: $("signupAdminKey").value.trim(),
+    role: "admin"
+  }, "POST");
   hideLoader();
   setStatus("signupStatus", res.message, res.ok);
 }
-async function validatePortal(){
-  const token=getToken(); if(!token) return false;
-  const res=await apiRequest("validateSession",{token},"POST");
-  if(!res.ok || !res.data || res.data.role!=="admin"){ clearAuth(); return false; }
+
+async function validatePortal() {
+  const token = getToken();
+  if (!token) return false;
+
+  const res = await apiRequest("validateSession", { token }, "POST");
+  if (!res.ok || !res.data || res.data.role !== "admin") {
+    clearAuth();
+    return false;
+  }
   return true;
 }
-async function logoutCurrent(){ showLoader("Signing out..."); await apiRequest("logout",{token:getToken()},"POST"); hideLoader(); clearAuth(); location.reload(); }
 
-async function showPortal(){
-  authSection.classList.add("hidden");
-  portalSection.classList.remove("hidden");
-  logoutBtn.classList.remove("hidden");
+async function logoutCurrent() {
+  showLoader("Signing out...");
+  await apiRequest("logout", { token: getToken() }, "POST");
+  hideLoader();
+  clearAuth();
+  location.reload();
+}
+
+async function showPortal() {
+  $("authSection").classList.add("hidden");
+  $("portalSection").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
   await refreshAll();
 }
-async function refreshAll(){
+
+async function refreshAll() {
   showLoader("Loading dashboard...");
-  await Promise.all([loadSettings(), loadExams(), loadCandidates(), loadUsers(), loadPermissionCodes()]);
+  await Promise.all([
+    loadSettings(),
+    loadExams(),
+    loadCandidates(),
+    loadUsers(),
+    loadPermissionCodes()
+  ]);
   hideLoader();
 }
-async function loadSettings(){
-  const res=await apiRequest("getSettings",{},"GET");
-  if(res.ok && res.data){
-    portalLocked.checked=!!res.data.portalLocked;
-    portalNotice.value=res.data.portalNotice||"";
+
+async function loadSettings() {
+  const res = await apiRequest("getSettings", {}, "GET");
+  if (res.ok && res.data) {
+    $("portalLocked").checked = !!res.data.portalLocked;
+    $("portalNotice").value = res.data.portalNotice || "";
   }
 }
-async function saveSettings(){
+
+async function saveSettings() {
   showLoader("Saving settings...");
-  const res=await apiRequest("saveSettings",{portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()},"POST");
-  hideLoader(); setStatus("settingsStatus", res.message, res.ok);
+  const res = await apiRequest("saveSettings", {
+    portalLocked: $("portalLocked").checked,
+    portalNotice: $("portalNotice").value.trim()
+  }, "POST");
+  hideLoader();
+  setStatus("settingsStatus", res.message, res.ok);
 }
-async function createExam(){
+
+async function createExam() {
   showLoader("Creating exam...");
-  const res=await apiRequest("createExam",{title:examTitle.value.trim(), examCode:examCode.value.trim(), durationMinutes:examDuration.value},"POST");
-  hideLoader(); setStatus("createExamStatus", res.message, res.ok);
-  if(res.ok){ examTitle.value=""; examCode.value=""; examDuration.value=20; await loadExams(); }
+  const res = await apiRequest("createExam", {
+    title: $("examTitle").value.trim(),
+    examCode: $("examCode").value.trim(),
+    durationMinutes: $("examDuration").value
+  }, "POST");
+  hideLoader();
+
+  setStatus("createExamStatus", res.message, res.ok);
+
+  if (res.ok) {
+    $("examTitle").value = "";
+    $("examCode").value = "";
+    $("examDuration").value = 20;
+    await loadExams();
+  }
 }
-async function loadExams(){
-  const res=await apiRequest("listExams",{},"GET");
-  if(!res.ok){ examsBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
+
+async function loadExams() {
+  const currentSelected = $("questionExamSelect").value || "";
+  const res = await apiRequest("listExams", {}, "GET");
+
+  if (!res.ok) {
+    $("examsBox").innerHTML = `<div class="status error">${esc(res.message)}</div>`;
+    return;
+  }
+
   examsData = res.data || [];
-  renderExamSelects();
+  renderExamSelects(currentSelected);
   renderExams();
 }
-function renderExamSelects(){
-  const opts = ['<option value="">Select exam</option>'].concat(examsData.map(e=>`<option value="${e.examCode}">${e.examCode} — ${e.title}</option>`)).join('');
-  questionExamSelect.innerHTML = opts;
+
+function renderExamSelects(preferred = "") {
+  const currentExam = examsData.find(e => e.isCurrent);
+  const selected = preferred || (currentExam ? currentExam.examCode : "");
+
+  const opts = ['<option value="">Select exam</option>']
+    .concat(examsData.map(e => `<option value="${esc(e.examCode)}">${esc(e.examCode)} — ${esc(e.title)}</option>`))
+    .join("");
+
+  $("questionExamSelect").innerHTML = opts;
+  $("questionExamSelect").value = selected;
+
+  $("selectedExamBadge").textContent = selected || "None";
+
+  if (!$("permExamCode").value && currentExam) $("permExamCode").value = currentExam.examCode;
+  if (!$("resultsExamCode").value && currentExam) $("resultsExamCode").value = currentExam.examCode;
 }
-function renderExams(){
-  if(!examsData.length){ examsBox.innerHTML='<div class="muted">No exams created yet.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
-  examsData.forEach(e=>{
-    const status = `${e.isCurrent ? 'Current' : 'Not Current'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
+
+function renderExams() {
+  if (!examsData.length) {
+    $("examsBox").innerHTML = '<div class="muted">No exams created yet.</div>';
+    return;
+  }
+
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>Exam Code</th><th>Title</th><th>Duration</th><th>Status</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  examsData.forEach(e => {
+    const status = `${e.isCurrent ? "Current" : "Not Current"} • ${e.isArchived ? "Archived" : "Live"} • ${e.examLocked ? "Locked" : "Open"}`;
     html += `<tr>
-      <td>${e.examCode}</td>
-      <td>${e.title}</td>
-      <td>${e.durationMinutes} mins</td>
-      <td>${status}</td>
+      <td><span class="code">${esc(e.examCode)}</span></td>
+      <td>${esc(e.title)}</td>
+      <td>${esc(e.durationMinutes)} mins</td>
+      <td>${esc(status)}</td>
       <td>
         <div class="actions">
-          <button class="small-btn primary" type="button" onclick="setCurrentExam('${e.examCode}')">Set Current</button>
-          <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${e.examCode}')">Use In Builder</button>
-          <button class="small-btn ${e.examLocked ? 'success' : 'warn'}" type="button" onclick="toggleExamLock('${e.examCode}', ${e.examLocked ? 'false':'true'})">${e.examLocked ? 'Unlock Exam' : 'Lock Exam'}</button>
-          <button class="small-btn warn" type="button" onclick="duplicateExamPrompt('${e.examCode}')">Duplicate</button>
-          <button class="small-btn danger" type="button" onclick="toggleArchiveExam('${e.examCode}', ${e.isArchived ? 'false':'true'})">${e.isArchived ? 'Restore':'Archive'}</button>
+          <button class="small-btn primary" type="button" onclick="setCurrentExam('${esc(e.examCode)}')">Set Current</button>
+          <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${esc(e.examCode)}')">Use In Builder</button>
+          <button class="small-btn ${e.examLocked ? "success" : "warn"}" type="button" onclick="toggleExamLock('${esc(e.examCode)}', ${e.examLocked ? "false" : "true"})">
+            ${e.examLocked ? "Unlock Exam" : "Lock Exam"}
+          </button>
+          <button class="small-btn warn" type="button" onclick="duplicateExamPrompt('${esc(e.examCode)}')">Duplicate</button>
+          <button class="small-btn danger" type="button" onclick="toggleArchiveExam('${esc(e.examCode)}', ${e.isArchived ? "false" : "true"})">
+            ${e.isArchived ? "Restore" : "Archive"}
+          </button>
         </div>
       </td>
     </tr>`;
   });
-  examsBox.innerHTML = html + '</tbody></table></div>';
+
+  $("examsBox").innerHTML = html + "</tbody></table></div>";
 }
-async function setCurrentExam(examCode){
+
+async function setCurrentExam(examCode) {
   showLoader("Switching current exam...");
-  const res=await apiRequest("setCurrentExam",{examCode},"POST");
+  const res = await apiRequest("setCurrentExam", { examCode }, "POST");
   hideLoader();
-  if(!res.ok) return alert(res.message);
+  if (!res.ok) return alert(res.message);
   await loadExams();
 }
-function pickExamForQuestions(examCode){
-  questionExamSelect.value = examCode;
-  selectedExamBadge.textContent = examCode;
-  permExamCode.value = examCode;
-  resultsExamCode.value = examCode;
+
+function pickExamForQuestions(examCode) {
+  $("questionExamSelect").value = examCode;
+  $("selectedExamBadge").textContent = examCode;
+  $("permExamCode").value = examCode;
+  $("resultsExamCode").value = examCode;
+  resetQuestionForm();
   loadQuestionsForSelectedExam();
 }
-async function toggleArchiveExam(examCode, archived){
+
+async function toggleArchiveExam(examCode, archived) {
   showLoader("Updating exam...");
-  const res=await apiRequest("archiveExam",{examCode, archived},"POST");
+  const res = await apiRequest("archiveExam", { examCode, archived }, "POST");
   hideLoader();
-  if(!res.ok) return alert(res.message);
+  if (!res.ok) return alert(res.message);
   await loadExams();
 }
-async function toggleExamLock(examCode, locked){
-  const notice = locked ? (prompt("Lock notice students should see for this exam:", "This exam is currently locked.") || "") : "";
+
+async function toggleExamLock(examCode, locked) {
+  const notice = locked
+    ? (prompt("Lock notice students should see for this exam:", "This exam is currently locked.") || "")
+    : "";
   showLoader(locked ? "Locking exam..." : "Unlocking exam...");
-  const res=await apiRequest("setExamLock",{examCode, locked, notice},"POST");
+  const res = await apiRequest("setExamLock", { examCode, locked, notice }, "POST");
   hideLoader();
-  if(!res.ok) return alert(res.message);
+  if (!res.ok) return alert(res.message);
   await loadExams();
 }
-async function duplicateExamPrompt(sourceExamCode){
+
+async function duplicateExamPrompt(sourceExamCode) {
   const newCode = prompt("New unique exam code:");
-  if(!newCode) return;
+  if (!newCode) return;
+
   const newTitle = prompt("New exam title:");
-  if(!newTitle) return;
+  if (!newTitle) return;
+
   showLoader("Duplicating exam...");
-  const res=await apiRequest("duplicateExam",{sourceExamCode, newExamCode:newCode.trim(), newTitle:newTitle.trim()},"POST");
+  const res = await apiRequest("duplicateExam", {
+    sourceExamCode,
+    newExamCode: newCode.trim(),
+    newTitle: newTitle.trim()
+  }, "POST");
   hideLoader();
+
   alert(res.message + (res.ok && res.data ? ` Copied questions: ${res.data.copiedQuestions}` : ""));
-  if(res.ok) await loadExams();
+  if (res.ok) await loadExams();
 }
-async function addCandidate(){
+
+async function addCandidate() {
   showLoader("Adding candidate...");
-  const res=await apiRequest("addCandidate",{fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()},"POST");
+  const res = await apiRequest("addCandidate", {
+    fullName: $("candidateName").value.trim(),
+    regId: $("candidateRegId").value.trim()
+  }, "POST");
   hideLoader();
+
   setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){ candidateName.value=""; candidateRegId.value=""; await loadCandidates(); }
+
+  if (res.ok) {
+    $("candidateName").value = "";
+    $("candidateRegId").value = "";
+    await loadCandidates();
+  }
 }
-async function importCandidates(){
-  const file = candidateCsvFile.files[0];
-  if(!file) return setStatus("candidateStatus","Choose a candidate CSV first.");
-  const rows=parseCsv(await fileToText(file));
+
+async function importCandidates() {
+  const file = $("candidateCsvFile").files[0];
+  if (!file) return setStatus("candidateStatus", "Choose a candidate CSV first.");
+
+  const rows = parseCsv(await fileToText(file));
   showLoader("Importing candidates...");
-  const res=await apiRequest("importCandidates",{rows},"POST");
+  const res = await apiRequest("importCandidates", { rows }, "POST");
   hideLoader();
-  setStatus("candidateStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) await loadCandidates();
+
+  setStatus(
+    "candidateStatus",
+    res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message,
+    res.ok
+  );
+
+  if (res.ok) await loadCandidates();
 }
-let candidatesData=[];
-async function loadCandidates(){
-  const res=await apiRequest("listCandidates",{},"GET");
-  if(!res.ok){ candidatesBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
-  candidatesData=res.data||[];
+
+async function loadCandidates() {
+  const res = await apiRequest("listCandidates", {}, "GET");
+  if (!res.ok) {
+    $("candidatesBox").innerHTML = `<div class="status error">${esc(res.message)}</div>`;
+    return;
+  }
+  candidatesData = res.data || [];
   renderCandidates();
 }
-function renderCandidates(){
-  const q=(candidateSearch.value||"").trim().toLowerCase();
-  const list=candidatesData.filter(c=>!q || `${c.fullName} ${c.regId}`.toLowerCase().includes(q));
-  if(!list.length){ candidatesBox.innerHTML='<div class="muted">No candidates found.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Full Name</th><th>Reg ID</th></tr></thead><tbody>`;
-  list.forEach(c=> html += `<tr><td>${c.fullName}</td><td>${c.regId}</td></tr>`);
-  candidatesBox.innerHTML=html+'</tbody></table></div>';
+
+function renderCandidates() {
+  const q = ($("candidateSearch").value || "").trim().toLowerCase();
+  const list = candidatesData.filter(c => !q || `${c.fullName} ${c.regId}`.toLowerCase().includes(q));
+
+  if (!list.length) {
+    $("candidatesBox").innerHTML = '<div class="muted">No candidates found.</div>';
+    return;
+  }
+
+  let html = `<div class="table-wrap"><table><thead><tr><th>Full Name</th><th>Reg ID</th></tr></thead><tbody>`;
+  list.forEach(c => {
+    html += `<tr><td>${esc(c.fullName)}</td><td>${esc(c.regId)}</td></tr>`;
+  });
+  $("candidatesBox").innerHTML = html + "</tbody></table></div>";
 }
-async function generateAccounts(){
+
+async function generateAccounts() {
   showLoader("Generating student accounts...");
-  const res=await apiRequest("generateStudentAccounts",{passwordLength:passwordLength.value},"POST");
+  const res = await apiRequest("generateStudentAccounts", {
+    passwordLength: $("passwordLength").value
+  }, "POST");
   hideLoader();
-  setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok);
-  if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || 'student_accounts_passwords.csv'; downloadText(lastGeneratedFilename,lastGeneratedCsv); await loadUsers(); }
+
+  setStatus(
+    "accountsStatus",
+    res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message,
+    res.ok
+  );
+
+  if (res.ok && res.data && res.data.csv) {
+    lastGeneratedCsv = res.data.csv;
+    lastGeneratedFilename = res.data.filename || "student_accounts_passwords.csv";
+    downloadText(lastGeneratedFilename, lastGeneratedCsv);
+    await loadUsers();
+  }
 }
-function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus","No generated CSV in this session."); downloadText(lastGeneratedFilename,lastGeneratedCsv); }
-let adminsData=[], studentsData=[];
-async function loadUsers(){
-  const [adminsRes, studentsRes] = await Promise.all([apiRequest("listAdmins",{},"GET"), apiRequest("listStudents",{},"GET")]);
+
+function downloadLastGenerated() {
+  if (!lastGeneratedCsv) return setStatus("accountsStatus", "No generated CSV in this session.");
+  downloadText(lastGeneratedFilename, lastGeneratedCsv);
+}
+
+async function loadUsers() {
+  const [adminsRes, studentsRes] = await Promise.all([
+    apiRequest("listAdmins", {}, "GET"),
+    apiRequest("listStudents", {}, "GET")
+  ]);
+
   adminsData = adminsRes.ok ? adminsRes.data : [];
   studentsData = studentsRes.ok ? studentsRes.data : [];
   renderUsers();
 }
-function renderUsers(){
-  adminsBox.innerHTML = renderUserTable(adminsData, true);
-  studentsBox.innerHTML = renderUserTable(studentsData, false);
+
+function renderUsers() {
+  $("adminsBox").innerHTML = renderUserTable(adminsData);
+  $("studentsBox").innerHTML = renderUserTable(studentsData);
 }
-function renderUserTable(data, isAdmin){
-  if(!data.length) return '<div class="muted">No users.</div>';
-  let html=`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
-  data.forEach(u=>{
-    html += `<tr><td>${u.fullName}</td><td>${u.username}</td><td>${u.isActive ? 'Active':'Inactive'}</td><td><div class="actions">
-      <button class="small-btn ${u.isActive ? 'warn':'success'}" onclick="toggleUser('${u.username}', ${u.isActive ? 'false':'true'})">${u.isActive ? 'Deactivate':'Activate'}</button>
-      <button class="small-btn danger" onclick="deleteUser('${u.username}')">Delete</button>
-    </div></td></tr>`;
+
+function renderUserTable(data) {
+  if (!data.length) return '<div class="muted">No users.</div>';
+
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>Name</th><th>Username</th><th>Status</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  data.forEach(u => {
+    html += `<tr>
+      <td>${esc(u.fullName)}</td>
+      <td>${esc(u.username)}</td>
+      <td>${u.isActive ? "Active" : "Inactive"}</td>
+      <td>
+        <div class="actions">
+          <button class="small-btn ${u.isActive ? "warn" : "success"}" type="button" onclick="toggleUser('${esc(u.username)}', ${u.isActive ? "false" : "true"})">
+            ${u.isActive ? "Deactivate" : "Activate"}
+          </button>
+          <button class="small-btn danger" type="button" onclick="deleteUser('${esc(u.username)}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
   });
-  return html + '</tbody></table></div>';
+
+  return html + "</tbody></table></div>";
 }
-async function toggleUser(username, active){
+
+async function toggleUser(username, active) {
   showLoader("Updating user...");
-  const res=await apiRequest("setUserActive",{username, active},"POST");
-  hideLoader(); alert(res.message); if(res.ok) await loadUsers();
-}
-async function deleteUser(username){
-  if(!confirm("Delete this user?")) return;
-  showLoader("Deleting user...");
-  const res=await apiRequest("deleteUser",{username},"POST");
-  hideLoader(); alert(res.message); if(res.ok) await loadUsers();
-}
-function resetQuestionForm(){
-  questionEditId.value='';
-  questionText.value=''; imageUrl.value=''; optionA.value=''; optionB.value=''; optionC.value=''; optionD.value=''; correctAnswer.value='';
-  addQuestionBtn.classList.remove('hidden');
-  updateQuestionBtn.classList.add('hidden');
-  cancelQuestionEditBtn.classList.add('hidden');
-}
-async function addQuestion(){
-  const examCode=questionExamSelect.value.trim();
-  if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  showLoader("Adding question...");
-  const res=await apiRequest("addQuestion",{examCode, question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value},"POST");
-  hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ resetQuestionForm(); await loadQuestionsForSelectedExam(); }
-}
-function startQuestionEdit(questionId){
-  const item=questionsData.find(q=>String(q.id)===String(questionId));
-  if(!item) return;
-  questionEditId.value=item.id;
-  questionText.value=item.question||'';
-  imageUrl.value=item.imageUrl||'';
-  optionA.value=item.optionA||'';
-  optionB.value=item.optionB||'';
-  optionC.value=item.optionC||'';
-  optionD.value=item.optionD||'';
-  correctAnswer.value=item.answer||'';
-  addQuestionBtn.classList.add('hidden');
-  updateQuestionBtn.classList.remove('hidden');
-  cancelQuestionEditBtn.classList.remove('hidden');
-  window.scrollTo({top:questionText.getBoundingClientRect().top + window.scrollY - 110, behavior:'smooth'});
-}
-async function updateQuestion(){
-  const examCode=questionExamSelect.value.trim();
-  if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  if(!questionEditId.value.trim()) return setStatus("questionStatus","Select a question to edit first.");
-  showLoader("Saving question changes...");
-  const res=await apiRequest("updateQuestionByExam",{examCode, questionId:questionEditId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value},"POST");
-  hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ resetQuestionForm(); await loadQuestionsForSelectedExam(); }
-}
-async function deleteQuestionItem(questionId){
-  const examCode=questionExamSelect.value.trim();
-  if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  if(!confirm("Delete this question from the selected exam?")) return;
-  showLoader("Deleting question...");
-  const res=await apiRequest("deleteQuestionByExam",{examCode, questionId},"POST");
-  hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ if(questionEditId.value===String(questionId)) resetQuestionForm(); await loadQuestionsForSelectedExam(); }
-}
-async function importQuestions(){
-  const examCode=questionExamSelect.value.trim(), file=questionCsvFile.files[0];
-  if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  if(!file) return setStatus("questionStatus","Choose a questions CSV first.");
-  const rows=parseCsv(await fileToText(file));
-  showLoader("Importing questions...");
-  const res=await apiRequest("importQuestions",{examCode, rows},"POST");
-  hideLoader(); setStatus("questionStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) await loadQuestionsForSelectedExam();
-}
-async function clearQuestionsByExam(){
-  const examCode=questionExamSelect.value.trim();
-  if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  if(!confirm("Clear all questions for this exam?")) return;
-  showLoader("Clearing questions...");
-  const res=await apiRequest("clearQuestionsByExam",{examCode},"POST");
-  hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok) await loadQuestionsForSelectedExam();
-}
-async function loadQuestionsForSelectedExam(){
-  const examCode=questionExamSelect.value.trim();
-  selectedExamBadge.textContent = examCode || 'None';
-  if(!examCode){ questionsBox.innerHTML='<div class="muted">Select an exam to load questions.</div>'; return; }
-  showLoader("Loading questions...");
-  const res=await apiRequest("listQuestionsByExam",{examCode},"POST");
+  const res = await apiRequest("setUserActive", { username, active }, "POST");
   hideLoader();
-  if(!res.ok){ questionsBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
-  questionsData=res.data||[];
+  alert(res.message);
+  if (res.ok) await loadUsers();
+}
+
+async function deleteUser(username) {
+  if (!confirm("Delete this user?")) return;
+  showLoader("Deleting user...");
+  const res = await apiRequest("deleteUser", { username }, "POST");
+  hideLoader();
+  alert(res.message);
+  if (res.ok) await loadUsers();
+}
+
+function resetQuestionForm() {
+  $("questionEditId").value = "";
+  $("questionText").value = "";
+  $("imageUrl").value = "";
+  $("optionA").value = "";
+  $("optionB").value = "";
+  $("optionC").value = "";
+  $("optionD").value = "";
+  $("correctAnswer").value = "";
+
+  $("addQuestionBtn").classList.remove("hidden");
+  $("updateQuestionBtn").classList.add("hidden");
+  $("cancelQuestionEditBtn").classList.add("hidden");
+}
+
+async function addQuestion() {
+  const examCode = $("questionExamSelect").value.trim();
+  if (!examCode) return setStatus("questionStatus", "Select an exam first.");
+
+  showLoader("Adding question...");
+  const res = await apiRequest("addQuestion", {
+    examCode,
+    question: $("questionText").value.trim(),
+    imageUrl: $("imageUrl").value.trim(),
+    optionA: $("optionA").value.trim(),
+    optionB: $("optionB").value.trim(),
+    optionC: $("optionC").value.trim(),
+    optionD: $("optionD").value.trim(),
+    answer: $("correctAnswer").value
+  }, "POST");
+  hideLoader();
+
+  setStatus("questionStatus", res.message, res.ok);
+
+  if (res.ok) {
+    resetQuestionForm();
+    await loadQuestionsForSelectedExam();
+  }
+}
+
+function startQuestionEdit(questionId) {
+  const item = questionsData.find(q => String(q.id) === String(questionId));
+  if (!item) return;
+
+  $("questionEditId").value = item.id;
+  $("questionText").value = item.question || "";
+  $("imageUrl").value = item.imageUrl || "";
+  $("optionA").value = item.optionA || "";
+  $("optionB").value = item.optionB || "";
+  $("optionC").value = item.optionC || "";
+  $("optionD").value = item.optionD || "";
+  $("correctAnswer").value = item.answer || "";
+
+  $("addQuestionBtn").classList.add("hidden");
+  $("updateQuestionBtn").classList.remove("hidden");
+  $("cancelQuestionEditBtn").classList.remove("hidden");
+
+  window.scrollTo({ top: $("questionText").getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
+}
+
+async function updateQuestion() {
+  const examCode = $("questionExamSelect").value.trim();
+  if (!examCode) return setStatus("questionStatus", "Select an exam first.");
+  if (!$("questionEditId").value.trim()) return setStatus("questionStatus", "Select a question to edit first.");
+
+  showLoader("Saving question changes...");
+  const res = await apiRequest("updateQuestionByExam", {
+    examCode,
+    questionId: $("questionEditId").value.trim(),
+    question: $("questionText").value.trim(),
+    imageUrl: $("imageUrl").value.trim(),
+    optionA: $("optionA").value.trim(),
+    optionB: $("optionB").value.trim(),
+    optionC: $("optionC").value.trim(),
+    optionD: $("optionD").value.trim(),
+    answer: $("correctAnswer").value
+  }, "POST");
+  hideLoader();
+
+  setStatus("questionStatus", res.message, res.ok);
+
+  if (res.ok) {
+    resetQuestionForm();
+    await loadQuestionsForSelectedExam();
+  }
+}
+
+async function deleteQuestionItem(questionId) {
+  const examCode = $("questionExamSelect").value.trim();
+  if (!examCode) return setStatus("questionStatus", "Select an exam first.");
+  if (!confirm("Delete this question from the selected exam?")) return;
+
+  showLoader("Deleting question...");
+  const res = await apiRequest("deleteQuestionByExam", { examCode, questionId }, "POST");
+  hideLoader();
+
+  setStatus("questionStatus", res.message, res.ok);
+
+  if (res.ok) {
+    if ($("questionEditId").value === String(questionId)) resetQuestionForm();
+    await loadQuestionsForSelectedExam();
+  }
+}
+
+async function importQuestions() {
+  const examCode = $("questionExamSelect").value.trim();
+  const file = $("questionCsvFile").files[0];
+
+  if (!examCode) return setStatus("questionStatus", "Select an exam first.");
+  if (!file) return setStatus("questionStatus", "Choose a questions CSV first.");
+
+  const rows = parseCsv(await fileToText(file));
+  showLoader("Importing questions...");
+  const res = await apiRequest("importQuestions", { examCode, rows }, "POST");
+  hideLoader();
+
+  setStatus(
+    "questionStatus",
+    res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message,
+    res.ok
+  );
+
+  if (res.ok) await loadQuestionsForSelectedExam();
+}
+
+async function clearQuestionsByExam() {
+  const examCode = $("questionExamSelect").value.trim();
+  if (!examCode) return setStatus("questionStatus", "Select an exam first.");
+  if (!confirm("Clear all questions for this exam?")) return;
+
+  showLoader("Clearing questions...");
+  const res = await apiRequest("clearQuestionsByExam", { examCode }, "POST");
+  hideLoader();
+
+  setStatus("questionStatus", res.message, res.ok);
+
+  if (res.ok) await loadQuestionsForSelectedExam();
+}
+
+async function loadQuestionsForSelectedExam() {
+  const examCode = $("questionExamSelect").value.trim();
+  $("selectedExamBadge").textContent = examCode || "None";
+
+  if (!examCode) {
+    questionsData = [];
+    renderQuestions();
+    return;
+  }
+
+  showLoader("Loading questions...");
+  const res = await apiRequest("listQuestionsByExam", { examCode }, "POST");
+  hideLoader();
+
+  if (!res.ok) {
+    $("questionsBox").innerHTML = `<div class="status error">${esc(res.message)}</div>`;
+    return;
+  }
+
+  questionsData = res.data || [];
   renderQuestions();
 }
-function renderQuestions(){
-  const q=(questionSearch.value||"").trim().toLowerCase();
-  const list=questionsData.filter(item=>!q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
-  if(!list.length){ questionsBox.innerHTML='<div class="muted">No questions found for this exam.</div>'; return; }
-  questionsBox.innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px"><div class="actions" style="justify-content:space-between;align-items:center"><div class="pill">Question ${i+1}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button class="small-btn danger" type="button" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div><h3 style="margin:10px 0 8px;font-size:1rem">${item.question}</h3>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" style="max-width:220px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${item.optionA}<br>B. ${item.optionB}<br>C. ${item.optionC}<br>D. ${item.optionD}<br><b>Answer:</b> ${item.answer}</div></div>`).join('');
+
+function renderQuestions() {
+  const q = ($("questionSearch").value || "").trim().toLowerCase();
+  const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
+
+  if (!list.length) {
+    $("questionsBox").innerHTML = '<div class="muted" style="margin-top:12px">No questions found for this exam.</div>';
+    return;
+  }
+
+  $("questionsBox").innerHTML = `<div class="stack" style="margin-top:12px">${list.map((item, i) => `
+    <div class="exam-card">
+      <div class="actions" style="justify-content:space-between;align-items:center">
+        <div class="pill">Question ${i + 1}</div>
+        <div class="actions">
+          <button class="small-btn warn" type="button" onclick="startQuestionEdit('${esc(String(item.id))}')">Edit</button>
+          <button class="small-btn danger" type="button" onclick="deleteQuestionItem('${esc(String(item.id))}')">Delete</button>
+        </div>
+      </div>
+      <h3 style="margin:10px 0 8px;font-size:1rem">${esc(item.question)}</h3>
+      ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="Question image" style="max-width:100%;width:auto;max-height:260px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ""}
+      <div class="muted">
+        A. ${esc(item.optionA)}<br>
+        B. ${esc(item.optionB)}<br>
+        C. ${esc(item.optionC)}<br>
+        D. ${esc(item.optionD)}<br>
+        <b>Answer:</b> ${esc(item.answer)}
+      </div>
+    </div>
+  `).join("")}</div>`;
 }
-async function createPermissionCode(){
+
+async function createPermissionCode() {
   showLoader("Creating permission code...");
-  const res=await apiRequest("createPermissionCode",{examCode:permExamCode.value.trim(), regId:permRegId.value.trim(), username:permUsername.value.trim(), reason:permReason.value.trim()},"POST");
+  const res = await apiRequest("createPermissionCode", {
+    examCode: $("permExamCode").value.trim(),
+    regId: $("permRegId").value.trim(),
+    username: $("permUsername").value.trim(),
+    reason: $("permReason").value.trim()
+  }, "POST");
   hideLoader();
-  setStatus("permissionStatus", res.ok ? `${res.message} Code: ${res.data.permissionCode}` : res.message, res.ok);
-  if(res.ok){ permReason.value=''; await loadPermissionCodes(); }
+
+  setStatus(
+    "permissionStatus",
+    res.ok ? `${res.message} Code: ${res.data.permissionCode}` : res.message,
+    res.ok
+  );
+
+  if (res.ok) {
+    $("permReason").value = "";
+    await loadPermissionCodes();
+  }
 }
-async function loadPermissionCodes(){
-  const res=await apiRequest("listPermissionCodes",{},"GET");
-  if(!res.ok){ permissionCodesBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
-  const list=res.data||[];
-  if(!list.length){ permissionCodesBox.innerHTML='<div class="muted">No permission codes yet.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Code</th><th>Exam</th><th>Reg ID</th><th>Username</th><th>Status</th><th>Reason</th></tr></thead><tbody>`;
-  list.forEach(p=> html += `<tr><td>${p.permissionCode}</td><td>${p.examCode}</td><td>${p.regId}</td><td>${p.username}</td><td>${p.status}</td><td>${p.reason}</td></tr>`);
-  permissionCodesBox.innerHTML = html + '</tbody></table></div>';
+
+async function loadPermissionCodes() {
+  const res = await apiRequest("listPermissionCodes", {}, "GET");
+  if (!res.ok) {
+    $("permissionCodesBox").innerHTML = `<div class="status error">${esc(res.message)}</div>`;
+    return;
+  }
+
+  const list = res.data || [];
+  if (!list.length) {
+    $("permissionCodesBox").innerHTML = '<div class="muted">No permission codes yet.</div>';
+    return;
+  }
+
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>Code</th><th>Exam</th><th>Reg ID</th><th>Username</th><th>Status</th><th>Reason</th>
+  </tr></thead><tbody>`;
+
+  list.forEach(p => {
+    html += `<tr>
+      <td><span class="code">${esc(p.permissionCode)}</span></td>
+      <td>${esc(p.examCode)}</td>
+      <td>${esc(p.regId)}</td>
+      <td>${esc(p.username)}</td>
+      <td>${esc(p.status)}</td>
+      <td>${esc(p.reason)}</td>
+    </tr>`;
+  });
+
+  $("permissionCodesBox").innerHTML = html + "</tbody></table></div>";
 }
-async function loadResultsByExam(){
-  const examCode=resultsExamCode.value.trim();
-  if(!examCode) return setStatus("resultsStatus","Enter an exam code first.");
+
+async function loadResultsByExam() {
+  const examCode = $("resultsExamCode").value.trim();
+  if (!examCode) return setStatus("resultsStatus", "Enter an exam code first.");
+
   showLoader("Loading results...");
-  const res=await apiRequest("listResultsByExam",{examCode},"POST");
+  const res = await apiRequest("listResultsByExam", { examCode }, "POST");
   hideLoader();
+
   setStatus("resultsStatus", res.message, res.ok);
-  if(!res.ok){ resultsBox.innerHTML=''; return; }
-  resultsData=res.data||[];
-  if(!resultsData.length){ resultsBox.innerHTML='<div class="muted">No results yet for this exam.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Time</th><th>Exam</th><th>Attempt</th><th>Name</th><th>Reg ID</th><th>Score</th><th>%</th><th>Rank</th></tr></thead><tbody>`;
-  resultsData.forEach(r=> html += `<tr><td>${r.timestamp}</td><td>${r.examCode}</td><td>${r.attemptNo}</td><td>${r.fullName}</td><td>${r.regId}</td><td>${r.score}</td><td>${r.percentage}</td><td>${r.ranking}</td></tr>`);
-  resultsBox.innerHTML = html + '</tbody></table></div>';
+
+  if (!res.ok) {
+    $("resultsBox").innerHTML = "";
+    return;
+  }
+
+  resultsData = res.data || [];
+
+  if (!resultsData.length) {
+    $("resultsBox").innerHTML = '<div class="muted">No results yet for this exam.</div>';
+    return;
+  }
+
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>Time</th><th>Exam</th><th>Attempt</th><th>Name</th><th>Reg ID</th><th>Score</th><th>%</th><th>Rank</th>
+  </tr></thead><tbody>`;
+
+  resultsData.forEach(r => {
+    html += `<tr>
+      <td>${esc(r.timestamp)}</td>
+      <td>${esc(r.examCode)}</td>
+      <td>${esc(r.attemptNo)}</td>
+      <td>${esc(r.fullName)}</td>
+      <td>${esc(r.regId)}</td>
+      <td>${esc(r.score)}</td>
+      <td>${esc(r.percentage)}</td>
+      <td>${esc(r.ranking)}</td>
+    </tr>`;
+  });
+
+  $("resultsBox").innerHTML = html + "</tbody></table></div>";
 }
-async function exportResultsByExam(){
-  const examCode=resultsExamCode.value.trim();
-  if(!examCode) return setStatus("resultsStatus","Enter an exam code first.");
+
+async function exportResultsByExam() {
+  const examCode = $("resultsExamCode").value.trim();
+  if (!examCode) return setStatus("resultsStatus", "Enter an exam code first.");
+
   showLoader("Preparing export...");
-  const res=await apiRequest("exportResultsByExam",{examCode},"POST");
+  const res = await apiRequest("exportResultsByExam", { examCode }, "POST");
   hideLoader();
+
   setStatus("resultsStatus", res.message, res.ok);
-  if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || ('results_' + examCode + '.csv'), res.data.csv);
+
+  if (res.ok && res.data && res.data.csv) {
+    downloadText(res.data.filename || ("results_" + examCode + ".csv"), res.data.csv);
+  }
 }
 
-loginBtn.addEventListener('click', loginAdmin);
-signupBtn.addEventListener('click', signupAdmin);
-logoutBtn.addEventListener('click', logoutCurrent);
-saveSettingsBtn.addEventListener('click', saveSettings);
-createExamBtn.addEventListener('click', createExam);
-addCandidateBtn.addEventListener('click', addCandidate);
-importCandidatesBtn.addEventListener('click', importCandidates);
-generateAccountsBtn.addEventListener('click', generateAccounts);
-downloadGeneratedBtn.addEventListener('click', downloadLastGenerated);
-questionExamSelect.addEventListener('change', function(){ resetQuestionForm(); loadQuestionsForSelectedExam(); });
-addQuestionBtn.addEventListener('click', addQuestion);
-updateQuestionBtn.addEventListener('click', updateQuestion);
-cancelQuestionEditBtn.addEventListener('click', resetQuestionForm);
-importQuestionsBtn.addEventListener('click', importQuestions);
-clearQuestionsBtn.addEventListener('click', clearQuestionsByExam);
-createPermissionBtn.addEventListener('click', createPermissionCode);
-loadResultsBtn.addEventListener('click', loadResultsByExam);
-exportResultsBtn.addEventListener('click', exportResultsByExam);
-candidateSearch.addEventListener('input', renderCandidates);
-questionSearch.addEventListener('input', renderQuestions);
+$("loginBtn").addEventListener("click", loginAdmin);
+$("signupBtn").addEventListener("click", signupAdmin);
+$("logoutBtn").addEventListener("click", logoutCurrent);
+$("saveSettingsBtn").addEventListener("click", saveSettings);
+$("createExamBtn").addEventListener("click", createExam);
+$("addCandidateBtn").addEventListener("click", addCandidate);
+$("importCandidatesBtn").addEventListener("click", importCandidates);
+$("generateAccountsBtn").addEventListener("click", generateAccounts);
+$("downloadGeneratedBtn").addEventListener("click", downloadLastGenerated);
+$("questionExamSelect").addEventListener("change", function() {
+  resetQuestionForm();
+  loadQuestionsForSelectedExam();
+});
+$("addQuestionBtn").addEventListener("click", addQuestion);
+$("updateQuestionBtn").addEventListener("click", updateQuestion);
+$("cancelQuestionEditBtn").addEventListener("click", resetQuestionForm);
+$("importQuestionsBtn").addEventListener("click", importQuestions);
+$("clearQuestionsBtn").addEventListener("click", clearQuestionsByExam);
+$("createPermissionBtn").addEventListener("click", createPermissionCode);
+$("loadResultsBtn").addEventListener("click", loadResultsByExam);
+$("exportResultsBtn").addEventListener("click", exportResultsByExam);
+$("candidateSearch").addEventListener("input", renderCandidates);
+$("questionSearch").addEventListener("input", renderQuestions);
 
-(async function init(){ if(await validatePortal()) await showPortal(); })();
+(async function init() {
+  if (await validatePortal()) await showPortal();
+})();
 </script>
 </body>
 </html>
