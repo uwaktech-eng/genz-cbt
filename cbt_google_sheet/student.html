@@ -378,6 +378,15 @@ button:hover{transform:translateY(-1px)}
   color:#475569;
   margin-top:8px;
 }
+.resume-note{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#ecfeff;
+  border:1px solid #a5f3fc;
+  color:#155e75;
+  font-size:13px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:900px){
   .auth-wrap{grid-template-columns:1fr}
@@ -489,6 +498,10 @@ button:hover{transform:translateY(-1px)}
         Camera access is compulsory before the exam starts.
       </div>
 
+      <div id="resumeNoteBox" class="resume-note hidden">
+        We found your saved exam session. Once you unlock, the system will restore where you stopped.
+      </div>
+
       <button id="unlockBtn" type="button">Unlock Exam</button>
       <div id="unlockStatus" class="status"></div>
     </div>
@@ -551,6 +564,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvreve
 const TOKEN_KEY = "cbt_auth_token";
 const ROLE_KEY = "cbt_auth_role";
 const USERNAME_KEY = "cbt_auth_username";
+const STUDENT_STATE_KEY = "cbt_student_resume_state_v1";
 
 const $ = id => document.getElementById(id);
 const loader = $("loader");
@@ -600,6 +614,41 @@ function esc(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function getStudentState() {
+  try {
+    return JSON.parse(localStorage.getItem(STUDENT_STATE_KEY) || "{}");
+  } catch (err) {
+    return {};
+  }
+}
+
+function saveStudentState(patch = {}) {
+  const current = getStudentState();
+  const merged = Object.assign({}, current, patch);
+  localStorage.setItem(STUDENT_STATE_KEY, JSON.stringify(merged));
+}
+
+function clearStudentState() {
+  localStorage.removeItem(STUDENT_STATE_KEY);
+}
+
+function populateFromSavedState() {
+  const state = getStudentState();
+  if (!state || !state.verifiedCandidate) return false;
+
+  verifiedCandidate = state.verifiedCandidate;
+
+  $("fullName").value = state.verifiedCandidate.fullName || "";
+  $("regId").value = state.verifiedCandidate.regId || "";
+  $("unlockRegId").value = state.verifiedCandidate.regId || "";
+  $("examCodeInput").value = state.examCode || "";
+  $("permissionCode").value = state.permissionCode || "";
+
+  $("unlockCard").classList.remove("hidden");
+  $("resumeNoteBox").classList.toggle("hidden", !state.examCode);
+  return true;
 }
 
 async function apiRequest(action, payload = null, method = "POST") {
@@ -655,6 +704,7 @@ async function validatePortal(role) {
   const res = await apiRequest("validateSession", { token }, "POST");
   if (!res.ok || !res.data || res.data.role !== role) {
     clearAuth();
+    clearStudentState();
     return false;
   }
   return true;
@@ -684,6 +734,67 @@ async function showPortal() {
   await loadPublicState();
 }
 
+async function tryAutoResumeFromSavedState() {
+  const state = getStudentState();
+  if (!state || !state.verifiedCandidate || !state.examCode || !state.examStarted) return false;
+
+  verifiedCandidate = state.verifiedCandidate;
+  $("fullName").value = state.verifiedCandidate.fullName || "";
+  $("regId").value = state.verifiedCandidate.regId || "";
+  $("unlockRegId").value = state.verifiedCandidate.regId || "";
+  $("examCodeInput").value = state.examCode || "";
+  $("permissionCode").value = state.permissionCode || "";
+
+  showLoader("Restoring your exam...");
+  const res = await apiRequest("unlockExam", {
+    regId: state.verifiedCandidate.regId,
+    examCode: state.examCode,
+    permissionCode: state.permissionCode || ""
+  }, "POST");
+
+  if (!res.ok || !res.data) {
+    hideLoader();
+    $("unlockCard").classList.remove("hidden");
+    $("resumeNoteBox").classList.remove("hidden");
+    setStatus("unlockStatus", "We found your saved session. Please unlock again to continue.");
+    return false;
+  }
+
+  pendingUnlockData = { examCode: state.examCode, response: res, autoResume: true };
+  hideLoader();
+
+  showLoader("Reconnecting camera...");
+  const cameraOk = await startCameraMonitor();
+  hideLoader();
+
+  if (!cameraOk) {
+    $("unlockCard").classList.remove("hidden");
+    $("resumeNoteBox").classList.remove("hidden");
+    setStatus("unlockStatus", "Saved exam found. Please allow camera and unlock again to continue.");
+    return false;
+  }
+
+  const examCode = state.examCode;
+  currentQuestions = res.data.questions || [];
+  timeRemaining = Number(res.data.durationMinutes || 20) * 60;
+  $("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
+
+  renderQuestions(currentQuestions);
+  $("examCard").classList.remove("hidden");
+  examStarted = true;
+
+  const resumed = await resumeSavedProgress(examCode);
+  if (!resumed) {
+    $("timeLeft").textContent = formatTime(timeRemaining);
+  }
+
+  armExamProtection();
+  startTimer();
+  jumpToQuestion(0);
+  saveStudentState({ examStarted: true });
+  return true;
+}
+
 async function signupStudent() {
   showLoader("Creating account...");
   const res = await apiRequest("signup", {
@@ -708,6 +819,8 @@ async function loginStudent() {
   if (res.ok && res.data) {
     setAuth(res.data);
     await showPortal();
+    populateFromSavedState();
+    await tryAutoResumeFromSavedState();
   }
 }
 
@@ -728,6 +841,14 @@ async function verifyCandidate() {
     };
     $("unlockRegId").value = verifiedCandidate.regId;
     $("unlockCard").classList.remove("hidden");
+    $("resumeNoteBox").classList.add("hidden");
+
+    saveStudentState({
+      verifiedCandidate: verifiedCandidate,
+      examCode: "",
+      permissionCode: "",
+      examStarted: false
+    });
   } else {
     await loadPublicState();
   }
@@ -1057,7 +1178,17 @@ function startTimer() {
 }
 
 async function autosaveProgress() {
-  if (!examStarted || !verifiedCandidate || !$("examCodeInput").value.trim()) return;
+  if (!verifiedCandidate || !$("examCodeInput").value.trim()) return;
+
+  saveStudentState({
+    verifiedCandidate: verifiedCandidate,
+    examCode: $("examCodeInput").value.trim(),
+    permissionCode: $("permissionCode").value.trim(),
+    examStarted: examStarted
+  });
+
+  if (!examStarted) return;
+
   await apiRequest("autosaveProgress", {
     examCode: $("examCodeInput").value.trim(),
     regId: verifiedCandidate.regId,
@@ -1106,6 +1237,12 @@ async function unlockExam() {
   }
 
   pendingUnlockData = { examCode, response: res };
+  saveStudentState({
+    verifiedCandidate: verifiedCandidate,
+    examCode: examCode,
+    permissionCode: $("permissionCode").value.trim(),
+    examStarted: false
+  });
   showWarningOverlay();
 }
 
@@ -1136,6 +1273,13 @@ async function proceedStartExam() {
   armExamProtection();
   startTimer();
   jumpToQuestion(0);
+
+  saveStudentState({
+    verifiedCandidate: verifiedCandidate,
+    examCode: examCode,
+    permissionCode: $("permissionCode").value.trim(),
+    examStarted: true
+  });
 }
 
 async function submitExam(isAuto = false) {
@@ -1158,6 +1302,12 @@ async function submitExam(isAuto = false) {
   if (!res.ok) {
     examStarted = true;
     startTimer();
+    saveStudentState({
+      verifiedCandidate: verifiedCandidate,
+      examCode: $("examCodeInput").value.trim(),
+      permissionCode: $("permissionCode").value.trim(),
+      examStarted: true
+    });
     return;
   }
 
@@ -1179,6 +1329,7 @@ async function submitExam(isAuto = false) {
   `;
 
   pendingUnlockData = null;
+  clearStudentState();
 }
 
 async function logoutCurrent() {
@@ -1187,11 +1338,12 @@ async function logoutCurrent() {
   disarmExamProtection();
   stopCameraMonitor();
   clearAuth();
+  clearStudentState();
   location.reload();
 }
 
 window.addEventListener("beforeunload", function() {
-  if (examStarted) autosaveProgress();
+  autosaveProgress();
 });
 
 $("signupBtn").addEventListener("click", signupStudent);
@@ -1209,6 +1361,8 @@ $("continueStartBtn").addEventListener("click", proceedStartExam);
 (async function init() {
   if (await validatePortal("student")) {
     await showPortal();
+    populateFromSavedState();
+    await tryAutoResumeFromSavedState();
   }
 })();
 </script>
