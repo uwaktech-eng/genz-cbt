@@ -6,238 +6,55 @@
 <title>CBT Student Portal</title>
 <style>
 :root{
-  --bg:#eef2ff;
-  --bg-2:#f8fbff;
-  --panel:#ffffff;
-  --line:#dbe4f3;
-  --text:#0f172a;
-  --muted:#64748b;
-  --primary:#1e1b4b;
-  --primary-2:#312e81;
-  --success:#15803d;
-  --danger:#dc2626;
-  --warning:#9a3412;
-  --shadow:0 12px 32px rgba(15,23,42,.08);
+  --bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;
+  --primary:#1e1b4b;--primary2:#312e81;--success:#15803d;--danger:#dc2626;--warning:#9a3412;
+  --shadow:0 12px 32px rgba(15,23,42,.08)
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:linear-gradient(180deg,var(--bg),var(--bg-2));
-  color:var(--text);
-}
-header{
-  position:sticky;
-  top:0;
-  z-index:25;
-  background:rgba(30,27,75,.96);
-  color:#fff;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.head{
-  max-width:1100px;
-  margin:auto;
-  padding:14px 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.head a{
-  color:#facc15;
-  text-decoration:none;
-  font-weight:700;
-}
-.container{
-  max-width:980px;
-  margin:24px auto;
-  padding:0 16px 40px;
-}
-.card{
-  background:#fff;
-  border-radius:18px;
-  padding:18px;
-  box-shadow:var(--shadow);
-  border:1px solid var(--line);
-  margin-bottom:18px;
-  min-width:0;
-}
-label{
-  display:block;
-  font-weight:700;
-  margin-bottom:6px;
-  font-size:14px;
-}
-input[type="text"],input[type="password"]{
-  width:100%;
-  padding:12px 14px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  margin-bottom:14px;
-  font-size:15px;
-}
-button{
-  border:none;
-  border-radius:12px;
-  min-height:44px;
-  padding:0 16px;
-  font-weight:700;
-  cursor:pointer;
-  margin-right:8px;
-  margin-bottom:8px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-2));
-  color:#fff;
-  transition:.2s transform,.2s opacity;
-}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+header{position:sticky;top:0;z-index:25;background:rgba(30,27,75,.96);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.head{max-width:1100px;margin:auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.head a{color:#facc15;text-decoration:none;font-weight:700}
+.container{max-width:980px;margin:24px auto;padding:0 16px 40px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px}
+label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
+input[type="text"],input[type="password"]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;font-size:15px}
+button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;transition:.2s transform}
 button:hover{transform:translateY(-1px)}
-.success{background:var(--success)}
-.ghost{background:#eef2ff;color:#243b67}
+.success{background:var(--success)} .ghost{background:#eef2ff;color:#243b67}
 .hidden{display:none!important}
-.status{font-size:14px;margin-top:6px;min-height:18px}
-.error{color:#b91c1c}
-.ok{color:#166534}
-.timer{
-  position:sticky;
-  top:78px;
-  z-index:10;
-  font-size:18px;
-  font-weight:800;
-  color:#dc2626;
-  background:#fff7f7;
-  border:1px solid #fecaca;
-  border-radius:14px;
-  padding:12px 14px;
-  margin-bottom:16px;
-}
-.question-block{
-  border:1px solid #e2e8f0;
-  border-radius:16px;
-  background:#f8fafc;
-  padding:16px;
-  margin-bottom:18px;
-}
-.question-title{
-  font-weight:700;
-  margin-bottom:12px;
-  line-height:1.6;
-}
-.question-image{
-  max-width:100%;
-  width:auto;
-  max-height:280px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  display:block;
-  margin:12px auto;
-  background:#fff;
-}
-.option{
-  display:block;
-  padding:12px;
-  margin-bottom:10px;
-  background:#fff;
-  border:1px solid #cbd5e1;
-  border-radius:10px;
-  cursor:pointer;
-  line-height:1.5;
-}
+.status{font-size:14px;margin-top:6px;min-height:18px}.error{color:#b91c1c}.ok{color:#166534}
+.timer{position:sticky;top:78px;z-index:10;font-size:18px;font-weight:800;color:#dc2626;background:#fff7f7;border:1px solid #fecaca;border-radius:14px;padding:12px 14px;margin-bottom:16px}
+.auth-wrap{max-width:860px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.notice{background:#fff7ed;border:1px solid #fdba74;color:var(--warning);padding:12px 14px;border-radius:12px;margin-bottom:16px}
+.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:12px 14px;border-radius:12px;margin-bottom:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px;margin:0 0 16px}
+.nav-grid button{min-height:42px;padding:0;border-radius:10px}
+.nav-grid button.current{outline:3px solid #93c5fd}
+.nav-grid button.answered{background:#15803d}
+.nav-grid button.unanswered{background:#475569}
+.question-shell{border:1px solid #e2e8f0;border-radius:16px;background:#f8fafc;padding:16px}
+.question-title{font-weight:700;margin-bottom:12px;line-height:1.6}
+.question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
+.option{display:block;padding:12px;margin-bottom:10px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer;line-height:1.5}
 .option input{margin-right:8px}
 .result-box{line-height:1.9;font-size:16px}
-.auth-wrap{
-  max-width:860px;
-  margin:30px auto;
-  padding:0 16px;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
-}
-.notice{
-  background:#fff7ed;
-  border:1px solid #fdba74;
-  color:var(--warning);
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:16px;
-}
-.info{
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
-  color:#1d4ed8;
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:14px;
-}
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.loader-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(7,17,34,.35);
-  backdrop-filter:blur(4px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-  padding:16px;
-}
+.review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
+.pass{color:#166534;font-weight:700}
+.fail{color:#b91c1c;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:12px;background:#eef2ff;color:#334155;border:1px solid var(--line)}
+.loader-overlay{position:fixed;inset:0;background:rgba(7,17,34,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
 .loader-overlay.show{display:flex}
-.loader-card{
-  width:min(100%,340px);
-  background:#fff;
-  padding:18px 20px;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border:1px solid var(--line);
-  box-shadow:0 10px 30px rgba(0,0,0,.12);
-}
-.spinner{
-  width:20px;height:20px;
-  border:3px solid #dbe5f4;
-  border-top-color:#4338ca;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-}
-.pill{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:12px;
-  background:#eef2ff;
-  color:#334155;
-  border:1px solid var(--line);
-}
+.loader-card{width:min(100%,340px);background:#fff;padding:18px 20px;border-radius:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:#4338ca;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-@media (max-width:900px){
-  .auth-wrap{grid-template-columns:1fr}
-}
-@media (max-width:640px){
-  .container{padding:0 12px 28px}
-  .auth-wrap{padding:0 12px}
-  .card{padding:16px;border-radius:16px}
-  .head{padding:12px}
-  .timer{top:70px}
-  .actions{flex-direction:column}
-  .actions > *{width:100%;margin-right:0}
-}
+@media (max-width:900px){.auth-wrap{grid-template-columns:1fr}}
+@media (max-width:640px){.container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px}.timer{top:70px}.actions{flex-direction:column}.actions>*{width:100%}}
 </style>
 </head>
 <body>
-<div class="loader-overlay" id="loader">
-  <div class="loader-card">
-    <div class="spinner"></div>
-    <div id="loaderText">Loading...</div>
-  </div>
-</div>
+<div class="loader-overlay" id="loader"><div class="loader-card"><div class="spinner"></div><div id="loaderText">Loading...</div></div></div>
 
 <header>
   <div class="head">
@@ -253,25 +70,17 @@ button:hover{transform:translateY(-1px)}
   <div class="auth-wrap">
     <div class="card">
       <h2>Student Login</h2>
-      <label>Username</label>
-      <input type="text" id="loginUsername" autocomplete="username">
-      <label>Password</label>
-      <input type="password" id="loginPassword" autocomplete="current-password">
+      <label>Username</label><input type="text" id="loginUsername">
+      <label>Password</label><input type="password" id="loginPassword">
       <button class="success" id="loginBtn" type="button">Login</button>
       <div id="loginStatus" class="status"></div>
     </div>
-
     <div class="card">
       <h2>Student Signup</h2>
-      <p style="margin-top:0;color:#475569;font-size:14px;">
-        Use this only if you want students to create their own accounts. If you generate student accounts from admin, students should log in with Username = Reg ID.
-      </p>
-      <label>Full Name</label>
-      <input type="text" id="signupFullName">
-      <label>Username</label>
-      <input type="text" id="signupUsername">
-      <label>Password</label>
-      <input type="password" id="signupPassword">
+      <p style="margin-top:0;color:#475569;font-size:14px;">Use this only if you want students to create their own accounts. If you generate student accounts from admin, students should log in with Username = Reg ID.</p>
+      <label>Full Name</label><input type="text" id="signupFullName">
+      <label>Username</label><input type="text" id="signupUsername">
+      <label>Password</label><input type="password" id="signupPassword">
       <button class="success" id="signupBtn" type="button">Sign Up</button>
       <div id="signupStatus" class="status"></div>
     </div>
@@ -285,13 +94,8 @@ button:hover{transform:translateY(-1px)}
     <div class="card" id="verifyCard">
       <h2>Candidate Verification</h2>
       <div class="info" id="currentExamInfo">Checking current exam...</div>
-
-      <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" placeholder="Enter your registered full name">
-
-      <label for="regId">Registration ID</label>
-      <input type="text" id="regId" placeholder="Enter your registration ID">
-
+      <label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="Enter your registered full name">
+      <label for="regId">Registration ID</label><input type="text" id="regId" placeholder="Enter your registration ID">
       <button id="verifyBtn" type="button">Verify</button>
       <div id="verifyStatus" class="status"></div>
     </div>
@@ -299,21 +103,20 @@ button:hover{transform:translateY(-1px)}
     <div class="card hidden" id="unlockCard">
       <h2>Unlock CBT</h2>
       <p>Please confirm your details to unlock the current exam.</p>
-
-      <label for="unlockRegId">Registration ID</label>
-      <input type="text" id="unlockRegId">
-
-      <label for="permissionCode">Permission Code (optional for rewrite)</label>
-      <input type="text" id="permissionCode" placeholder="Enter admin permission code if given">
-
+      <label for="unlockRegId">Registration ID</label><input type="text" id="unlockRegId">
+      <label for="permissionCode">Permission Code (optional for rewrite)</label><input type="text" id="permissionCode" placeholder="Enter admin permission code if given">
       <button id="unlockBtn" type="button">Unlock Exam</button>
       <div id="unlockStatus" class="status"></div>
     </div>
 
     <div class="card hidden" id="examCard">
       <div class="timer">Time Left: <span id="timeLeft">00:00</span></div>
-      <form id="examForm"></form>
-      <div class="actions">
+      <div class="pill" id="questionCounter">Question 1 of 1</div>
+      <div class="nav-grid" id="questionNav"></div>
+      <div class="question-shell" id="questionStage"></div>
+      <div class="actions" style="margin-top:16px">
+        <button id="prevBtn" type="button" class="ghost">Previous</button>
+        <button id="nextBtn" type="button" class="ghost">Next</button>
         <button class="success" id="submitBtn" type="button">Submit Exam</button>
       </div>
       <div id="submitStatus" class="status"></div>
@@ -322,6 +125,10 @@ button:hover{transform:translateY(-1px)}
     <div class="card hidden" id="resultCard">
       <h2>Exam Submitted</h2>
       <div class="result-box" id="resultBox"></div>
+      <div id="reviewSection" class="hidden" style="margin-top:18px">
+        <h3>Answer Review</h3>
+        <div id="reviewList"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -333,385 +140,279 @@ const ROLE_KEY = "cbt_auth_role";
 const USERNAME_KEY = "cbt_auth_username";
 
 const $ = id => document.getElementById(id);
-const loader = $("loader");
-const loaderText = $("loaderText");
+const loader = $("loader"), loaderText = $("loaderText");
 
-let verifiedCandidate = null;
-let currentQuestions = [];
-let timer = null;
-let autosaveTimer = null;
-let timeRemaining = 0;
-let examStarted = false;
+let verifiedCandidate=null, currentQuestions=[], timer=null, autosaveTimer=null, timeRemaining=0, examStarted=false, selectedAnswers={}, currentQuestionIndex=0;
 
-function showLoader(text = "Loading...") {
-  loaderText.textContent = text;
-  loader.classList.add("show");
-}
-function hideLoader() {
-  loader.classList.remove("show");
-}
+function showLoader(text="Loading..."){ loaderText.textContent=text; loader.classList.add("show"); }
+function hideLoader(){ loader.classList.remove("show"); }
+function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
+function setAuth(data){ localStorage.setItem(TOKEN_KEY, data.token); localStorage.setItem(ROLE_KEY, data.role); localStorage.setItem(USERNAME_KEY, data.username); }
+function clearAuth(){ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(USERNAME_KEY); }
+function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
-}
-function setAuth(data) {
-  localStorage.setItem(TOKEN_KEY, data.token);
-  localStorage.setItem(ROLE_KEY, data.role);
-  localStorage.setItem(USERNAME_KEY, data.username);
-}
-function clearAuth() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(ROLE_KEY);
-  localStorage.removeItem(USERNAME_KEY);
-}
-
-function esc(value) {
-  return String(value == null ? "" : value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-async function apiRequest(action, payload = null, method = "POST") {
-  try {
+async function apiRequest(action, payload=null, method="POST"){
+  try{
     payload = payload || {};
-
-    if (!payload.token && action !== "login" && action !== "signup" && action !== "getCurrentExamPublic") {
-      payload.token = getToken();
-    }
+    if(!payload.token && action !== "login" && action !== "signup" && action !== "getCurrentExamPublic" && action !== "checkResultPublic") payload.token = getToken();
 
     let response;
-
-    if (method === "GET") {
+    if(method === "GET"){
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
-
-      Object.keys(payload).forEach((key) => {
+      url.searchParams.set("_ts", Date.now());
+      Object.keys(payload).forEach(key => {
         const value = payload[key];
-        if (value !== undefined && value !== null) {
-          url.searchParams.set(
-            key,
-            typeof value === "object" ? JSON.stringify(value) : String(value)
-          );
+        if(value !== undefined && value !== null){
+          url.searchParams.set(key, typeof value === "object" ? JSON.stringify(value) : String(value));
         }
       });
-
       response = await fetch(url.toString(), { method: "GET" });
     } else {
       const form = new URLSearchParams();
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
-
       response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
         body: form.toString()
       });
     }
 
     const text = await response.text();
-
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      return {
-        ok: false,
-        message: "Server returned non-JSON response.",
-        raw: text
-      };
-    }
-  } catch (error) {
-    return {
-      ok: false,
-      message: error.message || "Failed to fetch."
-    };
+    try { return JSON.parse(text); } catch (err) { return { ok:false, message:"Server returned non-JSON response.", raw:text }; }
+  }catch(error){
+    return { ok:false, message:error.message || "Failed to fetch." };
   }
 }
-
-function setStatus(id, message, ok = false) {
-  const el = $(id);
-  if (!el) return;
-  el.className = "status " + (ok ? "ok" : "error");
-  el.textContent = message || "";
-}
-
-async function validatePortal(role) {
-  const token = getToken();
-  if (!token) return false;
-
-  const res = await apiRequest("validateSession", { token }, "POST");
-  if (!res.ok || !res.data || res.data.role !== role) {
-    clearAuth();
-    return false;
-  }
+function setStatus(id, message, ok=false){ const el=$(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
+async function validatePortal(role){
+  const token=getToken(); if(!token) return false;
+  const res=await apiRequest("validateSession",{token},"POST");
+  if(!res.ok || !res.data || res.data.role!==role){ clearAuth(); return false; }
   return true;
 }
-
-async function logoutCurrent() {
-  await apiRequest("logout", { token: getToken() }, "POST");
-  clearInterval(timer);
-  clearInterval(autosaveTimer);
+async function logoutCurrent(){
+  await apiRequest("logout",{token:getToken()},"POST");
+  stopTimers();
   clearAuth();
   location.reload();
 }
+function formatTime(seconds){ const mins=Math.floor(seconds/60), secs=seconds%60; return String(mins).padStart(2,"0")+":"+String(secs).padStart(2,"0"); }
 
-function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
-}
-
-async function loadPortalState() {
+async function loadPortalState(){
   const res = await apiRequest("getCurrentExamPublic", {}, "GET");
-
-  if (!res.ok || !res.data) {
+  if(!res.ok || !res.data){
     $("currentExamInfo").textContent = "Unable to load current exam information.";
     $("examTitleHeader").textContent = "CBT Examination";
     return;
   }
-
   const currentExam = res.data.currentExam || null;
-
-  if (currentExam) {
-    $("currentExamInfo").innerHTML = `
-      <strong>Current Exam:</strong> ${esc(currentExam.title)}<br>
-      <strong>Exam Code:</strong> ${esc(currentExam.examCode)}<br>
-      <strong>Duration:</strong> ${esc(currentExam.durationMinutes)} minutes
-    `;
+  if(currentExam){
+    $("currentExamInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(currentExam.title)}<br><strong>Exam Code:</strong> ${esc(currentExam.examCode)}<br><strong>Duration:</strong> ${esc(currentExam.durationMinutes)} minutes<br><strong>Pass Mark:</strong> ${esc(currentExam.passMark)}%`;
     $("examTitleHeader").textContent = currentExam.title || "CBT Examination";
-  } else {
+  }else{
     $("currentExamInfo").textContent = "No current exam has been activated by the admin.";
     $("examTitleHeader").textContent = "CBT Examination";
   }
 
-  if (res.data.portalLocked) {
+  if(res.data.portalLocked){
     $("portalNoticeBox").textContent = res.data.portalNotice || "CBT is currently locked.";
     $("portalNoticeBox").classList.remove("hidden");
-  } else {
+  }else{
     $("portalNoticeBox").classList.add("hidden");
     $("portalNoticeBox").textContent = "";
   }
 }
-
-async function showPortal() {
+async function showPortal(){
   $("authSection").classList.add("hidden");
   $("portalSection").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
   await loadPortalState();
 }
-
-async function signupStudent() {
+async function signupStudent(){
   showLoader("Creating account...");
   const res = await apiRequest("signup", {
-    fullName: $("signupFullName").value.trim(),
-    username: $("signupUsername").value.trim(),
-    password: $("signupPassword").value,
-    role: "student"
+    fullName:$("signupFullName").value.trim(),
+    username:$("signupUsername").value.trim(),
+    password:$("signupPassword").value,
+    role:"student"
   }, "POST");
   hideLoader();
   setStatus("signupStatus", res.message, res.ok);
 }
-
-async function loginStudent() {
+async function loginStudent(){
   showLoader("Signing in...");
   const res = await apiRequest("login", {
-    username: $("loginUsername").value.trim(),
-    password: $("loginPassword").value,
-    role: "student"
+    username:$("loginUsername").value.trim(),
+    password:$("loginPassword").value,
+    role:"student"
   }, "POST");
   hideLoader();
-
   setStatus("loginStatus", res.message, res.ok);
-
-  if (res.ok && res.data) {
-    setAuth(res.data);
-    await showPortal();
-  }
+  if(res.ok && res.data){ setAuth(res.data); await showPortal(); }
 }
-
-async function verifyCandidate() {
+async function verifyCandidate(){
   showLoader("Verifying candidate...");
-  const payload = {
-    fullName: $("fullName").value.trim(),
-    regId: $("regId").value.trim()
-  };
-
+  const payload = { fullName:$("fullName").value.trim(), regId:$("regId").value.trim() };
   const res = await apiRequest("verifyCandidate", payload, "POST");
   hideLoader();
-
   setStatus("verifyStatus", res.message, res.ok);
-
-  if (res.ok && res.data) {
+  if(res.ok && res.data){
     verifiedCandidate = {
-      fullName: res.data.fullName,
-      regId: res.data.regId,
-      examCode: res.data.currentExamCode,
-      examTitle: res.data.examTitle
+      fullName:res.data.fullName,
+      regId:res.data.regId,
+      examCode:res.data.currentExamCode,
+      examTitle:res.data.examTitle,
+      passMark:res.data.passMark
     };
-
     $("unlockRegId").value = verifiedCandidate.regId;
     $("examTitleHeader").textContent = verifiedCandidate.examTitle || "CBT Examination";
     $("unlockCard").classList.remove("hidden");
-  } else {
+  }else{
     await loadPortalState();
   }
 }
 
-function renderQuestions(questions) {
-  $("examForm").innerHTML = questions.map((q, index) => `
-    <div class="question-block">
-      <div class="question-title">${index + 1}. ${esc(q.question)}</div>
-      ${q.imageUrl ? `<img src="${esc(q.imageUrl)}" class="question-image" alt="Question image">` : ""}
-      <label class="option"><input type="radio" name="question_${index}" value="A"> A. ${esc(q.optionA)}</label>
-      <label class="option"><input type="radio" name="question_${index}" value="B"> B. ${esc(q.optionB)}</label>
-      <label class="option"><input type="radio" name="question_${index}" value="C"> C. ${esc(q.optionC)}</label>
-      <label class="option"><input type="radio" name="question_${index}" value="D"> D. ${esc(q.optionD)}</label>
-    </div>
-  `).join("");
+function renderQuestionNav(){
+  $("questionNav").innerHTML = currentQuestions.map((q, index) => {
+    const stateClass = index === currentQuestionIndex ? "current" : (selectedAnswers[q.id] ? "answered" : "unanswered");
+    return `<button type="button" class="${stateClass}" onclick="goToQuestion(${index})">${index + 1}</button>`;
+  }).join("");
+  $("questionCounter").textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
 }
-
-function collectAnswers() {
-  return currentQuestions.map((q, index) => {
-    const selected = document.querySelector(`input[name="question_${index}"]:checked`);
-    return {
-      questionId: q.id,
-      selected: selected ? selected.value : ""
-    };
-  });
+function renderCurrentQuestion(){
+  if(!currentQuestions.length){ $("questionStage").innerHTML = "<div>No questions available.</div>"; return; }
+  const q = currentQuestions[currentQuestionIndex];
+  const selected = selectedAnswers[q.id] || "";
+  $("questionStage").innerHTML = `
+    <div class="question-title">${currentQuestionIndex + 1}. ${esc(q.question)}</div>
+    ${q.imageUrl ? `<img src="${esc(q.imageUrl)}" class="question-image" alt="Question image">` : ""}
+    ${["A","B","C","D"].map(letter => `<label class="option"><input type="radio" name="currentOption" value="${letter}" ${selected===letter?'checked':''} onchange="selectOption('${esc(q.id)}','${letter}')"> ${letter}. ${esc(q['option'+letter])}</label>`).join("")}
+  `;
+  renderQuestionNav();
+  $("prevBtn").disabled = currentQuestionIndex === 0;
+  $("nextBtn").disabled = currentQuestionIndex === currentQuestions.length - 1;
 }
-
-function applySavedAnswers(savedAnswers) {
-  if (!Array.isArray(savedAnswers) || !savedAnswers.length) return;
-
-  const byId = {};
-  savedAnswers.forEach(a => {
-    byId[String(a.questionId || "")] = String(a.selected || "");
-  });
-
-  currentQuestions.forEach((q, index) => {
-    const selected = byId[String(q.id)];
-    if (!selected) return;
-    const input = document.querySelector(`input[name="question_${index}"][value="${selected}"]`);
-    if (input) input.checked = true;
-  });
+function selectOption(questionId, value){
+  selectedAnswers[questionId] = value;
+  renderQuestionNav();
 }
-
-function stopTimers() {
-  clearInterval(timer);
-  clearInterval(autosaveTimer);
+function goToQuestion(index){
+  currentQuestionIndex = Math.max(0, Math.min(index, currentQuestions.length - 1));
+  renderCurrentQuestion();
 }
+function nextQuestion(){ if(currentQuestionIndex < currentQuestions.length - 1){ currentQuestionIndex++; renderCurrentQuestion(); } }
+function prevQuestion(){ if(currentQuestionIndex > 0){ currentQuestionIndex--; renderCurrentQuestion(); } }
 
-function startTimer() {
+function collectAnswers(){
+  return currentQuestions.map(q => ({ questionId:q.id, selected:selectedAnswers[q.id] || "" }));
+}
+function applySavedAnswers(savedAnswers){
+  selectedAnswers = {};
+  if(Array.isArray(savedAnswers)){
+    savedAnswers.forEach(a => { if(a && a.questionId) selectedAnswers[String(a.questionId)] = String(a.selected || ""); });
+  }
+}
+function stopTimers(){ clearInterval(timer); clearInterval(autosaveTimer); }
+function startTimer(){
   stopTimers();
   $("timeLeft").textContent = formatTime(timeRemaining);
-
   timer = setInterval(() => {
     timeRemaining = Math.max(0, timeRemaining - 1);
     $("timeLeft").textContent = formatTime(timeRemaining);
-
-    if (timeRemaining <= 0) {
-      stopTimers();
-      submitExam();
-    }
+    if(timeRemaining <= 0){ stopTimers(); submitExam(); }
   }, 1000);
-
-  autosaveTimer = setInterval(() => {
-    autosaveProgress();
-  }, 15000);
+  autosaveTimer = setInterval(() => { autosaveProgress(); }, 15000);
 }
-
-async function autosaveProgress() {
-  if (!examStarted || !verifiedCandidate || !verifiedCandidate.examCode) return;
-
+async function autosaveProgress(){
+  if(!examStarted || !verifiedCandidate || !verifiedCandidate.examCode) return;
   await apiRequest("autosaveProgress", {
-    examCode: verifiedCandidate.examCode,
-    regId: verifiedCandidate.regId,
-    fullName: verifiedCandidate.fullName,
-    remainingSeconds: timeRemaining,
-    answers: collectAnswers()
+    examCode:verifiedCandidate.examCode,
+    regId:verifiedCandidate.regId,
+    fullName:verifiedCandidate.fullName,
+    remainingSeconds:timeRemaining,
+    answers:collectAnswers()
   }, "POST");
 }
-
-async function resumeSavedProgress() {
-  if (!verifiedCandidate || !verifiedCandidate.examCode) return false;
-
-  const res = await apiRequest("resumeProgress", {
-    examCode: verifiedCandidate.examCode,
-    regId: verifiedCandidate.regId
-  }, "POST");
-
-  if (!res.ok || !res.data || !res.data.found) return false;
-
+async function resumeSavedProgress(){
+  if(!verifiedCandidate || !verifiedCandidate.examCode) return false;
+  const res = await apiRequest("resumeProgress", { examCode:verifiedCandidate.examCode, regId:verifiedCandidate.regId }, "POST");
+  if(!res.ok || !res.data || !res.data.found) return false;
   const remaining = Number(res.data.remainingSeconds || 0);
-
-  if (remaining <= 0) return false;
-
+  if(remaining <= 0) return false;
   timeRemaining = remaining;
   applySavedAnswers(res.data.answers || []);
   return true;
 }
-
-async function unlockExam() {
+async function unlockExam(){
   const entered = $("unlockRegId").value.trim();
-
-  if (!verifiedCandidate) return setStatus("unlockStatus", "Please verify first.");
-  if (entered !== verifiedCandidate.regId) {
-    return setStatus("unlockStatus", "Registration ID does not match the verified candidate.");
-  }
+  if(!verifiedCandidate) return setStatus("unlockStatus","Please verify first.");
+  if(entered !== verifiedCandidate.regId) return setStatus("unlockStatus","Registration ID does not match the verified candidate.");
 
   showLoader("Unlocking exam...");
   const res = await apiRequest("unlockExam", {
-    regId: entered,
-    examCode: verifiedCandidate.examCode,
-    permissionCode: $("permissionCode").value.trim()
+    regId:entered,
+    examCode:verifiedCandidate.examCode,
+    permissionCode:$("permissionCode").value.trim()
   }, "POST");
   hideLoader();
-
   setStatus("unlockStatus", res.message, res.ok);
 
-  if (res.ok && res.data) {
+  if(res.ok && res.data){
     currentQuestions = res.data.questions || [];
+    selectedAnswers = {};
     timeRemaining = Number(res.data.durationMinutes || 20) * 60;
+    currentQuestionIndex = 0;
     $("examTitleHeader").textContent = res.data.examTitle || verifiedCandidate.examTitle || "CBT Examination";
-
-    renderQuestions(currentQuestions);
+    const resumed = await resumeSavedProgress();
+    renderCurrentQuestion();
     $("examCard").classList.remove("hidden");
     examStarted = true;
-
-    const resumed = await resumeSavedProgress();
-    if (!resumed) {
-      $("timeLeft").textContent = formatTime(timeRemaining);
-    }
-
+    if(!resumed) $("timeLeft").textContent = formatTime(timeRemaining);
     startTimer();
-  } else {
+  }else{
     await loadPortalState();
   }
 }
-
-async function submitExam() {
-  if (!examStarted || !verifiedCandidate) return;
-
+function renderReview(review){
+  if(!Array.isArray(review) || !review.length){
+    $("reviewSection").classList.add("hidden");
+    $("reviewList").innerHTML = "";
+    return;
+  }
+  $("reviewSection").classList.remove("hidden");
+  $("reviewList").innerHTML = review.map(item => `
+    <div class="review-item">
+      <div class="${item.status === 'PASS' ? 'pass' : 'fail'}">Question ${esc(item.qNo)} — ${esc(item.status)}</div>
+      <div style="margin-top:8px"><strong>${esc(item.question)}</strong></div>
+      ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" class="question-image" alt="Question image">` : ""}
+      <div style="margin-top:8px">
+        A. ${esc(item.optionA)}<br>
+        B. ${esc(item.optionB)}<br>
+        C. ${esc(item.optionC)}<br>
+        D. ${esc(item.optionD)}
+      </div>
+      <div style="margin-top:8px"><strong>Your Answer:</strong> ${esc(item.chosen || "BLANK")}</div>
+      <div><strong>Correct Answer:</strong> ${esc(item.correct)}</div>
+    </div>
+  `).join("");
+}
+async function submitExam(){
+  if(!examStarted || !verifiedCandidate) return;
   stopTimers();
   examStarted = false;
-
   showLoader("Submitting exam...");
   const res = await apiRequest("submitExam", {
-    examCode: verifiedCandidate.examCode,
-    fullName: verifiedCandidate.fullName,
-    regId: verifiedCandidate.regId,
-    permissionCode: $("permissionCode").value.trim(),
-    answers: collectAnswers()
+    examCode:verifiedCandidate.examCode,
+    fullName:verifiedCandidate.fullName,
+    regId:verifiedCandidate.regId,
+    permissionCode:$("permissionCode").value.trim(),
+    answers:collectAnswers()
   }, "POST");
   hideLoader();
-
   setStatus("submitStatus", res.message, res.ok);
-
-  if (!res.ok) {
+  if(!res.ok){
     examStarted = true;
     startTimer();
     await loadPortalState();
@@ -722,22 +423,33 @@ async function submitExam() {
   $("resultCard").classList.remove("hidden");
 
   const d = res.data || {};
-  $("resultBox").innerHTML = `
+  let html = `
     <strong>Full Name:</strong> ${esc(d.fullName || "")}<br>
     <strong>Reg ID:</strong> ${esc(d.regId || "")}<br>
-    <strong>Score:</strong> ${esc(d.score || 0)} / ${esc(d.total || 0)}<br>
-    <strong>Percentage:</strong> ${esc(d.percentage || 0)}%<br>
-    <strong>Ranking:</strong> ${esc(d.ranking || "")}<br>
-    <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
-    <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}
+    <strong>Exam Code:</strong> ${esc(d.examCode || "")}<br>
+    <strong>Attempt:</strong> ${esc(d.attemptNo || "")}<br>
+    <strong>Pass Mark:</strong> ${esc(d.passMark || 0)}%<br>
+    <strong>Result Status:</strong> ${esc(d.passedStatus || "")}<br>
+    <strong>Message:</strong> ${esc(d.statusMessage || "")}<br>
   `;
+
+  if(d.showScoreSummary){
+    html += `
+      <strong>Score:</strong> ${esc(d.score || 0)} / ${esc(d.total || 0)}<br>
+      <strong>Percentage:</strong> ${esc(d.percentage || 0)}%<br>
+      <strong>Ranking:</strong> ${esc(d.ranking || "")}<br>
+      <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
+      <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}<br>
+    `;
+  } else {
+    html += `<strong>Notice:</strong> Your score summary is hidden for this exam.<br>`;
+  }
+
+  $("resultBox").innerHTML = html;
+  renderReview(d.allowReview ? (d.review || []) : []);
 }
 
-window.addEventListener("beforeunload", function() {
-  if (examStarted) {
-    autosaveProgress();
-  }
-});
+window.addEventListener("beforeunload", function(){ if(examStarted) autosaveProgress(); });
 
 $("signupBtn").addEventListener("click", signupStudent);
 $("loginBtn").addEventListener("click", loginStudent);
@@ -745,12 +457,10 @@ $("logoutBtn").addEventListener("click", logoutCurrent);
 $("verifyBtn").addEventListener("click", verifyCandidate);
 $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
+$("prevBtn").addEventListener("click", prevQuestion);
+$("nextBtn").addEventListener("click", nextQuestion);
 
-(async function init() {
-  if (await validatePortal("student")) {
-    await showPortal();
-  }
-})();
+(async function init(){ if(await validatePortal("student")) await showPortal(); })();
 </script>
 </body>
 </html>
