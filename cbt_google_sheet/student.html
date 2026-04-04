@@ -232,6 +232,17 @@ button:hover{transform:translateY(-1px)}
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  background:#eef2ff;
+  color:#334155;
+  border:1px solid var(--line);
+}
 .exam-protected,
 .exam-protected *{
   -webkit-user-select:none;
@@ -243,7 +254,7 @@ button:hover{transform:translateY(-1px)}
   position:fixed;
   right:14px;
   bottom:14px;
-  width:140px;
+  width:160px;
   background:rgba(15,23,42,.92);
   color:#fff;
   border:1px solid rgba(255,255,255,.12);
@@ -255,7 +266,7 @@ button:hover{transform:translateY(-1px)}
 }
 .camera-monitor video{
   width:100%;
-  height:105px;
+  height:120px;
   object-fit:cover;
   display:block;
   background:#000;
@@ -285,6 +296,45 @@ button:hover{transform:translateY(-1px)}
   color:#b91c1c;
   font-size:13px;
 }
+.warning-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9997;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.warning-overlay.show{display:flex}
+.warning-card{
+  width:min(100%,560px);
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:22px;
+  box-shadow:0 24px 60px rgba(0,0,0,.22);
+  padding:22px;
+}
+.warning-card h3{
+  margin:0 0 10px;
+  font-size:1.2rem;
+}
+.warning-list{
+  margin:12px 0 18px;
+  padding-left:20px;
+  color:#334155;
+  line-height:1.7;
+}
+.warning-banner{
+  padding:12px 14px;
+  border-radius:14px;
+  background:#fff7ed;
+  border:1px solid #fdba74;
+  color:#9a3412;
+  font-size:14px;
+  margin-bottom:14px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:900px){
   .auth-wrap{grid-template-columns:1fr}
@@ -300,13 +350,14 @@ button:hover{transform:translateY(-1px)}
   .actions > *{width:100%;margin-right:0}
   .qnum{min-width:36px;height:36px}
   .camera-monitor{
-    width:110px;
+    width:118px;
     right:10px;
     bottom:10px;
   }
   .camera-monitor video{
-    height:82px;
+    height:88px;
   }
+  .warning-card{padding:18px}
 }
 </style>
 </head>
@@ -419,6 +470,26 @@ button:hover{transform:translateY(-1px)}
   <video id="cameraFeed" autoplay playsinline muted></video>
 </div>
 
+<div id="warningOverlay" class="warning-overlay">
+  <div class="warning-card">
+    <h3>Exam Instructions & Consequences</h3>
+    <div class="warning-banner">
+      Camera access is compulsory. Your face must remain visible during the exam.
+    </div>
+    <ul class="warning-list">
+      <li>Right-click, copy, cut, paste, drag, and text selection are disabled during the exam.</li>
+      <li>If you switch tabs, minimize the page, or move away from the exam window <strong>4 times</strong>, the exam will be submitted automatically.</li>
+      <li>Your camera must stay on throughout the exam.</li>
+      <li>Do not refresh, close, or leave the page unless instructed.</li>
+      <li>By continuing, you agree to these monitoring rules.</li>
+    </ul>
+    <div class="actions">
+      <button type="button" id="cancelStartBtn" class="ghost">Cancel</button>
+      <button type="button" id="continueStartBtn">I Understand, Start Exam</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 const TOKEN_KEY = "cbt_auth_token";
@@ -439,6 +510,7 @@ let cameraStream = null;
 let violationCount = 0;
 let lastViolationAt = 0;
 let protectionArmed = false;
+let pendingUnlockData = null;
 
 function showLoader(text = "Loading...") {
   loaderText.textContent = text;
@@ -689,25 +761,39 @@ function clearProctorAlert() {
   if (box) box.remove();
 }
 
+function showWarningOverlay() {
+  $("warningOverlay").classList.add("show");
+}
+function hideWarningOverlay() {
+  $("warningOverlay").classList.remove("show");
+}
+
 async function startCameraMonitor() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     setStatus("unlockStatus", "This browser does not support camera access.");
     return false;
   }
 
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-      audio: false
-    });
-    const video = $("cameraFeed");
-    video.srcObject = cameraStream;
-    $("cameraMonitor").classList.remove("hidden");
-    return true;
-  } catch (error) {
-    setStatus("unlockStatus", "Camera permission is required before the exam can start.");
-    return false;
+  const tries = [
+    { video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+    { video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+    { video: true, audio: false }
+  ];
+
+  for (const constraints of tries) {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const video = $("cameraFeed");
+      video.srcObject = cameraStream;
+      $("cameraMonitor").classList.remove("hidden");
+      return true;
+    } catch (error) {
+      // try next fallback
+    }
   }
+
+  setStatus("unlockStatus", "Camera permission is required before the exam can start.");
+  return false;
 }
 
 function stopCameraMonitor() {
@@ -860,8 +946,22 @@ async function unlockExam() {
     return;
   }
 
+  pendingUnlockData = { examCode, response: res };
+  showWarningOverlay();
+}
+
+async function proceedStartExam() {
+  if (!pendingUnlockData || !pendingUnlockData.response || !pendingUnlockData.response.data) return;
+
+  hideWarningOverlay();
+  showLoader("Starting camera...");
   const cameraOk = await startCameraMonitor();
+  hideLoader();
+
   if (!cameraOk) return;
+
+  const res = pendingUnlockData.response;
+  const examCode = pendingUnlockData.examCode;
 
   currentQuestions = res.data.questions || [];
   timeRemaining = Number(res.data.durationMinutes || 20) * 60;
@@ -939,6 +1039,11 @@ $("logoutBtn").addEventListener("click", logoutCurrent);
 $("verifyBtn").addEventListener("click", verifyCandidate);
 $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
+$("cancelStartBtn").addEventListener("click", function(){
+  hideWarningOverlay();
+  pendingUnlockData = null;
+});
+$("continueStartBtn").addEventListener("click", proceedStartExam);
 
 (async function init() {
   if (await validatePortal("student")) {
