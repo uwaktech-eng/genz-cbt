@@ -1,460 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CBT Admin Portal</title>
-  <style>
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:#f8fafc;color:#0f172a;overflow-x:hidden}
-    header{background:#0f172a;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    header a{color:#facc15;text-decoration:none;font-weight:bold}
-    .container{width:min(100%,1220px);max-width:1220px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,.08)}
-    .full{grid-column:1/-1}
-    label{display:block;font-weight:bold;margin-bottom:6px;font-size:14px}
-    input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:14px;font-size:15px}
-    textarea{min-height:90px;resize:vertical}
-    button{border:none;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-right:8px;margin-bottom:8px;background:#0f172a;color:#fff;transition:opacity .2s ease, transform .2s ease}
-    button:hover{opacity:.94}
-    button:disabled{opacity:.65;cursor:not-allowed}
-    .danger{background:#dc2626}.success{background:#15803d}.muted{background:#475569}.warn{background:#b45309}
-    .item{background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0f172a;border-radius:10px;padding:12px;margin-bottom:12px}
-    .question-image-preview{max-width:220px;max-height:160px;display:block;margin:10px 0;border:1px solid #ddd;border-radius:8px}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border:1px solid #cbd5e1;padding:10px;text-align:left;font-size:14px;vertical-align:top}
-    th{background:#e2e8f0}
-    .status{font-size:14px;margin-top:8px;min-height:20px}.error{color:#b91c1c}.ok{color:#166534}.hidden{display:none}
-    .auth-wrap{width:min(100%,820px);max-width:820px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    .info-box{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .search-input{max-width:420px}
-    .action-row{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
-    .pill-on{background:#dcfce7;color:#166534}.pill-off{background:#fee2e2;color:#b91c1c}
-    .loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(2px)}
-    .spinner-card{background:#fff;border-radius:16px;padding:22px 26px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:14px}
-    .spinner{width:26px;height:26px;border:3px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin .8s linear infinite}
-    .button-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @media (max-width:900px){.container,.auth-wrap,.grid-2{grid-template-columns:1fr}}
-    @media (max-width:640px){header{padding:14px 12px}header h1{font-size:20px}.container,.auth-wrap{padding:0 12px;margin:16px auto}.card{padding:16px;border-radius:12px}button{width:100%;margin-right:0}header div{width:100%;display:flex;gap:8px;flex-wrap:wrap}header a,header button{flex:1 1 auto;text-align:center}.search-input{max-width:100%}th,td{font-size:13px;padding:8px}.action-row{flex-direction:column}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Admin Dashboard</title>
+<style>
+:root{--bg:#071122;--panel:#ffffff;--soft:#f4f7ff;--line:#d9e2f3;--text:#0f172a;--muted:#64748b;--primary:#6d5efc;--accent:#0ea5e9;--success:#15803d;--danger:#dc2626;--warn:#b45309}
+*{box-sizing:border-box;font-family:Inter,Arial,sans-serif} body{margin:0;background:linear-gradient(180deg,#eef4ff,#f8fbff);color:var(--text)}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{max-width:1280px;margin:auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}.brand-badge{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent))}
+h1,h2,h3{margin:0} .muted{color:var(--muted)}
+.wrap{max-width:1280px;margin:auto;padding:18px 16px 34px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.card{grid-column:span 6;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 12px 34px rgba(15,23,42,.06)}
+.full{grid-column:1/-1}
+label{display:block;font-size:14px;font-weight:700;margin:0 0 6px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;margin:0 0 12px}
+textarea{min-height:92px;resize:vertical}
+input[type="checkbox"]{width:auto;margin-right:8px}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+button,.btn{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;transition:.2s transform,.2s opacity,.2s background}
+button:hover,.btn:hover{transform:translateY(-1px)}
+.primary{background:linear-gradient(135deg,var(--primary),#4f8cff);color:#fff}
+.success{background:var(--success);color:#fff}
+.danger{background:var(--danger);color:#fff}
+.warn{background:var(--warn);color:#fff}
+.ghost{background:#eef2ff;color:#243b67}
+.status{font-size:14px;margin-top:8px;min-height:20px}.ok{color:var(--success)} .error{color:var(--danger)}
+.hidden{display:none!important}
+.pill{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;font-size:12px;background:#eef2ff;color:#334155;border:1px solid var(--line);gap:6px}
+.info{padding:12px 14px;border-radius:14px;background:#f6faff;border:1px solid #cfe6ff;color:#175b9e;font-size:14px}
+.search{max-width:420px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:12px}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
+th{background:#f8fbff;position:sticky;top:0}
+.small-btn{min-height:34px;padding:0 12px;border-radius:10px;font-size:13px}
+.auth-shell{max-width:980px;margin:36px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.loader-overlay{position:fixed;inset:0;background:rgba(7,17,34,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999}
+.loader-overlay.show{display:flex}
+.loader-card{background:#fff;padding:18px 20px;border-radius:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:980px){.card{grid-column:1/-1}.row{grid-template-columns:1fr}.auth-shell{grid-template-columns:1fr}}
+@media (max-width:640px){.wrap{padding:14px}.card{padding:15px;border-radius:16px}.top{padding:12px 14px}table{min-width:640px}}
+</style>
 </head>
 <body>
+<div class="loader-overlay" id="loader"><div class="loader-card"><div class="spinner"></div><div id="loaderText">Loading...</div></div></div>
+
 <header>
-  <h1 style="margin:0;">CBT Admin Portal</h1>
-  <div><a href="index.html">← Back Home</a><button id="logoutBtn" class="hidden" type="button">Logout</button></div>
+  <div class="top">
+    <div class="brand">
+      <div class="brand-badge"></div>
+      <div>
+        <h1 style="font-size:1.25rem">CBT Admin Dashboard</h1>
+        <div class="muted">Multi-exam control, current exam selection, archiving, duplicate, permissions</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn ghost" href="index.html" style="text-decoration:none">Home</a>
+      <button class="ghost hidden" id="logoutBtn" type="button">Logout</button>
+    </div>
+  </div>
 </header>
 
-<div id="loadingOverlay" class="loading-overlay hidden">
-  <div class="spinner-card"><div class="spinner"></div><div id="loadingText">Loading...</div></div>
-</div>
-
-<div id="authSection">
-  <div class="auth-wrap">
+<section id="authSection">
+  <div class="auth-shell">
     <div class="card">
       <h2>Admin Login</h2>
-      <label>Username</label><input type="text" id="loginUsername">
-      <label>Password</label><input type="password" id="loginPassword">
-      <button class="success" id="loginBtn" type="button">Login</button>
+      <p class="muted" style="margin:8px 0 16px">Sign in to manage exams and students.</p>
+      <label>Username</label><input id="loginUsername" type="text">
+      <label>Password</label><input id="loginPassword" type="password">
+      <button class="primary" id="loginBtn" type="button">Login</button>
       <div id="loginStatus" class="status"></div>
     </div>
     <div class="card">
-      <h2>Admin Signup</h2>
-      <label>Full Name</label><input type="text" id="signupFullName">
-      <label>Username</label><input type="text" id="signupUsername">
-      <label>Password</label><input type="password" id="signupPassword">
-      <label>Admin Signup Key</label><input type="password" id="signupAdminKey">
+      <h2>Create Admin Account</h2>
+      <p class="muted" style="margin:8px 0 16px">Use your private admin signup key once.</p>
+      <label>Full Name</label><input id="signupFullName" type="text">
+      <label>Username</label><input id="signupUsername" type="text">
+      <label>Password</label><input id="signupPassword" type="password">
+      <label>Admin Signup Key</label><input id="signupAdminKey" type="password">
       <button class="success" id="signupBtn" type="button">Sign Up</button>
       <div id="signupStatus" class="status"></div>
     </div>
   </div>
-</div>
+</section>
 
-<div id="portalSection" class="hidden">
-  <div class="container">
-    <div class="card">
-      <h2>Exam Settings</h2>
-      <label>Exam Title</label><input type="text" id="examTitle">
-      <label>Duration (Minutes)</label><input type="number" id="durationMinutes" min="1" value="20">
-      <label><input type="checkbox" id="portalLocked" style="width:auto;margin-right:8px;"> Lock CBT Portal</label>
-      <label>Lock Notice</label><textarea id="portalNotice"></textarea>
-      <button class="success" id="saveSettingsBtn" type="button">Save Settings</button>
-      <div id="settingsStatus" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h2>Student Accounts</h2>
-      <label>Password Length</label><input type="number" id="passwordLength" min="6" value="8">
-      <button class="success" id="generateAccountsBtn" type="button">Generate Student Passwords</button>
-      <button class="muted" id="downloadGeneratedBtn" type="button">Download Last Generated CSV</button>
-      <div id="accountsStatus" class="status"></div>
-      <hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0;">
-      <label>Student Username / Reg ID</label><input type="text" id="resetUsername">
-      <label>New Password (blank = auto-generate)</label><input type="text" id="resetPassword">
-      <button class="success" id="resetPasswordBtn" type="button">Reset Student Password</button>
-      <div id="resetPasswordStatus" class="status"></div>
-    </div>
-
-    <div class="card full">
-      <h2>Admin Management</h2>
-      <input type="text" id="adminSearch" class="search-input" placeholder="Search admins by name or username">
-      <div id="adminsBox">Loading admins...</div>
-    </div>
-
-    <div class="card full">
-      <h2>Student Management</h2>
-      <input type="text" id="accountSearch" class="search-input" placeholder="Search students by name or username">
-      <div id="accountsListBox">Loading student accounts...</div>
-    </div>
-
-    <div class="card">
-      <h2 id="candidateFormTitle">Add Candidate</h2>
-      <label>Full Name</label><input type="text" id="candidateName">
-      <label>Reg ID</label><input type="text" id="candidateRegId">
-      <input type="hidden" id="candidateOldRegId">
-      <button class="success" id="addCandidateBtn" type="button">Add Candidate</button>
-      <button class="warn hidden" id="updateCandidateBtn" type="button">Save Candidate Changes</button>
-      <button class="muted hidden" id="cancelCandidateEditBtn" type="button">Cancel Edit</button>
-      <div id="candidateStatus" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h2>Import Candidates CSV</h2>
-      <div class="info-box">CSV headers: <strong>fullName,regId</strong></div>
-      <input type="file" id="candidateCsvFile" accept=".csv">
-      <button class="success" id="importCandidatesBtn" type="button">Import Candidates CSV</button>
-      <div id="candidateImportStatus" class="status"></div>
-    </div>
-
-    <div class="card full">
-      <h2 id="questionFormTitle">Add Question</h2>
-      <input type="hidden" id="questionId">
-      <label>Question</label><textarea id="questionText"></textarea>
-      <label>Image URL (optional)</label><input type="text" id="imageUrl">
-      <div class="grid-2">
-        <div><label>Option A</label><input type="text" id="optionA"></div>
-        <div><label>Option B</label><input type="text" id="optionB"></div>
-        <div><label>Option C</label><input type="text" id="optionC"></div>
-        <div><label>Option D</label><input type="text" id="optionD"></div>
+<section id="portalSection" class="hidden">
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <h2>Portal Settings</h2>
+        <div class="info" style="margin:10px 0 14px">Portal lock affects every student. Current exam is selected below in the Exams table.</div>
+        <label><input id="portalLocked" type="checkbox"> Lock Entire CBT Portal</label>
+        <label>Portal Notice</label><textarea id="portalNotice" placeholder="What students should see when the portal is locked"></textarea>
+        <button class="primary" id="saveSettingsBtn" type="button">Save Portal Settings</button>
+        <div id="settingsStatus" class="status"></div>
       </div>
-      <label>Correct Answer</label>
-      <select id="correctAnswer"><option value="">Select answer</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
-      <button class="success" id="addQuestionBtn" type="button">Add Question</button>
-      <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
-      <button class="muted hidden" id="cancelQuestionEditBtn" type="button">Cancel Edit</button>
-      <button class="danger" id="clearQuestionsBtn" type="button">Clear All Questions</button>
-      <div id="questionStatus" class="status"></div>
-    </div>
 
-    <div class="card full">
-      <h2>Import Questions CSV</h2>
-      <div class="info-box">CSV headers: <strong>question,imageUrl,optionA,optionB,optionC,optionD,answer</strong></div>
-      <input type="file" id="questionCsvFile" accept=".csv">
-      <button class="success" id="importQuestionsBtn" type="button">Import Questions CSV</button>
-      <div id="questionImportStatus" class="status"></div>
-    </div>
-
-    <div class="card full">
-      <h2>Candidates</h2>
-      <input type="text" id="candidateSearch" class="search-input" placeholder="Search candidates by name or Reg ID">
-      <div id="candidatesBox">Loading candidates...</div>
-    </div>
-
-    <div class="card full">
-      <h2>Questions</h2>
-      <input type="text" id="questionSearch" class="search-input" placeholder="Search questions, options, answer">
-      <div id="questionsBox">Loading questions...</div>
-    </div>
-
-    <div class="card full">
-      <h2>Results Summary</h2>
-      <input type="text" id="resultsSearch" class="search-input" placeholder="Search results by name, Reg ID, score, percentage, ranking">
-      <div class="item" style="margin-top:12px;">
-        <h3 style="margin-top:0;">Edit / Invalidate / Reopen One Candidate</h3>
-        <div class="grid-2">
-          <div><label>Reg ID</label><input type="text" id="resultRegId"></div>
-          <div><label>Full Name</label><input type="text" id="resultFullName"></div>
-          <div><label>Raw Score</label><input type="number" id="resultRawScore" min="0"></div>
-          <div><label>Total Questions</label><input type="number" id="resultTotalQuestions" min="1"></div>
+      <div class="card">
+        <h2>Create New Exam</h2>
+        <label>Exam Title</label><input id="examTitle" type="text" placeholder="e.g. Mock Mathematics CBT">
+        <div class="row">
+          <div><label>Unique Exam Code</label><input id="examCode" type="text" placeholder="e.g. MATH-MOCK-01"></div>
+          <div><label>Duration (Minutes)</label><input id="examDuration" type="number" min="1" value="20"></div>
         </div>
-        <label>Passed Question Nos</label><input type="text" id="resultPassedNos">
-        <label>Failed Question Nos</label><input type="text" id="resultFailedNos">
-        <label>Reason (for invalidate/reopen)</label><input type="text" id="resultReason">
-        <button class="warn" id="updateResultBtn" type="button">Save Result Changes</button>
-        <button class="danger" id="invalidateResultBtn" type="button">Invalidate Submission</button>
-        <button class="muted" id="reopenExamBtn" type="button">Reopen Exam For Candidate</button>
-        <button class="muted" id="cancelResultEditBtn" type="button">Clear Result Form</button>
+        <button class="success" id="createExamBtn" type="button">Create Exam</button>
+        <div id="createExamStatus" class="status"></div>
       </div>
-      <div style="margin-top:10px;"><button class="danger" id="clearResultsBtn" type="button">Clear Results</button><button class="success" id="exportResultsBtn" type="button">Export Results CSV</button></div>
-      <div id="resultsStatus" class="status"></div>
-      <div id="resultsBox">Loading results...</div>
+
+      <div class="card full">
+        <div class="actions" style="justify-content:space-between">
+          <div>
+            <h2>Exams</h2>
+            <div class="muted" style="margin-top:6px">Set one exam as current, archive old exams, or duplicate an old exam with all its questions.</div>
+          </div>
+        </div>
+        <div id="examsBox"></div>
+      </div>
+
+      <div class="card">
+        <h2>Add Candidates</h2>
+        <div class="row">
+          <div><label>Full Name</label><input id="candidateName" type="text"></div>
+          <div><label>Reg ID</label><input id="candidateRegId" type="text"></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="addCandidateBtn" type="button">Add Candidate</button>
+        </div>
+        <label>Import Candidates CSV</label>
+        <input id="candidateCsvFile" type="file" accept=".csv">
+        <div class="muted" style="margin-top:-4px;margin-bottom:8px">Headers: <b>fullName,regId</b></div>
+        <button class="ghost" id="importCandidatesBtn" type="button">Import Candidates CSV</button>
+        <div id="candidateStatus" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>Student Accounts</h2>
+        <label>Generated Password Length</label><input id="passwordLength" type="number" min="6" value="8">
+        <div class="actions">
+          <button class="success" id="generateAccountsBtn" type="button">Generate Student Passwords</button>
+          <button class="ghost" id="downloadGeneratedBtn" type="button">Download Last CSV</button>
+        </div>
+        <div id="accountsStatus" class="status"></div>
+      </div>
+
+      <div class="card full">
+        <div class="actions" style="justify-content:space-between;align-items:center">
+          <div>
+            <h2>Question Builder</h2>
+            <div class="muted" style="margin-top:6px">Questions belong to a specific exam. Select an exam first.</div>
+          </div>
+          <div class="pill">Selected exam: <span id="selectedExamBadge">None</span></div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <div>
+            <label>Exam For New Questions</label>
+            <select id="questionExamSelect"></select>
+          </div>
+          <div>
+            <label>Import Questions CSV</label>
+            <input id="questionCsvFile" type="file" accept=".csv">
+          </div>
+        </div>
+        <div class="muted" style="margin:-2px 0 10px">Question CSV headers: <b>question,imageUrl,optionA,optionB,optionC,optionD,answer</b></div>
+        <input id="questionEditId" type="hidden">
+        <label>Question</label><textarea id="questionText"></textarea>
+        <label>Image URL (optional)</label><input id="imageUrl" type="text" placeholder="Paste direct image URL">
+        <div class="row">
+          <div><label>Option A</label><input id="optionA" type="text"></div>
+          <div><label>Option B</label><input id="optionB" type="text"></div>
+          <div><label>Option C</label><input id="optionC" type="text"></div>
+          <div><label>Option D</label><input id="optionD" type="text"></div>
+        </div>
+        <label>Correct Answer</label>
+        <select id="correctAnswer"><option value="">Select answer</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+        <div class="actions">
+          <button class="primary" id="addQuestionBtn" type="button">Add Question</button>
+          <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
+          <button class="ghost hidden" id="cancelQuestionEditBtn" type="button">Cancel Edit</button>
+          <button class="ghost" id="importQuestionsBtn" type="button">Import Questions CSV</button>
+          <button class="danger" id="clearQuestionsBtn" type="button">Clear Questions For Selected Exam</button>
+        </div>
+        <div id="questionStatus" class="status"></div>
+      </div>
+
+      <div class="card full">
+        <div class="actions" style="justify-content:space-between;align-items:center">
+          <h2>Questions In Selected Exam</h2>
+          <input id="questionSearch" class="search" type="text" placeholder="Search current exam questions">
+        </div>
+        <div id="questionsBox"></div>
+      </div>
+
+      <div class="card">
+        <h2>Permission Code</h2>
+        <div class="muted" style="margin:8px 0 14px">Give one student permission to rewrite a particular exam once.</div>
+        <label>Exam Code</label><input id="permExamCode" type="text" placeholder="e.g. MATH-MOCK-01">
+        <div class="row">
+          <div><label>Reg ID</label><input id="permRegId" type="text"></div>
+          <div><label>Username (optional)</label><input id="permUsername" type="text"></div>
+        </div>
+        <label>Reason</label><input id="permReason" type="text" placeholder="e.g. power outage">
+        <button class="warn" id="createPermissionBtn" type="button">Create Permission Code</button>
+        <div id="permissionStatus" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>Results By Exam</h2>
+        <label>Exam Code</label><input id="resultsExamCode" type="text" placeholder="Type exam code to load/export results">
+        <div class="actions">
+          <button class="primary" id="loadResultsBtn" type="button">Load Results</button>
+          <button class="success" id="exportResultsBtn" type="button">Export Results CSV</button>
+        </div>
+        <div id="resultsStatus" class="status"></div>
+      </div>
+
+      <div class="card full">
+        <h2>Candidates</h2>
+        <input id="candidateSearch" class="search" type="text" placeholder="Search candidates by name or Reg ID">
+        <div id="candidatesBox"></div>
+      </div>
+
+      <div class="card full">
+        <h2>Users</h2>
+        <div class="row">
+          <div>
+            <h3 style="margin-bottom:10px">Admins</h3>
+            <div id="adminsBox"></div>
+          </div>
+          <div>
+            <h3 style="margin-bottom:10px">Students</h3>
+            <div id="studentsBox"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card full">
+        <h2>Permission Codes</h2>
+        <div id="permissionCodesBox"></div>
+      </div>
+
+      <div class="card full">
+        <h2>Results Table</h2>
+        <div id="resultsBox"></div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <script>
 const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
-const TOKEN_KEY = "cbt_admin_token";
-const ROLE_KEY = "cbt_admin_role";
-const USER_KEY = "cbt_admin_username";
+const ADMIN_TOKEN_KEY = "cbt_admin_token_v2";
+let examsData=[], questionsData=[], resultsData=[], lastGeneratedCsv="", lastGeneratedFilename="student_passwords.csv";
 
-let lastGeneratedCsv = "", lastGeneratedFilename = "student_accounts_passwords.csv";
-let candidatesData = [], questionsData = [], resultsData = [], accountsData = [], adminsData = [];
+function showLoader(text="Loading..."){ loaderText.textContent=text; loader.classList.add('show'); }
+function hideLoader(){ loader.classList.remove('show'); }
 
-const resultRegId=document.getElementById('resultRegId'),
-      resultFullName=document.getElementById('resultFullName'),
-      resultRawScore=document.getElementById('resultRawScore'),
-      resultTotalQuestions=document.getElementById('resultTotalQuestions'),
-      resultPassedNos=document.getElementById('resultPassedNos'),
-      resultFailedNos=document.getElementById('resultFailedNos'),
-      resultReason=document.getElementById('resultReason'),
-      overlay=document.getElementById('loadingOverlay'),
-      loadingText=document.getElementById('loadingText');
+function getToken(){ return localStorage.getItem(ADMIN_TOKEN_KEY) || ""; }
+function setAuth(data){ localStorage.setItem(ADMIN_TOKEN_KEY, data.token); }
+function clearAuth(){ localStorage.removeItem(ADMIN_TOKEN_KEY); }
 
-function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
-function getUsername(){ return localStorage.getItem(USER_KEY) || ""; }
-function setAuth(data){ localStorage.setItem(TOKEN_KEY, data.token); localStorage.setItem(ROLE_KEY, data.role); localStorage.setItem(USER_KEY, data.username); }
-function clearAuth(){ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(USER_KEY); }
-
-function showLoading(text){ loadingText.textContent = text || "Loading..."; overlay.classList.remove("hidden"); }
-function hideLoading(){ overlay.classList.add("hidden"); }
-
-function setButtonLoading(btn, isLoading, text){
-  if (!btn) return;
-  if (isLoading){
-    btn.dataset.original = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="button-spinner"></span>' + (text || 'Processing...');
-  } else {
-    btn.disabled = false;
-    if (btn.dataset.original) btn.innerHTML = btn.dataset.original;
-  }
-}
-
-async function withLoading(button, text, fn){
+async function apiRequest(action, payload={}, method="POST"){
+  payload = payload || {};
+  if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
   try{
-    setButtonLoading(button, true, text);
-    return await fn();
-  } finally {
-    setButtonLoading(button, false);
-  }
-}
-
-async function apiRequest(action, payload=null, method="POST"){
-  try{
-    payload = payload || {};
-    if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
-
     let response;
     if (method === "GET"){
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
-      Object.keys(payload).forEach((key) => {
-        const value = payload[key];
-        if (value !== undefined && value !== null) {
-          url.searchParams.set(key, typeof value === "object" ? JSON.stringify(value) : String(value));
-        }
-      });
-      response = await fetch(url.toString(), { method: "GET" });
-    } else {
+      Object.keys(payload).forEach(k => url.searchParams.set(k, typeof payload[k] === "object" ? JSON.stringify(payload[k]) : String(payload[k])));
+      response = await fetch(url.toString(), {method:"GET"});
+    }else{
       const form = new URLSearchParams();
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
-      response = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
-        body: form.toString()
-      });
+      response = await fetch(APPS_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:form.toString()});
     }
-
     const text = await response.text();
-    try { return JSON.parse(text); }
-    catch (err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
-  }catch(error){
-    return {ok:false, message:error.message || "Failed to fetch."};
-  }
+    try{ return JSON.parse(text); }catch(err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
+  }catch(err){ return {ok:false, message:err.message || "Failed to fetch."}; }
 }
-
-function setStatus(id, message, ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
-function downloadText(filename, text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
+function setStatus(id,msg,ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=msg||""; }
 function splitCsvLine(line){ const result=[]; let current="", inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; } if(ch==='"'){ inQuotes=!inQuotes; continue; } if(ch===',' && !inQuotes){ result.push(current); current=""; continue; } current+=ch; } result.push(current); return result; }
 function parseCsv(text){ const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim()); if(!lines.length) return []; const rows=lines.map(splitCsvLine); const headers=rows[0].map(h=>h.trim()); return rows.slice(1).map(cols=>{ const obj={}; headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim()); return obj; }); }
 async function fileToText(file){ return await file.text(); }
+function downloadText(filename,text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
 
-async function validatePortal(role){
-  const token=getToken();
-  if(!token) return false;
+async function loginAdmin(){
+  showLoader("Signing in...");
+  const res = await apiRequest("login",{username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"},"POST");
+  hideLoader();
+  setStatus("loginStatus", res.message, res.ok);
+  if(res.ok && res.data){ setAuth(res.data); await showPortal(); }
+}
+async function signupAdmin(){
+  showLoader("Creating admin account...");
+  const res = await apiRequest("signup",{fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value.trim(), role:"admin"},"POST");
+  hideLoader();
+  setStatus("signupStatus", res.message, res.ok);
+}
+async function validatePortal(){
+  const token=getToken(); if(!token) return false;
   const res=await apiRequest("validateSession",{token},"POST");
-  if(!res.ok || !res.data || res.data.role!==role){ clearAuth(); return false; }
+  if(!res.ok || !res.data || res.data.role!=="admin"){ clearAuth(); return false; }
   return true;
 }
+async function logoutCurrent(){ showLoader("Signing out..."); await apiRequest("logout",{token:getToken()},"POST"); hideLoader(); clearAuth(); location.reload(); }
 
 async function showPortal(){
   authSection.classList.add("hidden");
   portalSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
-  showLoading("Loading dashboard...");
-  try{
-    await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadAdminAccounts(), loadQuestions(), loadResults()]);
-  } finally {
-    hideLoading();
-  }
+  await refreshAll();
 }
-
-async function signupAdmin(){
-  await withLoading(signupBtn, "Signing up...", async () => {
-    const res=await apiRequest("signup", {fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value, role:"admin"}, "POST");
-    setStatus("signupStatus", res.message, res.ok);
-  });
+async function refreshAll(){
+  showLoader("Loading dashboard...");
+  await Promise.all([loadSettings(), loadExams(), loadCandidates(), loadUsers(), loadPermissionCodes()]);
+  hideLoader();
 }
-
-async function loginAdmin(){
-  await withLoading(loginBtn, "Logging in...", async () => {
-    const res=await apiRequest("login", {username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"}, "POST");
-    setStatus("loginStatus", res.message, res.ok);
-    if(res.ok && res.data){ setAuth(res.data); await showPortal(); }
-  });
-}
-
-async function logoutCurrent(){
-  showLoading("Logging out...");
-  try{
-    await apiRequest("logout", {token:getToken()}, "POST");
-  } finally {
-    clearAuth();
-    location.reload();
-  }
-}
-
 async function loadSettings(){
-  const res=await apiRequest("getSettings", {}, "GET");
+  const res=await apiRequest("getSettings",{},"GET");
   if(res.ok && res.data){
-    examTitle.value=res.data.examTitle||"";
-    durationMinutes.value=res.data.durationMinutes||20;
     portalLocked.checked=!!res.data.portalLocked;
     portalNotice.value=res.data.portalNotice||"";
   }
 }
 async function saveSettings(){
-  await withLoading(saveSettingsBtn, "Saving...", async () => {
-    const res=await apiRequest("saveSettings", {examTitle:examTitle.value.trim(), durationMinutes:durationMinutes.value.trim(), portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()}, "POST");
-    setStatus("settingsStatus", res.message, res.ok);
+  showLoader("Saving settings...");
+  const res=await apiRequest("saveSettings",{portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()},"POST");
+  hideLoader(); setStatus("settingsStatus", res.message, res.ok);
+}
+async function createExam(){
+  showLoader("Creating exam...");
+  const res=await apiRequest("createExam",{title:examTitle.value.trim(), examCode:examCode.value.trim(), durationMinutes:examDuration.value},"POST");
+  hideLoader(); setStatus("createExamStatus", res.message, res.ok);
+  if(res.ok){ examTitle.value=""; examCode.value=""; examDuration.value=20; await loadExams(); }
+}
+async function loadExams(){
+  const res=await apiRequest("listExams",{},"GET");
+  if(!res.ok){ examsBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
+  examsData = res.data || [];
+  renderExamSelects();
+  renderExams();
+}
+function renderExamSelects(){
+  const opts = ['<option value="">Select exam</option>'].concat(examsData.map(e=>`<option value="${e.examCode}">${e.examCode} — ${e.title}</option>`)).join('');
+  questionExamSelect.innerHTML = opts;
+}
+function renderExams(){
+  if(!examsData.length){ examsBox.innerHTML='<div class="muted">No exams created yet.</div>'; return; }
+  let html=`<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+  examsData.forEach(e=>{
+    const status = `${e.isCurrent ? 'Current' : 'Not Current'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
+    html += `<tr>
+      <td>${e.examCode}</td>
+      <td>${e.title}</td>
+      <td>${e.durationMinutes} mins</td>
+      <td>${status}</td>
+      <td>
+        <div class="actions">
+          <button class="small-btn primary" type="button" onclick="setCurrentExam('${e.examCode}')">Set Current</button>
+          <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${e.examCode}')">Use In Builder</button>
+          <button class="small-btn ${e.examLocked ? 'success' : 'warn'}" type="button" onclick="toggleExamLock('${e.examCode}', ${e.examLocked ? 'false':'true'})">${e.examLocked ? 'Unlock Exam' : 'Lock Exam'}</button>
+          <button class="small-btn warn" type="button" onclick="duplicateExamPrompt('${e.examCode}')">Duplicate</button>
+          <button class="small-btn danger" type="button" onclick="toggleArchiveExam('${e.examCode}', ${e.isArchived ? 'false':'true'})">${e.isArchived ? 'Restore':'Archive'}</button>
+        </div>
+      </td>
+    </tr>`;
   });
+  examsBox.innerHTML = html + '</tbody></table></div>';
+}
+async function setCurrentExam(examCode){
+  showLoader("Switching current exam...");
+  const res=await apiRequest("setCurrentExam",{examCode},"POST");
+  hideLoader();
+  if(!res.ok) return alert(res.message);
+  await loadExams();
+}
+function pickExamForQuestions(examCode){
+  questionExamSelect.value = examCode;
+  selectedExamBadge.textContent = examCode;
+  permExamCode.value = examCode;
+  resultsExamCode.value = examCode;
+  loadQuestionsForSelectedExam();
+}
+async function toggleArchiveExam(examCode, archived){
+  showLoader("Updating exam...");
+  const res=await apiRequest("archiveExam",{examCode, archived},"POST");
+  hideLoader();
+  if(!res.ok) return alert(res.message);
+  await loadExams();
+}
+async function toggleExamLock(examCode, locked){
+  const notice = locked ? (prompt("Lock notice students should see for this exam:", "This exam is currently locked.") || "") : "";
+  showLoader(locked ? "Locking exam..." : "Unlocking exam...");
+  const res=await apiRequest("setExamLock",{examCode, locked, notice},"POST");
+  hideLoader();
+  if(!res.ok) return alert(res.message);
+  await loadExams();
+}
+async function duplicateExamPrompt(sourceExamCode){
+  const newCode = prompt("New unique exam code:");
+  if(!newCode) return;
+  const newTitle = prompt("New exam title:");
+  if(!newTitle) return;
+  showLoader("Duplicating exam...");
+  const res=await apiRequest("duplicateExam",{sourceExamCode, newExamCode:newCode.trim(), newTitle:newTitle.trim()},"POST");
+  hideLoader();
+  alert(res.message + (res.ok && res.data ? ` Copied questions: ${res.data.copiedQuestions}` : ""));
+  if(res.ok) await loadExams();
+}
+async function addCandidate(){
+  showLoader("Adding candidate...");
+  const res=await apiRequest("addCandidate",{fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()},"POST");
+  hideLoader();
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){ candidateName.value=""; candidateRegId.value=""; await loadCandidates(); }
+}
+async function importCandidates(){
+  const file = candidateCsvFile.files[0];
+  if(!file) return setStatus("candidateStatus","Choose a candidate CSV first.");
+  const rows=parseCsv(await fileToText(file));
+  showLoader("Importing candidates...");
+  const res=await apiRequest("importCandidates",{rows},"POST");
+  hideLoader();
+  setStatus("candidateStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
+  if(res.ok) await loadCandidates();
+}
+let candidatesData=[];
+async function loadCandidates(){
+  const res=await apiRequest("listCandidates",{},"GET");
+  if(!res.ok){ candidatesBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
+  candidatesData=res.data||[];
+  renderCandidates();
+}
+function renderCandidates(){
+  const q=(candidateSearch.value||"").trim().toLowerCase();
+  const list=candidatesData.filter(c=>!q || `${c.fullName} ${c.regId}`.toLowerCase().includes(q));
+  if(!list.length){ candidatesBox.innerHTML='<div class="muted">No candidates found.</div>'; return; }
+  let html=`<div class="table-wrap"><table><thead><tr><th>Full Name</th><th>Reg ID</th></tr></thead><tbody>`;
+  list.forEach(c=> html += `<tr><td>${c.fullName}</td><td>${c.regId}</td></tr>`);
+  candidatesBox.innerHTML=html+'</tbody></table></div>';
+}
+async function generateAccounts(){
+  showLoader("Generating student accounts...");
+  const res=await apiRequest("generateStudentAccounts",{passwordLength:passwordLength.value},"POST");
+  hideLoader();
+  setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok);
+  if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || 'student_accounts_passwords.csv'; downloadText(lastGeneratedFilename,lastGeneratedCsv); await loadUsers(); }
+}
+function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus","No generated CSV in this session."); downloadText(lastGeneratedFilename,lastGeneratedCsv); }
+let adminsData=[], studentsData=[];
+async function loadUsers(){
+  const [adminsRes, studentsRes] = await Promise.all([apiRequest("listAdmins",{},"GET"), apiRequest("listStudents",{},"GET")]);
+  adminsData = adminsRes.ok ? adminsRes.data : [];
+  studentsData = studentsRes.ok ? studentsRes.data : [];
+  renderUsers();
+}
+function renderUsers(){
+  adminsBox.innerHTML = renderUserTable(adminsData, true);
+  studentsBox.innerHTML = renderUserTable(studentsData, false);
+}
+function renderUserTable(data, isAdmin){
+  if(!data.length) return '<div class="muted">No users.</div>';
+  let html=`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+  data.forEach(u=>{
+    html += `<tr><td>${u.fullName}</td><td>${u.username}</td><td>${u.isActive ? 'Active':'Inactive'}</td><td><div class="actions">
+      <button class="small-btn ${u.isActive ? 'warn':'success'}" onclick="toggleUser('${u.username}', ${u.isActive ? 'false':'true'})">${u.isActive ? 'Deactivate':'Activate'}</button>
+      <button class="small-btn danger" onclick="deleteUser('${u.username}')">Delete</button>
+    </div></td></tr>`;
+  });
+  return html + '</tbody></table></div>';
+}
+async function toggleUser(username, active){
+  showLoader("Updating user...");
+  const res=await apiRequest("setUserActive",{username, active},"POST");
+  hideLoader(); alert(res.message); if(res.ok) await loadUsers();
+}
+async function deleteUser(username){
+  if(!confirm("Delete this user?")) return;
+  showLoader("Deleting user...");
+  const res=await apiRequest("deleteUser",{username},"POST");
+  hideLoader(); alert(res.message); if(res.ok) await loadUsers();
+}
+function resetQuestionForm(){
+  questionEditId.value='';
+  questionText.value=''; imageUrl.value=''; optionA.value=''; optionB.value=''; optionC.value=''; optionD.value=''; correctAnswer.value='';
+  addQuestionBtn.classList.remove('hidden');
+  updateQuestionBtn.classList.add('hidden');
+  cancelQuestionEditBtn.classList.add('hidden');
+}
+async function addQuestion(){
+  const examCode=questionExamSelect.value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  showLoader("Adding question...");
+  const res=await apiRequest("addQuestion",{examCode, question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+}
+function startQuestionEdit(questionId){
+  const item=questionsData.find(q=>String(q.id)===String(questionId));
+  if(!item) return;
+  questionEditId.value=item.id;
+  questionText.value=item.question||'';
+  imageUrl.value=item.imageUrl||'';
+  optionA.value=item.optionA||'';
+  optionB.value=item.optionB||'';
+  optionC.value=item.optionC||'';
+  optionD.value=item.optionD||'';
+  correctAnswer.value=item.answer||'';
+  addQuestionBtn.classList.add('hidden');
+  updateQuestionBtn.classList.remove('hidden');
+  cancelQuestionEditBtn.classList.remove('hidden');
+  window.scrollTo({top:questionText.getBoundingClientRect().top + window.scrollY - 110, behavior:'smooth'});
+}
+async function updateQuestion(){
+  const examCode=questionExamSelect.value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  if(!questionEditId.value.trim()) return setStatus("questionStatus","Select a question to edit first.");
+  showLoader("Saving question changes...");
+  const res=await apiRequest("updateQuestionByExam",{examCode, questionId:questionEditId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+}
+async function deleteQuestionItem(questionId){
+  const examCode=questionExamSelect.value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  if(!confirm("Delete this question from the selected exam?")) return;
+  showLoader("Deleting question...");
+  const res=await apiRequest("deleteQuestionByExam",{examCode, questionId},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ if(questionEditId.value===String(questionId)) resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+}
+async function importQuestions(){
+  const examCode=questionExamSelect.value.trim(), file=questionCsvFile.files[0];
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  if(!file) return setStatus("questionStatus","Choose a questions CSV first.");
+  const rows=parseCsv(await fileToText(file));
+  showLoader("Importing questions...");
+  const res=await apiRequest("importQuestions",{examCode, rows},"POST");
+  hideLoader(); setStatus("questionStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
+  if(res.ok) await loadQuestionsForSelectedExam();
+}
+async function clearQuestionsByExam(){
+  const examCode=questionExamSelect.value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  if(!confirm("Clear all questions for this exam?")) return;
+  showLoader("Clearing questions...");
+  const res=await apiRequest("clearQuestionsByExam",{examCode},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok) await loadQuestionsForSelectedExam();
+}
+async function loadQuestionsForSelectedExam(){
+  const examCode=questionExamSelect.value.trim();
+  selectedExamBadge.textContent = examCode || 'None';
+  if(!examCode){ questionsBox.innerHTML='<div class="muted">Select an exam to load questions.</div>'; return; }
+  showLoader("Loading questions...");
+  const res=await apiRequest("listQuestionsByExam",{examCode},"POST");
+  hideLoader();
+  if(!res.ok){ questionsBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
+  questionsData=res.data||[];
+  renderQuestions();
+}
+function renderQuestions(){
+  const q=(questionSearch.value||"").trim().toLowerCase();
+  const list=questionsData.filter(item=>!q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
+  if(!list.length){ questionsBox.innerHTML='<div class="muted">No questions found for this exam.</div>'; return; }
+  questionsBox.innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px"><div class="actions" style="justify-content:space-between;align-items:center"><div class="pill">Question ${i+1}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button class="small-btn danger" type="button" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div><h3 style="margin:10px 0 8px;font-size:1rem">${item.question}</h3>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" style="max-width:220px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${item.optionA}<br>B. ${item.optionB}<br>C. ${item.optionC}<br>D. ${item.optionD}<br><b>Answer:</b> ${item.answer}</div></div>`).join('');
+}
+async function createPermissionCode(){
+  showLoader("Creating permission code...");
+  const res=await apiRequest("createPermissionCode",{examCode:permExamCode.value.trim(), regId:permRegId.value.trim(), username:permUsername.value.trim(), reason:permReason.value.trim()},"POST");
+  hideLoader();
+  setStatus("permissionStatus", res.ok ? `${res.message} Code: ${res.data.permissionCode}` : res.message, res.ok);
+  if(res.ok){ permReason.value=''; await loadPermissionCodes(); }
+}
+async function loadPermissionCodes(){
+  const res=await apiRequest("listPermissionCodes",{},"GET");
+  if(!res.ok){ permissionCodesBox.innerHTML=`<div class="status error">${res.message}</div>`; return; }
+  const list=res.data||[];
+  if(!list.length){ permissionCodesBox.innerHTML='<div class="muted">No permission codes yet.</div>'; return; }
+  let html=`<div class="table-wrap"><table><thead><tr><th>Code</th><th>Exam</th><th>Reg ID</th><th>Username</th><th>Status</th><th>Reason</th></tr></thead><tbody>`;
+  list.forEach(p=> html += `<tr><td>${p.permissionCode}</td><td>${p.examCode}</td><td>${p.regId}</td><td>${p.username}</td><td>${p.status}</td><td>${p.reason}</td></tr>`);
+  permissionCodesBox.innerHTML = html + '</tbody></table></div>';
+}
+async function loadResultsByExam(){
+  const examCode=resultsExamCode.value.trim();
+  if(!examCode) return setStatus("resultsStatus","Enter an exam code first.");
+  showLoader("Loading results...");
+  const res=await apiRequest("listResultsByExam",{examCode},"POST");
+  hideLoader();
+  setStatus("resultsStatus", res.message, res.ok);
+  if(!res.ok){ resultsBox.innerHTML=''; return; }
+  resultsData=res.data||[];
+  if(!resultsData.length){ resultsBox.innerHTML='<div class="muted">No results yet for this exam.</div>'; return; }
+  let html=`<div class="table-wrap"><table><thead><tr><th>Time</th><th>Exam</th><th>Attempt</th><th>Name</th><th>Reg ID</th><th>Score</th><th>%</th><th>Rank</th></tr></thead><tbody>`;
+  resultsData.forEach(r=> html += `<tr><td>${r.timestamp}</td><td>${r.examCode}</td><td>${r.attemptNo}</td><td>${r.fullName}</td><td>${r.regId}</td><td>${r.score}</td><td>${r.percentage}</td><td>${r.ranking}</td></tr>`);
+  resultsBox.innerHTML = html + '</tbody></table></div>';
+}
+async function exportResultsByExam(){
+  const examCode=resultsExamCode.value.trim();
+  if(!examCode) return setStatus("resultsStatus","Enter an exam code first.");
+  showLoader("Preparing export...");
+  const res=await apiRequest("exportResultsByExam",{examCode},"POST");
+  hideLoader();
+  setStatus("resultsStatus", res.message, res.ok);
+  if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || ('results_' + examCode + '.csv'), res.data.csv);
 }
 
-function resetCandidateForm(){ candidateFormTitle.textContent="Add Candidate"; candidateOldRegId.value=""; candidateName.value=""; candidateRegId.value=""; addCandidateBtn.classList.remove("hidden"); updateCandidateBtn.classList.add("hidden"); cancelCandidateEditBtn.classList.add("hidden"); }
-async function addCandidate(){ await withLoading(addCandidateBtn, "Adding...", async () => {
-  const res=await apiRequest("addCandidate", {fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST");
-  setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){ resetCandidateForm(); await Promise.all([loadCandidates(), loadStudentAccounts()]); }
-});}
-window.startCandidateEdit = function(regId){ const item=candidatesData.find(x=>String(x.regId)===String(regId)); if(!item) return; candidateFormTitle.textContent="Edit Candidate"; candidateOldRegId.value=item.regId; candidateName.value=item.fullName; candidateRegId.value=item.regId; addCandidateBtn.classList.add("hidden"); updateCandidateBtn.classList.remove("hidden"); cancelCandidateEditBtn.classList.remove("hidden"); window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function updateCandidate(){ await withLoading(updateCandidateBtn, "Saving...", async () => {
-  const res=await apiRequest("updateCandidate", {oldRegId:candidateOldRegId.value.trim(), fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST");
-  setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){ resetCandidateForm(); await Promise.all([loadCandidates(), loadStudentAccounts(), loadResults()]); }
-});}
-window.deleteCandidateItem = async function(regId){ if(!confirm(`Delete candidate ${regId}?`)) return; showLoading("Deleting candidate..."); try{ const res=await apiRequest("deleteCandidate", {regId}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadCandidates(), loadStudentAccounts()]); } } finally{ hideLoading(); } }
-async function importCandidates(){ const file=candidateCsvFile.files[0]; if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first."); await withLoading(importCandidatesBtn, "Importing...", async () => {
-  const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importCandidates", {rows}, "POST");
-  setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) await loadCandidates();
-});}
-async function loadCandidates(){ candidatesBox.innerHTML="Loading candidates..."; const res=await apiRequest("listCandidates", {}, "GET"); if(!res.ok){ candidatesBox.innerHTML=`<div class="error">${res.message}</div>`; return; } candidatesData = res.data || []; renderCandidates(); }
-function renderCandidates(){ const q=(candidateSearch.value||"").trim().toLowerCase(); const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q)); if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safeReg=String(item.regId).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`; }); candidatesBox.innerHTML = html + "</tbody></table>"; }
+loginBtn.addEventListener('click', loginAdmin);
+signupBtn.addEventListener('click', signupAdmin);
+logoutBtn.addEventListener('click', logoutCurrent);
+saveSettingsBtn.addEventListener('click', saveSettings);
+createExamBtn.addEventListener('click', createExam);
+addCandidateBtn.addEventListener('click', addCandidate);
+importCandidatesBtn.addEventListener('click', importCandidates);
+generateAccountsBtn.addEventListener('click', generateAccounts);
+downloadGeneratedBtn.addEventListener('click', downloadLastGenerated);
+questionExamSelect.addEventListener('change', function(){ resetQuestionForm(); loadQuestionsForSelectedExam(); });
+addQuestionBtn.addEventListener('click', addQuestion);
+updateQuestionBtn.addEventListener('click', updateQuestion);
+cancelQuestionEditBtn.addEventListener('click', resetQuestionForm);
+importQuestionsBtn.addEventListener('click', importQuestions);
+clearQuestionsBtn.addEventListener('click', clearQuestionsByExam);
+createPermissionBtn.addEventListener('click', createPermissionCode);
+loadResultsBtn.addEventListener('click', loadResultsByExam);
+exportResultsBtn.addEventListener('click', exportResultsByExam);
+candidateSearch.addEventListener('input', renderCandidates);
+questionSearch.addEventListener('input', renderQuestions);
 
-async function loadStudentAccounts(){ accountsListBox.innerHTML="Loading student accounts..."; const res=await apiRequest("listStudentAccounts", {}, "GET"); if(!res.ok){ accountsListBox.innerHTML=`<div class="error">${res.message}</div>`; return; } accountsData = res.data || []; renderAccounts(); }
-function renderAccounts(){ const q=(accountSearch.value||"").trim().toLowerCase(); const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safe=String(item.username).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td><span class="pill ${item.isActive ? 'pill-on' : 'pill-off'}">${item.isActive ? 'Active' : 'Inactive'}</span></td><td><div class="action-row"><button type="button" class="muted" onclick="prefillReset('${safe}')">Reset Password</button><button type="button" class="${item.isActive ? 'warn' : 'success'}" onclick="toggleUserActive('${safe}', ${item.isActive ? 'false' : 'true'})">${item.isActive ? 'Deactivate' : 'Activate'}</button><button type="button" class="danger" onclick="deleteUserItem('${safe}')">Delete</button></div></td></tr>`; }); accountsListBox.innerHTML = html + "</tbody></table>"; }
-window.prefillReset = function(username){ resetUsername.value = username; resetPassword.focus(); }
-async function resetStudentPassword(){ await withLoading(resetPasswordBtn, "Resetting...", async () => {
-  const payload={username:resetUsername.value.trim(), newPassword:resetPassword.value.trim(), autoGenerate: !resetPassword.value.trim(), passwordLength: passwordLength.value};
-  const res=await apiRequest("resetStudentPassword", payload, "POST");
-  if(res.ok && res.data){ setStatus("resetPasswordStatus", `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`, true); resetPassword.value=""; resetUsername.value=""; } else { setStatus("resetPasswordStatus", res.message, false); }
-});}
-
-async function loadAdminAccounts(){ adminsBox.innerHTML="Loading admins..."; const res=await apiRequest("listAdminAccounts", {}, "GET"); if(!res.ok){ adminsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } adminsData = res.data || []; renderAdmins(); }
-function renderAdmins(){ const q=(adminSearch.value||"").trim().toLowerCase(); const list = adminsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return adminsBox.innerHTML = q ? "<p>No matching admins found.</p>" : "<p>No admin accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safe=String(item.username).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}${item.isCurrent ? ' <strong>(You)</strong>' : ''}</td><td>${item.username}</td><td><span class="pill ${item.isActive ? 'pill-on' : 'pill-off'}">${item.isActive ? 'Active' : 'Inactive'}</span></td><td><div class="action-row"><button type="button" class="${item.isActive ? 'warn' : 'success'}" onclick="toggleUserActive('${safe}', ${item.isActive ? 'false' : 'true'})">${item.isActive ? 'Deactivate' : 'Activate'}</button><button type="button" class="danger" onclick="deleteUserItem('${safe}')">Delete</button></div></td></tr>`; }); adminsBox.innerHTML = html + "</tbody></table>"; }
-window.toggleUserActive = async function(username, active){ showLoading(active ? "Activating user..." : "Deactivating user..."); try{ const res=await apiRequest("setUserActive", {username, active}, "POST"); setStatus("accountsStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadAdminAccounts(), loadStudentAccounts()]); if(username === getUsername() && !active){ clearAuth(); location.reload(); } } } finally{ hideLoading(); } }
-window.deleteUserItem = async function(username){ if(!confirm(`Delete user ${username}?`)) return; showLoading("Deleting user..."); try{ const res=await apiRequest("deleteUser", {username}, "POST"); setStatus("accountsStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadAdminAccounts(), loadStudentAccounts()]); if(username === getUsername()){ clearAuth(); location.reload(); } } } finally{ hideLoading(); } }
-
-function resetQuestionForm(){ questionFormTitle.textContent="Add Question"; questionId.value=""; [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value=""); correctAnswer.value=""; addQuestionBtn.classList.remove("hidden"); updateQuestionBtn.classList.add("hidden"); cancelQuestionEditBtn.classList.add("hidden"); }
-async function addQuestion(){ await withLoading(addQuestionBtn, "Adding...", async () => {
-  const res=await apiRequest("addQuestion", {question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST");
-  setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ resetQuestionForm(); await loadQuestions(); }
-});}
-window.startQuestionEdit = function(id){ const item=questionsData.find(x=>String(x.id)===String(id)); if(!item) return; questionFormTitle.textContent="Edit Question"; questionId.value=item.id; questionText.value=item.question||""; imageUrl.value=item.imageUrl||""; optionA.value=item.optionA||""; optionB.value=item.optionB||""; optionC.value=item.optionC||""; optionD.value=item.optionD||""; correctAnswer.value=item.answer||""; addQuestionBtn.classList.add("hidden"); updateQuestionBtn.classList.remove("hidden"); cancelQuestionEditBtn.classList.remove("hidden"); window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
-async function updateQuestion(){ await withLoading(updateQuestionBtn, "Saving...", async () => {
-  const res=await apiRequest("updateQuestion", {id:questionId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST");
-  setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ resetQuestionForm(); await loadQuestions(); }
-});}
-window.deleteQuestionItem = async function(id){ if(!confirm("Delete this question?")) return; showLoading("Deleting question..."); try{ const res=await apiRequest("deleteQuestion", {id}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok) await loadQuestions(); } finally{ hideLoading(); } }
-async function importQuestions(){ const file=questionCsvFile.files[0]; if(!file) return setStatus("questionImportStatus", "Choose a CSV file first."); await withLoading(importQuestionsBtn, "Importing...", async () => {
-  const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importQuestions", {rows}, "POST");
-  setStatus("questionImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) await loadQuestions();
-});}
-async function clearQuestions(){ if(!confirm("Delete all questions?")) return; showLoading("Clearing questions..."); try{ const res=await apiRequest("clearQuestions", {}, "POST"); setStatus("questionStatus", res.message, res.ok); await loadQuestions(); } finally{ hideLoading(); } }
-async function loadQuestions(){ questionsBox.innerHTML="Loading questions..."; const res=await apiRequest("listQuestions", {}, "GET"); if(!res.ok){ questionsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } questionsData = res.data || []; renderQuestions(); }
-function renderQuestions(){ const q=(questionSearch.value||"").trim().toLowerCase(); const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q)); if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>"; questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join(""); }
-
-function resetResultForm(){ [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value=''); }
-async function loadResults(){ resultsBox.innerHTML="Loading results..."; const res=await apiRequest("listResults", {}, "GET"); if(!res.ok){ resultsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } resultsData = res.data || []; renderResults(); }
-function renderResults(){ const q=(resultsSearch.value||"").trim().toLowerCase(); const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q)); if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`); resultsBox.innerHTML = html + "</tbody></table>"; }
-window.startResultEdit = function(regId){ const item=resultsData.find(x=>String(x.regId)===String(regId)); if(!item) return; resultRegId.value=item.regId||''; resultFullName.value=item.fullName||''; resultRawScore.value=item.rawScore||0; resultTotalQuestions.value=item.totalQuestions||0; resultPassedNos.value=item.passedNos||''; resultFailedNos.value=item.failedNos||''; resultReason.value=''; }
-async function updateResult(){ await withLoading(updateResultBtn, "Saving...", async () => {
-  const res=await apiRequest('updateResult', {regId:resultRegId.value.trim(), fullName:resultFullName.value.trim(), rawScore:resultRawScore.value, totalQuestions:resultTotalQuestions.value, passedNos:resultPassedNos.value.trim(), failedNos:resultFailedNos.value.trim()}, 'POST');
-  setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){ resetResultForm(); await loadResults(); }
-});}
-window.invalidateResultItem = async function(regId){ const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || ''; showLoading("Invalidating result..."); try{ const res=await apiRequest('invalidateResult', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); await loadResults(); } } finally { hideLoading(); } }
-async function invalidateResult(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); await withLoading(invalidateResultBtn, "Invalidating...", async () => { const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); await loadResults(); } });}
-window.reopenCandidateItem = async function(regId){ const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || ''; showLoading("Reopening exam..."); try{ const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); await loadResults(); } } finally { hideLoading(); } }
-async function reopenCandidateExam(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); await withLoading(reopenExamBtn, "Reopening...", async () => { const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); await loadResults(); } });}
-async function clearResults(){ if(!confirm("Clear all results?")) return; showLoading("Clearing results..."); try{ const res=await apiRequest("clearResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); await loadResults(); } finally{ hideLoading(); } }
-async function exportResults(){ await withLoading(exportResultsBtn, "Exporting...", async () => { const res=await apiRequest("exportResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv); });}
-async function generateAccounts(){ await withLoading(generateAccountsBtn, "Generating...", async () => { const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST"); setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok); if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv"; downloadText(lastGeneratedFilename, lastGeneratedCsv); await loadStudentAccounts(); } });}
-function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet."); downloadText(lastGeneratedFilename, lastGeneratedCsv); }
-
-signupBtn.addEventListener("click", signupAdmin);
-loginBtn.addEventListener("click", loginAdmin);
-logoutBtn.addEventListener("click", logoutCurrent);
-saveSettingsBtn.addEventListener("click", saveSettings);
-addCandidateBtn.addEventListener("click", addCandidate);
-updateCandidateBtn.addEventListener("click", updateCandidate);
-cancelCandidateEditBtn.addEventListener("click", resetCandidateForm);
-importCandidatesBtn.addEventListener("click", importCandidates);
-addQuestionBtn.addEventListener("click", addQuestion);
-updateQuestionBtn.addEventListener("click", updateQuestion);
-cancelQuestionEditBtn.addEventListener("click", resetQuestionForm);
-importQuestionsBtn.addEventListener("click", importQuestions);
-clearQuestionsBtn.addEventListener("click", clearQuestions);
-clearResultsBtn.addEventListener("click", clearResults);
-exportResultsBtn.addEventListener("click", exportResults);
-generateAccountsBtn.addEventListener("click", generateAccounts);
-downloadGeneratedBtn.addEventListener("click", downloadLastGenerated);
-resetPasswordBtn.addEventListener("click", resetStudentPassword);
-candidateSearch.addEventListener("input", renderCandidates);
-accountSearch.addEventListener("input", renderAccounts);
-adminSearch.addEventListener("input", renderAdmins);
-questionSearch.addEventListener("input", renderQuestions);
-resultsSearch.addEventListener("input", renderResults);
-updateResultBtn.addEventListener("click", updateResult);
-invalidateResultBtn.addEventListener("click", invalidateResult);
-reopenExamBtn.addEventListener("click", reopenCandidateExam);
-cancelResultEditBtn.addEventListener("click", resetResultForm);
-
-(async function init(){
-  showLoading("Checking session...");
-  try{
-    if(await validatePortal("admin")) await showPortal();
-  } finally {
-    hideLoading();
-  }
-})();
+(async function init(){ if(await validatePortal()) await showPortal(); })();
 </script>
 </body>
 </html>
