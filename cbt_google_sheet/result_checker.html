@@ -5,22 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CBT Result Checker</title>
 <style>
-:root{--bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;--primary:#1e1b4b;--shadow:0 12px 32px rgba(15,23,42,.08)}
+:root{--bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;--primary:#1e3a8a;--primary2:#4338ca;--accent:#0ea5e9;--shadow:0 16px 40px rgba(15,23,42,.10)}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-header{background:rgba(30,27,75,.96);color:#fff}
-.head{max-width:980px;margin:auto;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header{background:rgba(30,58,138,.96);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.head{max-width:1040px;margin:auto;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .head a{color:#facc15;text-decoration:none;font-weight:700}
-.container{max-width:980px;margin:24px auto;padding:0 16px 40px}
-.card{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px}
+.container{max-width:1040px;margin:24px auto;padding:0 16px 40px}
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px}
 label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
 input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;font-size:15px}
-button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff}
+button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+button.ghost{background:#eef2ff;color:#243b67}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
 .status{font-size:14px;margin-top:6px;min-height:18px}.error{color:#b91c1c}.ok{color:#166534}
 .info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:12px 14px;border-radius:12px;margin-bottom:14px}
+.report-card{border:1px solid #dbe4f3;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#ffffff,#f8fbff);box-shadow:0 18px 44px rgba(37,99,235,.10)}
+.report-head{background:linear-gradient(135deg,#1e3a8a,#4338ca 62%,#0ea5e9);color:#fff;padding:24px 20px}
+.report-brand{font-size:1.22rem;font-weight:800;letter-spacing:.2px}
+.report-sub{opacity:.95;margin-top:4px;font-size:13px}
+.report-status{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;font-weight:800;font-size:12px;margin-top:14px}
+.report-status.pass{background:#dcfce7;color:#166534}.report-status.fail{background:#fee2e2;color:#b91c1c}
+.report-body{padding:18px}
+.report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.report-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+.report-item-label{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:4px}
+.report-item-value{font-weight:800;font-size:1rem;color:var(--text)}
+.report-message{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:14px;margin-top:10px;line-height:1.7}
 .review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
 .pass{color:#166534;font-weight:700}.fail{color:#b91c1c;font-weight:700}
 .question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
+.note{font-size:13px;color:var(--muted);margin-top:-6px;margin-bottom:12px}
+@media (max-width:640px){.container{padding:0 12px 28px}.head{padding:12px}.report-grid{grid-template-columns:1fr}.actions{flex-direction:column}.actions>*{width:100%}}
 </style>
 </head>
 <body>
@@ -34,12 +50,18 @@ button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight
 <div class="container">
   <div class="card">
     <h2>Check Your Result</h2>
-    <div id="examInfo" class="info">Enter your Registration ID to check your result.</div>
+    <div id="examInfo" class="info">Enter your Registration ID and student password to check your result.</div>
     <label>Exam Code</label>
     <input id="examCode" type="text" placeholder="Exam code">
     <label>Registration ID</label>
     <input id="regId" type="text" placeholder="Registration ID">
-    <button id="checkBtn" type="button">Check Result</button>
+    <label>Student Password</label>
+    <input id="password" type="password" placeholder="Student password">
+    <div class="note">For generated student accounts, the password is the one created by the admin. For self-created accounts, use your account password.</div>
+    <div class="actions">
+      <button id="checkBtn" type="button">Check Result</button>
+      <button id="printBtn" type="button" class="ghost">Print Report</button>
+    </div>
     <div id="checkStatus" class="status"></div>
   </div>
 
@@ -56,10 +78,8 @@ button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 const $ = id => document.getElementById(id);
-
 function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 function setStatus(id, message, ok=false){ const el=$(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
-
 async function apiRequest(action, payload={}, method="POST"){
   try{
     let response;
@@ -78,90 +98,73 @@ async function apiRequest(action, payload={}, method="POST"){
       const form = new URLSearchParams();
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
-      response = await fetch(APPS_SCRIPT_URL, {
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
-        body:form.toString()
-      });
+      response = await fetch(APPS_SCRIPT_URL, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:form.toString() });
     }
     const text = await response.text();
     try{ return JSON.parse(text); }catch(err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
   }catch(err){ return {ok:false, message:err.message || "Failed to fetch."}; }
 }
-
 function renderReview(review){
-  if(!Array.isArray(review) || !review.length){
-    $("reviewWrap").style.display = "none";
-    $("reviewList").innerHTML = "";
-    return;
-  }
+  if(!Array.isArray(review) || !review.length){ $("reviewWrap").style.display = "none"; $("reviewList").innerHTML = ""; return; }
   $("reviewWrap").style.display = "block";
   $("reviewList").innerHTML = review.map(item => `
     <div class="review-item">
       <div class="${item.status === 'PASS' ? 'pass' : 'fail'}">Question ${esc(item.qNo)} — ${esc(item.status)}</div>
       <div style="margin-top:8px"><strong>${esc(item.question)}</strong></div>
       ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" class="question-image" alt="Question image">` : ""}
-      <div style="margin-top:8px">
-        A. ${esc(item.optionA)}<br>
-        B. ${esc(item.optionB)}<br>
-        C. ${esc(item.optionC)}<br>
-        D. ${esc(item.optionD)}
-      </div>
-      <div style="margin-top:8px"><strong>Your Answer:</strong> ${esc(item.chosen || "BLANK")}</div>
+      <div style="margin-top:8px">A. ${esc(item.optionA)}<br>B. ${esc(item.optionB)}<br>C. ${esc(item.optionC)}<br>D. ${esc(item.optionD)}</div>
+      <div style="margin-top:8px"><strong>Your Answer:</strong> ${esc(item.chosen || 'BLANK')}</div>
       <div><strong>Correct Answer:</strong> ${esc(item.correct)}</div>
-    </div>
-  `).join("");
+    </div>`).join("");
 }
-
 async function loadPublicExamInfo(){
   const res = await apiRequest("getCurrentExamPublic", {}, "GET");
   if(res.ok && res.data && res.data.currentExam){
     const exam = res.data.currentExam;
     if(!$("examCode").value.trim()) $("examCode").value = exam.examCode;
-    $("examInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(exam.title)}<br><strong>Exam Code:</strong> ${esc(exam.examCode)}<br><strong>Pass Mark:</strong> ${esc(exam.passMark)}%`;
+    $("examInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(exam.title)}<br><strong>Exam Code:</strong> ${esc(exam.examCode)}<br><strong>Pass Mark:</strong> ${esc(exam.passMark)}%<br><strong>Access:</strong> Use your Registration ID and student password.`;
   }
 }
-
 async function checkResult(){
   const examCode = $("examCode").value.trim();
   const regId = $("regId").value.trim();
-  const res = await apiRequest("checkResultPublic", { examCode, regId }, "POST");
+  const password = $("password").value;
+  const res = await apiRequest("checkResultPublic", { examCode, regId, password }, "POST");
   setStatus("checkStatus", res.message, res.ok);
-
-  if(!res.ok){
-    $("resultCard").style.display = "none";
-    return;
-  }
-
+  if(!res.ok){ $("resultCard").style.display = "none"; return; }
   const d = res.data || {};
+  const passed = String(d.passedStatus || '').toUpperCase() === 'PASSED';
   $("resultCard").style.display = "block";
   $("resultBox").innerHTML = `
-    <strong>Full Name:</strong> ${esc(d.fullName || "")}<br>
-    <strong>Registration ID:</strong> ${esc(d.regId || "")}<br>
-    <strong>Username:</strong> ${esc(d.username || "")}<br>
-    <strong>Exam Code:</strong> ${esc(d.examCode || "")}<br>
-    <strong>Exam Title:</strong> ${esc(d.examTitle || "")}<br>
-    <strong>Attempt:</strong> ${esc(d.attemptNo || "")}<br>
-    <strong>Score:</strong> ${esc(d.score || "")}<br>
-    <strong>Percentage:</strong> ${esc(d.percentage || 0)}%<br>
-    <strong>Pass Mark:</strong> ${esc(d.passMark || 0)}%<br>
-    <strong>Status:</strong> ${esc(d.passedStatus || "")}<br>
-    <strong>Ranking:</strong> ${esc(d.ranking || "")}<br>
-    <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
-    <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}<br>
-    <strong>Message:</strong> ${esc(d.statusMessage || "")}
-  `;
+    <div class="report-card">
+      <div class="report-head">
+        <div class="report-brand">Genz Edutech Innovation</div>
+        <div class="report-sub">Official Student Result Report</div>
+        <div class="report-status ${passed ? 'pass' : 'fail'}">${esc(d.passedStatus || '')}</div>
+      </div>
+      <div class="report-body">
+        <div class="report-grid">
+          <div class="report-item"><div class="report-item-label">Student Name</div><div class="report-item-value">${esc(d.fullName || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Registration ID</div><div class="report-item-value">${esc(d.regId || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Username</div><div class="report-item-value">${esc(d.username || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Exam Title</div><div class="report-item-value">${esc(d.examTitle || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Exam Code</div><div class="report-item-value">${esc(d.examCode || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Attempt</div><div class="report-item-value">${esc(d.attemptNo || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Score</div><div class="report-item-value">${esc(d.score || '')}</div></div>
+          <div class="report-item"><div class="report-item-label">Percentage</div><div class="report-item-value">${esc(d.percentage || 0)}%</div></div>
+          <div class="report-item"><div class="report-item-label">Pass Mark</div><div class="report-item-value">${esc(d.passMark || 0)}%</div></div>
+          <div class="report-item"><div class="report-item-label">Ranking</div><div class="report-item-value">${esc(d.ranking || '—')}</div></div>
+          <div class="report-item"><div class="report-item-label">Passed Questions</div><div class="report-item-value">${esc(d.passedNos || 'None')}</div></div>
+          <div class="report-item"><div class="report-item-label">Failed Questions</div><div class="report-item-value">${esc(d.failedNos || 'None')}</div></div>
+        </div>
+        <div class="report-message"><strong>Remark:</strong> ${esc(d.statusMessage || '')}</div>
+      </div>
+    </div>`;
   renderReview(d.allowReview ? (d.review || []) : []);
 }
-
 $("checkBtn").addEventListener("click", checkResult);
-
-(function init(){
-  const params = new URLSearchParams(location.search);
-  const exam = params.get("exam");
-  if(exam) $("examCode").value = exam;
-  loadPublicExamInfo();
-})();
+$("printBtn").addEventListener("click", function(){ if($("resultCard").style.display !== "none") window.print(); });
+(function init(){ const params = new URLSearchParams(location.search); const exam = params.get('exam'); if(exam) $("examCode").value = exam; loadPublicExamInfo(); })();
 </script>
 </body>
 </html>
