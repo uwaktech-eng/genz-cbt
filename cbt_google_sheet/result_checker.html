@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CBT Result Checker</title>
+<style>
+:root{--bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;--primary:#1e1b4b;--shadow:0 12px 32px rgba(15,23,42,.08)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+header{background:rgba(30,27,75,.96);color:#fff}
+.head{max-width:980px;margin:auto;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.head a{color:#facc15;text-decoration:none;font-weight:700}
+.container{max-width:980px;margin:24px auto;padding:0 16px 40px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px}
+label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
+input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;font-size:15px}
+button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff}
+.status{font-size:14px;margin-top:6px;min-height:18px}.error{color:#b91c1c}.ok{color:#166534}
+.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:12px 14px;border-radius:12px;margin-bottom:14px}
+.review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
+.pass{color:#166534;font-weight:700}.fail{color:#b91c1c;font-weight:700}
+.question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <h1 style="margin:0;font-size:1.2rem;">CBT Result Checker</h1>
+    <a href="index.html">← Back Home</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>Check Your Result</h2>
+    <div id="examInfo" class="info">Enter your Registration ID to check your result.</div>
+    <label>Exam Code</label>
+    <input id="examCode" type="text" placeholder="Exam code">
+    <label>Registration ID</label>
+    <input id="regId" type="text" placeholder="Registration ID">
+    <button id="checkBtn" type="button">Check Result</button>
+    <div id="checkStatus" class="status"></div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <h2>Result Summary</h2>
+    <div id="resultBox" style="line-height:1.9;font-size:16px"></div>
+    <div id="reviewWrap" style="display:none;margin-top:18px">
+      <h3>Answer Review</h3>
+      <div id="reviewList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
+const $ = id => document.getElementById(id);
+
+function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function setStatus(id, message, ok=false){ const el=$(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
+
+async function apiRequest(action, payload={}, method="POST"){
+  try{
+    let response;
+    if(method === "GET"){
+      const url = new URL(APPS_SCRIPT_URL);
+      url.searchParams.set("action", action);
+      url.searchParams.set("_ts", Date.now());
+      Object.keys(payload).forEach(key => {
+        const value = payload[key];
+        if(value !== undefined && value !== null){
+          url.searchParams.set(key, typeof value === "object" ? JSON.stringify(value) : String(value));
+        }
+      });
+      response = await fetch(url.toString(), {method:"GET"});
+    } else {
+      const form = new URLSearchParams();
+      form.set("action", action);
+      form.set("payload", JSON.stringify(payload));
+      response = await fetch(APPS_SCRIPT_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+        body:form.toString()
+      });
+    }
+    const text = await response.text();
+    try{ return JSON.parse(text); }catch(err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
+  }catch(err){ return {ok:false, message:err.message || "Failed to fetch."}; }
+}
+
+function renderReview(review){
+  if(!Array.isArray(review) || !review.length){
+    $("reviewWrap").style.display = "none";
+    $("reviewList").innerHTML = "";
+    return;
+  }
+  $("reviewWrap").style.display = "block";
+  $("reviewList").innerHTML = review.map(item => `
+    <div class="review-item">
+      <div class="${item.status === 'PASS' ? 'pass' : 'fail'}">Question ${esc(item.qNo)} — ${esc(item.status)}</div>
+      <div style="margin-top:8px"><strong>${esc(item.question)}</strong></div>
+      ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" class="question-image" alt="Question image">` : ""}
+      <div style="margin-top:8px">
+        A. ${esc(item.optionA)}<br>
+        B. ${esc(item.optionB)}<br>
+        C. ${esc(item.optionC)}<br>
+        D. ${esc(item.optionD)}
+      </div>
+      <div style="margin-top:8px"><strong>Your Answer:</strong> ${esc(item.chosen || "BLANK")}</div>
+      <div><strong>Correct Answer:</strong> ${esc(item.correct)}</div>
+    </div>
+  `).join("");
+}
+
+async function loadPublicExamInfo(){
+  const res = await apiRequest("getCurrentExamPublic", {}, "GET");
+  if(res.ok && res.data && res.data.currentExam){
+    const exam = res.data.currentExam;
+    if(!$("examCode").value.trim()) $("examCode").value = exam.examCode;
+    $("examInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(exam.title)}<br><strong>Exam Code:</strong> ${esc(exam.examCode)}<br><strong>Pass Mark:</strong> ${esc(exam.passMark)}%`;
+  }
+}
+
+async function checkResult(){
+  const examCode = $("examCode").value.trim();
+  const regId = $("regId").value.trim();
+  const res = await apiRequest("checkResultPublic", { examCode, regId }, "POST");
+  setStatus("checkStatus", res.message, res.ok);
+
+  if(!res.ok){
+    $("resultCard").style.display = "none";
+    return;
+  }
+
+  const d = res.data || {};
+  $("resultCard").style.display = "block";
+  $("resultBox").innerHTML = `
+    <strong>Full Name:</strong> ${esc(d.fullName || "")}<br>
+    <strong>Registration ID:</strong> ${esc(d.regId || "")}<br>
+    <strong>Username:</strong> ${esc(d.username || "")}<br>
+    <strong>Exam Code:</strong> ${esc(d.examCode || "")}<br>
+    <strong>Exam Title:</strong> ${esc(d.examTitle || "")}<br>
+    <strong>Attempt:</strong> ${esc(d.attemptNo || "")}<br>
+    <strong>Score:</strong> ${esc(d.score || "")}<br>
+    <strong>Percentage:</strong> ${esc(d.percentage || 0)}%<br>
+    <strong>Pass Mark:</strong> ${esc(d.passMark || 0)}%<br>
+    <strong>Status:</strong> ${esc(d.passedStatus || "")}<br>
+    <strong>Ranking:</strong> ${esc(d.ranking || "")}<br>
+    <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
+    <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}<br>
+    <strong>Message:</strong> ${esc(d.statusMessage || "")}
+  `;
+  renderReview(d.allowReview ? (d.review || []) : []);
+}
+
+$("checkBtn").addEventListener("click", checkResult);
+
+(function init(){
+  const params = new URLSearchParams(location.search);
+  const exam = params.get("exam");
+  if(exam) $("examCode").value = exam;
+  loadPublicExamInfo();
+})();
+</script>
+</body>
+</html>
