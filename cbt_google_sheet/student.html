@@ -232,17 +232,6 @@ button:hover{transform:translateY(-1px)}
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
-.pill{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:12px;
-  background:#eef2ff;
-  color:#334155;
-  border:1px solid var(--line);
-}
 .exam-protected,
 .exam-protected *{
   -webkit-user-select:none;
@@ -254,8 +243,8 @@ button:hover{transform:translateY(-1px)}
   position:fixed;
   right:14px;
   bottom:14px;
-  width:160px;
-  background:rgba(15,23,42,.92);
+  width:170px;
+  background:rgba(15,23,42,.94);
   color:#fff;
   border:1px solid rgba(255,255,255,.12);
   border-radius:16px;
@@ -266,10 +255,11 @@ button:hover{transform:translateY(-1px)}
 }
 .camera-monitor video{
   width:100%;
-  height:120px;
+  height:128px;
   object-fit:cover;
   display:block;
   background:#000;
+  transform:scaleX(-1);
 }
 .camera-head{
   padding:8px 10px;
@@ -335,6 +325,58 @@ button:hover{transform:translateY(-1px)}
   font-size:14px;
   margin-bottom:14px;
 }
+.violation-float{
+  position:fixed;
+  top:86px;
+  left:50%;
+  transform:translateX(-50%) translateY(-14px);
+  width:min(92vw,520px);
+  z-index:10000;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s ease;
+}
+.violation-float.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.violation-card{
+  background:rgba(127,29,29,.96);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:18px;
+  box-shadow:0 20px 48px rgba(0,0,0,.30);
+  padding:14px 16px;
+  backdrop-filter:blur(8px);
+}
+.violation-title{
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.violation-text{
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(255,255,255,.92);
+}
+.violation-progress{
+  margin-top:10px;
+  height:8px;
+  background:rgba(255,255,255,.16);
+  border-radius:999px;
+  overflow:hidden;
+}
+.violation-progress > span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#facc15,#fb7185);
+}
+.camera-help{
+  font-size:12px;
+  color:#475569;
+  margin-top:8px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:900px){
   .auth-wrap{grid-template-columns:1fr}
@@ -358,6 +400,7 @@ button:hover{transform:translateY(-1px)}
     height:88px;
   }
   .warning-card{padding:18px}
+  .violation-float{top:76px}
 }
 </style>
 </head>
@@ -441,6 +484,10 @@ button:hover{transform:translateY(-1px)}
       <label for="permissionCode">Permission Code (optional for rewrite)</label>
       <input type="text" id="permissionCode" placeholder="Enter admin permission code if given">
 
+      <div class="camera-help">
+        Camera access is compulsory before the exam starts.
+      </div>
+
       <button id="unlockBtn" type="button">Unlock Exam</button>
       <div id="unlockStatus" class="status"></div>
     </div>
@@ -490,6 +537,14 @@ button:hover{transform:translateY(-1px)}
   </div>
 </div>
 
+<div id="violationFloat" class="violation-float">
+  <div class="violation-card">
+    <div class="violation-title" id="violationTitle">Warning</div>
+    <div class="violation-text" id="violationText">You switched away from the exam.</div>
+    <div class="violation-progress"><span id="violationProgressBar"></span></div>
+  </div>
+</div>
+
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 const TOKEN_KEY = "cbt_auth_token";
@@ -511,6 +566,8 @@ let violationCount = 0;
 let lastViolationAt = 0;
 let protectionArmed = false;
 let pendingUnlockData = null;
+let violationToastTimer = null;
+let violationProgressTimer = null;
 
 function showLoader(text = "Loading...") {
   loaderText.textContent = text;
@@ -768,29 +825,91 @@ function hideWarningOverlay() {
   $("warningOverlay").classList.remove("show");
 }
 
+function showViolationFloat(reason) {
+  clearTimeout(violationToastTimer);
+  clearInterval(violationProgressTimer);
+
+  const remaining = Math.max(0, 4 - violationCount);
+  $("violationTitle").textContent = `Warning ${violationCount}/4`;
+  $("violationText").textContent = `${reason}. ${remaining} ${remaining === 1 ? "chance" : "chances"} left before auto-submission.`;
+  const progress = $("violationProgressBar");
+  progress.style.width = `${Math.min(100, (violationCount / 4) * 100)}%`;
+
+  $("violationFloat").classList.add("show");
+
+  let visual = (violationCount / 4) * 100;
+  violationProgressTimer = setInterval(() => {
+    visual = Math.min(100, visual + 1.2);
+    progress.style.width = `${visual}%`;
+  }, 30);
+
+  violationToastTimer = setTimeout(() => {
+    $("violationFloat").classList.remove("show");
+    clearInterval(violationProgressTimer);
+  }, 5200);
+}
+
+function hideViolationFloat() {
+  clearTimeout(violationToastTimer);
+  clearInterval(violationProgressTimer);
+  $("violationFloat").classList.remove("show");
+}
+
+async function attachVideoStream(stream) {
+  const video = $("cameraFeed");
+  video.srcObject = stream;
+  try {
+    await video.play();
+  } catch (err) {}
+  $("cameraMonitor").classList.remove("hidden");
+  return true;
+}
+
 async function startCameraMonitor() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     setStatus("unlockStatus", "This browser does not support camera access.");
     return false;
   }
 
-  const tries = [
-    { video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+  const baseTries = [
+    { video: { facingMode: { ideal: "user" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+    { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
     { video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
     { video: true, audio: false }
   ];
 
-  for (const constraints of tries) {
+  for (const constraints of baseTries) {
     try {
-      cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-      const video = $("cameraFeed");
-      video.srcObject = cameraStream;
-      $("cameraMonitor").classList.remove("hidden");
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      cameraStream = stream;
+      await attachVideoStream(stream);
       return true;
-    } catch (error) {
-      // try next fallback
-    }
+    } catch (error) {}
   }
+
+  try {
+    const temp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    temp.getTracks().forEach(t => t.stop());
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(d => d.kind === "videoinput");
+
+    for (const device of videoDevices) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: { exact: device.deviceId },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+        cameraStream = stream;
+        await attachVideoStream(stream);
+        return true;
+      } catch (error) {}
+    }
+  } catch (error) {}
 
   setStatus("unlockStatus", "Camera permission is required before the exam can start.");
   return false;
@@ -831,6 +950,8 @@ function registerViolation(reason) {
   lastViolationAt = now;
   violationCount++;
   showProctorAlert(`Warning ${violationCount}/4: ${reason}. After 4 violations, your exam will be submitted automatically.`);
+  showViolationFloat(reason);
+
   if (violationCount >= 4) {
     setStatus("submitStatus", "4 tab/minimize violations detected. Auto-submitting exam...");
     submitExam(true);
@@ -877,6 +998,7 @@ function disarmExamProtection() {
   document.removeEventListener("visibilitychange", handleVisibilityViolation);
   window.removeEventListener("blur", handleBlurViolation);
   clearProctorAlert();
+  hideViolationFloat();
 }
 
 function startTimer() {
@@ -1018,6 +1140,8 @@ async function submitExam(isAuto = false) {
     <strong>Passed Question Nos:</strong> ${esc(d.passedNos || "None")}<br>
     <strong>Failed Question Nos:</strong> ${esc(d.failedNos || "None")}
   `;
+
+  pendingUnlockData = null;
 }
 
 async function logoutCurrent() {
