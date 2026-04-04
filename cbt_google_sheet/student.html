@@ -80,7 +80,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
 function getToken(){ return localStorage.getItem("cbt_auth_token") || ""; }
 function setAuth(data){ localStorage.setItem("cbt_auth_token", data.token); localStorage.setItem("cbt_auth_role", data.role); localStorage.setItem("cbt_auth_username", data.username); }
 function clearAuth(){ localStorage.removeItem("cbt_auth_token"); localStorage.removeItem("cbt_auth_role"); localStorage.removeItem("cbt_auth_username"); }
