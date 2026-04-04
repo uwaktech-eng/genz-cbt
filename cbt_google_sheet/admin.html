@@ -8,50 +8,50 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
-  --bg:#eef4ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;
+  --bg:#eef3ff;--bg2:#f9fbff;--panel:rgba(255,255,255,.56);--panel-strong:rgba(255,255,255,.72);--line:rgba(150,170,220,.28);--line-2:rgba(255,255,255,.48);--text:#0f172a;--muted:#66758f;
   --primary:#6d5efc;--primary2:#4f8cff;--success:#15803d;--danger:#dc2626;--warn:#b45309;
-  --soft:#eef2ff;--shadow:0 12px 34px rgba(15,23,42,.08)
+  --soft:rgba(109,94,252,.10);--soft-2:rgba(255,255,255,.42);--shadow:0 20px 48px rgba(37,59,117,.12);--glow:0 1px 0 rgba(255,255,255,.5) inset
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--text);background:linear-gradient(180deg,var(--bg),var(--bg2))}
-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left, rgba(109,94,252,.16), transparent 30%),radial-gradient(circle at top right, rgba(79,140,255,.14), transparent 26%),linear-gradient(180deg,var(--bg),var(--bg2)) fixed}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.45);backdrop-filter:blur(18px) saturate(145%);-webkit-backdrop-filter:blur(18px) saturate(145%);border-bottom:1px solid var(--line)}
 .top{max-width:1280px;margin:auto;padding:14px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .wrap{max-width:1280px;margin:auto;padding:18px 16px 40px}
 .brand{display:flex;gap:12px;align-items:center}
 .badge{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--primary),#22c1ff)}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
-.card{grid-column:span 6;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.card{grid-column:span 6;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow),var(--glow);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);min-width:0}
 .full{grid-column:1/-1}
 h1,h2,h3{margin:0}
 .muted{color:var(--muted)}
 label{display:block;font-size:14px;font-weight:700;margin:0 0 6px}
-input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;margin:0 0 12px}
+.card input,.card textarea,.card select{width:100%;border:1px solid rgba(160,178,222,.34);border-radius:14px;padding:12px 14px;font-size:15px;background:rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.65);margin:0 0 12px}
 textarea{min-height:92px;resize:vertical}
 input[type="checkbox"]{width:auto;margin-right:8px}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .actions{display:flex;flex-wrap:wrap;gap:10px}
-button,.btn{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:.2s transform}
+.btn,button{border:none;border-radius:14px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:transform .2s ease, box-shadow .25s ease, background .25s ease, opacity .2s ease;box-shadow:0 10px 24px rgba(79,140,255,.12)}
 button:hover,.btn:hover{transform:translateY(-1px)}
 .primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
 .success{background:var(--success);color:#fff}
 .danger{background:var(--danger);color:#fff}
 .warn{background:var(--warn);color:#fff}
-.ghost{background:#eef2ff;color:#243b67}
+.ghost{background:rgba(255,255,255,.56);color:#243b67;border:1px solid rgba(160,178,222,.24);backdrop-filter:blur(10px)}
 .status{font-size:14px;margin-top:8px;min-height:20px}
 .ok{color:var(--success)} .error{color:var(--danger)}
 .hidden{display:none!important}
-.info{padding:12px 14px;border-radius:14px;background:#f6faff;border:1px solid #cfe6ff;color:#175b9e;font-size:14px}
-.pill{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;font-size:12px;background:#eef2ff;color:#334155;border:1px solid var(--line);gap:6px}
+.info{padding:12px 14px;border-radius:16px;background:rgba(239,246,255,.72);border:1px solid rgba(173,212,255,.55);color:#175b9e;font-size:14px;backdrop-filter:blur(12px)}
+.pill{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.55);color:#334155;border:1px solid var(--line);gap:6px;backdrop-filter:blur(10px)}
 .search{max-width:420px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:12px;background:#fff}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;margin-top:12px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px)}
 table{width:100%;border-collapse:collapse;min-width:820px}
 th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
-th{background:#f8fbff;position:sticky;top:0;z-index:1}
+.table-wrap th{background:rgba(248,251,255,.9);position:sticky;top:0;z-index:1;backdrop-filter:blur(10px)}
 .small-btn{min-height:34px;padding:0 12px;border-radius:10px;font-size:13px}
 .auth-shell{max-width:980px;margin:36px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .loader-overlay{position:fixed;inset:0;background:rgba(7,17,34,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
 .loader-overlay.show{display:flex}
-.loader-card{width:min(100%,360px);background:#fff;padding:18px 20px;border-radius:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.loader-card{width:min(100%,360px);background:rgba(255,255,255,.7);padding:18px 20px;border-radius:20px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 18px 40px rgba(15,23,42,.16);backdrop-filter:blur(18px)}
 .spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
 .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#f8fafc;border:1px solid var(--line);padding:2px 8px;border-radius:999px;word-break:break-all}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -60,17 +60,18 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
 @media (max-width:520px){.actions{flex-direction:column}.actions>*{width:100%}table{min-width:660px}}
 
 /* dashboard cleanup */
-.card.collapsible{padding:0;overflow:hidden}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f8fbff)}
+.card.collapsible{padding:0;overflow:hidden;position:relative}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(160,178,222,.2);background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(248,251,255,.28));backdrop-filter:blur(16px)}
 .card-head h2{font-size:1rem}
 .card-head .muted{font-size:13px}
-.card-toggle{min-height:38px;padding:0 14px;border-radius:10px;flex:0 0 auto}
-.card-toggle .toggle-icon{font-size:16px;transition:transform .2s ease}
-.card-body{padding:18px}
-.card.collapsible.is-collapsed .card-body{display:none}
+.card-toggle{min-height:40px;padding:0 14px;border-radius:12px;flex:0 0 auto;background:rgba(255,255,255,.54)!important}
+.card-toggle .toggle-icon{font-size:16px;transition:transform .28s ease}
+.card-body{padding:18px;display:block;overflow:hidden;max-height:4800px;opacity:1;transform:translateY(0);transition:max-height .42s cubic-bezier(.22,1,.36,1),opacity .28s ease,transform .28s ease,padding .28s ease}
+.card.collapsible.is-collapsed .card-body{max-height:0;opacity:0;transform:translateY(-8px);padding-top:0;padding-bottom:0;pointer-events:none}
 .card.collapsible:not(.is-collapsed) .card-toggle .toggle-icon{transform:rotate(180deg)}
+.card.collapsible:hover{box-shadow:0 24px 54px rgba(37,59,117,.13),var(--glow)}
 .card-summary{margin-top:4px;font-size:13px;color:var(--muted)}
-.dashboard-banner{grid-column:1/-1;background:linear-gradient(135deg,#141b34,#2d3f86 52%,#4f8cff);color:#fff;border:none;border-radius:24px;padding:20px;box-shadow:0 18px 40px rgba(15,23,42,.18)}
+.dashboard-banner{grid-column:1/-1;background:linear-gradient(135deg,rgba(20,27,52,.94),rgba(45,63,134,.92) 52%,rgba(79,140,255,.88));color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:26px;padding:20px;box-shadow:0 24px 50px rgba(15,23,42,.18);backdrop-filter:blur(14px)}
 .dashboard-banner .actions .ghost{background:rgba(255,255,255,.14);color:#fff}
 .dashboard-banner .actions .ghost:hover{background:rgba(255,255,255,.2)}
 .quick-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
@@ -365,6 +366,42 @@ function getCardSummary_(title){
   };
   return map[title] || 'Open this section when you need it.';
 }
+
+function applyCollapseState(card, collapsed, immediate=false){
+  const body = card.querySelector('.card-body');
+  const toggle = card.querySelector('.card-toggle');
+  if(!body || !toggle) return;
+  const label = toggle.querySelector('.toggle-label');
+
+  if(immediate){
+    card.classList.toggle('is-collapsed', collapsed);
+    body.style.maxHeight = collapsed ? '0px' : 'none';
+    if(label) label.textContent = collapsed ? 'Reveal' : 'Hide';
+    return;
+  }
+
+  if(collapsed){
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      card.classList.add('is-collapsed');
+      body.style.maxHeight = '0px';
+    });
+  } else {
+    card.classList.remove('is-collapsed');
+    body.style.maxHeight = '0px';
+    requestAnimationFrame(() => {
+      body.style.maxHeight = body.scrollHeight + 'px';
+    });
+    const tidy = () => {
+      if(!card.classList.contains('is-collapsed')) body.style.maxHeight = 'none';
+      body.removeEventListener('transitionend', tidy);
+    };
+    body.addEventListener('transitionend', tidy);
+  }
+
+  if(label) label.textContent = collapsed ? 'Reveal' : 'Hide';
+}
+
 function initCollapsibleCards(){
   if(collapsibleCardsReady) return;
   collapsibleCardsReady = true;
@@ -376,8 +413,10 @@ function initCollapsibleCards(){
     if(first.tagName === 'H2') titleEl = first;
     else titleEl = first.querySelector('h2');
     if(!titleEl) return;
+
     const title = titleEl.textContent.trim();
     card.classList.add('collapsible');
+
     const header = document.createElement('div');
     header.className = 'card-head';
     const titleWrap = document.createElement('div');
@@ -388,10 +427,12 @@ function initCollapsibleCards(){
     s.textContent = getCardSummary_(title);
     titleWrap.appendChild(h);
     titleWrap.appendChild(s);
+
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'card-toggle ghost';
-    toggle.innerHTML = '<span>Reveal</span> <span class="toggle-icon">▾</span>';
+    toggle.innerHTML = '<span class="toggle-label">Reveal</span> <span class="toggle-icon">▾</span>';
+
     header.appendChild(titleWrap);
     header.appendChild(toggle);
 
@@ -403,15 +444,21 @@ function initCollapsibleCards(){
       body.appendChild(node);
     });
     if(first.tagName !== 'H2') body.insertBefore(first, body.firstChild);
+
     card.innerHTML = '';
     card.appendChild(header);
     card.appendChild(body);
+
     const open = keepOpen.has(title);
-    card.classList.toggle('is-collapsed', !open);
-    toggle.querySelector('span').textContent = open ? 'Hide' : 'Reveal';
-    toggle.addEventListener('click', () => {
-      const collapsed = card.classList.toggle('is-collapsed');
-      toggle.querySelector('span').textContent = collapsed ? 'Reveal' : 'Hide';
+    applyCollapseState(card, !open, true);
+
+    header.addEventListener('click', (event) => {
+      if(event.target.closest('button')) return;
+      applyCollapseState(card, !card.classList.contains('is-collapsed'));
+    });
+    toggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      applyCollapseState(card, !card.classList.contains('is-collapsed'));
     });
   });
 }
