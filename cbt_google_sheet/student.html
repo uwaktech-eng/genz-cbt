@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CBT Student Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
   --bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;
@@ -11,12 +13,13 @@
   --shadow:0 12px 32px rgba(15,23,42,.08)
 }
 *{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
 body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
 header{position:sticky;top:0;z-index:25;background:rgba(30,27,75,.96);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
 .head{max-width:1100px;margin:auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .head a{color:#facc15;text-decoration:none;font-weight:700}
 .container{max-width:980px;margin:24px auto;padding:0 16px 40px}
-.card{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:18px;min-width:0}
 label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
 input[type="text"],input[type="password"]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;font-size:15px}
 button{border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;transition:.2s transform}
@@ -35,9 +38,9 @@ button:hover{transform:translateY(-1px)}
 .nav-grid button.answered{background:#15803d}
 .nav-grid button.unanswered{background:#475569}
 .question-shell{border:1px solid #e2e8f0;border-radius:16px;background:#f8fafc;padding:16px}
-.question-title{font-weight:700;margin-bottom:12px;line-height:1.6}
+.question-title{font-weight:700;margin-bottom:12px;line-height:1.6;word-break:break-word}
 .question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
-.option{display:block;padding:12px;margin-bottom:10px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer;line-height:1.5}
+.option{display:block;padding:12px;margin-bottom:10px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer;line-height:1.5;word-break:break-word}
 .option input{margin-right:8px}
 .result-box{line-height:1.8;font-size:15px}
 .report-card{border:1px solid #dbe4f3;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#ffffff,#f8fbff);box-shadow:0 18px 44px rgba(37,99,235,.10)}
@@ -51,7 +54,7 @@ button:hover{transform:translateY(-1px)}
 .report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
 .report-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
 .report-item-label{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:4px}
-.report-item-value{font-weight:800;font-size:1rem;color:var(--text)}
+.report-item-value{font-weight:800;font-size:1rem;color:var(--text);word-break:break-word}
 .report-message{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:14px;margin-top:10px}
 .review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
 .pass{color:#166534;font-weight:700}
@@ -63,7 +66,7 @@ button:hover{transform:translateY(-1px)}
 .spinner{width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:#4338ca;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:900px){.auth-wrap{grid-template-columns:1fr}}
-@media (max-width:640px){.container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px}.timer{top:70px}.actions{flex-direction:column}.actions>*{width:100%}.report-grid{grid-template-columns:1fr}}
+@media (max-width:768px){.container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px;align-items:flex-start}.head h1{font-size:1rem}.timer{top:70px;font-size:16px}.actions{flex-direction:column}.actions>*{width:100%}.report-grid{grid-template-columns:1fr}.nav-grid{grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}.nav-grid button{min-height:38px;font-size:12px}.question-shell{padding:12px}}
 </style>
 </head>
 <body>
@@ -139,7 +142,7 @@ button:hover{transform:translateY(-1px)}
       <h2>Exam Submitted</h2>
       <div class="result-box" id="resultBox"></div>
       <div class="actions" style="margin-top:14px">
-        <button id="printResultBtn" type="button" class="ghost">Print Result</button>
+        <button id="downloadResultBtn" type="button" class="ghost">Download Result PDF</button>
       </div>
       <div id="reviewSection" class="hidden" style="margin-top:18px">
         <h3>Answer Review</h3>
@@ -166,6 +169,45 @@ function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
 function setAuth(data){ localStorage.setItem(TOKEN_KEY, data.token); localStorage.setItem(ROLE_KEY, data.role); localStorage.setItem(USERNAME_KEY, data.username); }
 function clearAuth(){ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(USERNAME_KEY); }
 function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+
+function pdfReady(){ return window.jspdf && window.jspdf.jsPDF; }
+function downloadCurrentResultPdf(){
+  if($("resultCard").classList.contains("hidden")) return setStatus("submitStatus", "No result available yet.");
+  if(!pdfReady()) return setStatus("submitStatus", "PDF library did not load. Refresh and try again.");
+  const data = $("resultCard").dataset.result ? JSON.parse($("resultCard").dataset.result) : null;
+  if(!data) return setStatus("submitStatus", "No result data found.");
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
+
+  doc.setFillColor(30,58,138);
+  doc.rect(0,0,595,110,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(20);
+  doc.text('Genz Edutech Innovation', 40, 42);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11);
+  doc.text('Official Student Result Report', 40, 62);
+  doc.setTextColor(15,23,42);
+
+  doc.autoTable({
+    startY: 135,
+    theme: 'grid',
+    styles: {fontSize: 10, cellPadding: 7, overflow:'linebreak'},
+    headStyles: {fillColor: [30,58,138]},
+    body: [
+      ['Student Name', data.fullName || '', 'Registration ID', data.regId || ''],
+      ['Exam Title', data.examTitle || '', 'Exam Code', data.examCode || ''],
+      ['Attempt', String(data.attemptNo || ''), 'Ranking', data.ranking || '—'],
+      ['Score', `${data.score || 0} / ${data.total || 0}`, 'Percentage', `${data.percentage || 0}%`],
+      ['Passed Questions', data.passedNos || 'None', 'Failed Questions', data.failedNos || 'None']
+    ]
+  });
+
+  const safeReg = String(data.regId || 'student').replace(/[^a-z0-9_-]+/gi,'_');
+  const safeExam = String(data.examCode || 'result').replace(/[^a-z0-9_-]+/gi,'_');
+  doc.save(`result_${safeReg}_${safeExam}.pdf`);
+}
 
 async function apiRequest(action, payload=null, method="POST"){
   try{
@@ -439,6 +481,7 @@ async function submitExam(){
   $("resultCard").classList.remove("hidden");
 
   const d = res.data || {};
+  $("resultCard").dataset.result = JSON.stringify(d);
   const passed = String(d.passedStatus || '').toUpperCase() === 'PASSED';
   let scoreCards = d.showScoreSummary ? `
     <div class="report-grid">
@@ -482,7 +525,7 @@ $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
 $("prevBtn").addEventListener("click", prevQuestion);
 $("nextBtn").addEventListener("click", nextQuestion);
-$("printResultBtn").addEventListener("click", function(){ window.print(); });
+$("downloadResultBtn").addEventListener("click", downloadCurrentResultPdf);
 
 (async function init(){ if(await validatePortal("student")) await showPortal(); })();
 </script>
