@@ -6,30 +6,39 @@
   <title>CBT Admin Portal</title>
   <style>
     *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:#f8fafc;color:#0f172a}
+    body{margin:0;background:#f8fafc;color:#0f172a;overflow-x:hidden}
     header{background:#0f172a;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     header a{color:#facc15;text-decoration:none;font-weight:bold}
-    .container{max-width:1220px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .container{width:min(100%,1220px);max-width:1220px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
     .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,.08)}
     .full{grid-column:1/-1}
     label{display:block;font-weight:bold;margin-bottom:6px;font-size:14px}
     input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:14px;font-size:15px}
     textarea{min-height:90px;resize:vertical}
-    button{border:none;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-right:8px;margin-bottom:8px;background:#0f172a;color:#fff}
+    button{border:none;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-right:8px;margin-bottom:8px;background:#0f172a;color:#fff;transition:opacity .2s ease, transform .2s ease}
+    button:hover{opacity:.94}
+    button:disabled{opacity:.65;cursor:not-allowed}
     .danger{background:#dc2626}.success{background:#15803d}.muted{background:#475569}.warn{background:#b45309}
     .item{background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0f172a;border-radius:10px;padding:12px;margin-bottom:12px}
     .question-image-preview{max-width:220px;max-height:160px;display:block;margin:10px 0;border:1px solid #ddd;border-radius:8px}
     table{width:100%;border-collapse:collapse;margin-top:10px}
     th,td{border:1px solid #cbd5e1;padding:10px;text-align:left;font-size:14px;vertical-align:top}
     th{background:#e2e8f0}
-    .status{font-size:14px;margin-top:8px}.error{color:#b91c1c}.ok{color:#166534}.hidden{display:none}
-    .auth-wrap{max-width:820px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .status{font-size:14px;margin-top:8px;min-height:20px}.error{color:#b91c1c}.ok{color:#166534}.hidden{display:none}
+    .auth-wrap{width:min(100%,820px);max-width:820px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
     .info-box{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .search-input{max-width:420px}
-    .nowrap{white-space:nowrap}
     .action-row{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .pill-on{background:#dcfce7;color:#166534}.pill-off{background:#fee2e2;color:#b91c1c}
+    .loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(2px)}
+    .spinner-card{background:#fff;border-radius:16px;padding:22px 26px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:14px}
+    .spinner{width:26px;height:26px;border:3px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin .8s linear infinite}
+    .button-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
     @media (max-width:900px){.container,.auth-wrap,.grid-2{grid-template-columns:1fr}}
+    @media (max-width:640px){header{padding:14px 12px}header h1{font-size:20px}.container,.auth-wrap{padding:0 12px;margin:16px auto}.card{padding:16px;border-radius:12px}button{width:100%;margin-right:0}header div{width:100%;display:flex;gap:8px;flex-wrap:wrap}header a,header button{flex:1 1 auto;text-align:center}.search-input{max-width:100%}th,td{font-size:13px;padding:8px}.action-row{flex-direction:column}}
   </style>
 </head>
 <body>
@@ -37,6 +46,10 @@
   <h1 style="margin:0;">CBT Admin Portal</h1>
   <div><a href="index.html">← Back Home</a><button id="logoutBtn" class="hidden" type="button">Logout</button></div>
 </header>
+
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="spinner-card"><div class="spinner"></div><div id="loadingText">Loading...</div></div>
+</div>
 
 <div id="authSection">
   <div class="auth-wrap">
@@ -63,32 +76,43 @@
   <div class="container">
     <div class="card">
       <h2>Exam Settings</h2>
-      <label for="examTitle">Exam Title</label><input type="text" id="examTitle">
-      <label for="durationMinutes">Duration (Minutes)</label><input type="number" id="durationMinutes" min="1" value="20">
+      <label>Exam Title</label><input type="text" id="examTitle">
+      <label>Duration (Minutes)</label><input type="number" id="durationMinutes" min="1" value="20">
       <label><input type="checkbox" id="portalLocked" style="width:auto;margin-right:8px;"> Lock CBT Portal</label>
-      <label for="portalNotice">Lock Notice</label><textarea id="portalNotice" placeholder="Type notice students will see when portal is locked"></textarea>
+      <label>Lock Notice</label><textarea id="portalNotice"></textarea>
       <button class="success" id="saveSettingsBtn" type="button">Save Settings</button>
       <div id="settingsStatus" class="status"></div>
     </div>
 
     <div class="card">
       <h2>Student Accounts</h2>
-      <div class="info-box">Bulk account generation uses Username = Reg ID. You can also reset an individual student password below.</div>
-      <label for="passwordLength">Generated Password Length</label><input type="number" id="passwordLength" min="6" value="8">
+      <label>Password Length</label><input type="number" id="passwordLength" min="6" value="8">
       <button class="success" id="generateAccountsBtn" type="button">Generate Student Passwords</button>
       <button class="muted" id="downloadGeneratedBtn" type="button">Download Last Generated CSV</button>
       <div id="accountsStatus" class="status"></div>
       <hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0;">
-      <label for="resetUsername">Student Username / Reg ID</label><input type="text" id="resetUsername" placeholder="Enter student username or Reg ID">
-      <label for="resetPassword">New Password (leave blank to auto-generate)</label><input type="text" id="resetPassword" placeholder="Optional manual new password">
+      <label>Student Username / Reg ID</label><input type="text" id="resetUsername">
+      <label>New Password (blank = auto-generate)</label><input type="text" id="resetPassword">
       <button class="success" id="resetPasswordBtn" type="button">Reset Student Password</button>
       <div id="resetPasswordStatus" class="status"></div>
     </div>
 
+    <div class="card full">
+      <h2>Admin Management</h2>
+      <input type="text" id="adminSearch" class="search-input" placeholder="Search admins by name or username">
+      <div id="adminsBox">Loading admins...</div>
+    </div>
+
+    <div class="card full">
+      <h2>Student Management</h2>
+      <input type="text" id="accountSearch" class="search-input" placeholder="Search students by name or username">
+      <div id="accountsListBox">Loading student accounts...</div>
+    </div>
+
     <div class="card">
-      <h2 id="candidateFormTitle">Add Candidate Manually</h2>
-      <label for="candidateName">Full Name</label><input type="text" id="candidateName" placeholder="Enter candidate full name">
-      <label for="candidateRegId">Reg ID</label><input type="text" id="candidateRegId" placeholder="Enter registration ID">
+      <h2 id="candidateFormTitle">Add Candidate</h2>
+      <label>Full Name</label><input type="text" id="candidateName">
+      <label>Reg ID</label><input type="text" id="candidateRegId">
       <input type="hidden" id="candidateOldRegId">
       <button class="success" id="addCandidateBtn" type="button">Add Candidate</button>
       <button class="warn hidden" id="updateCandidateBtn" type="button">Save Candidate Changes</button>
@@ -105,19 +129,18 @@
     </div>
 
     <div class="card full">
-      <h2 id="questionFormTitle">Add Question Manually</h2>
-      <div class="info-box">Image URL is optional. If you add an image link, the Questions sheet supports the Image URL column automatically.</div>
+      <h2 id="questionFormTitle">Add Question</h2>
       <input type="hidden" id="questionId">
-      <label for="questionText">Question</label><textarea id="questionText" placeholder="Enter question"></textarea>
-      <label for="imageUrl">Image URL (optional)</label><input type="text" id="imageUrl" placeholder="Paste direct image URL here">
+      <label>Question</label><textarea id="questionText"></textarea>
+      <label>Image URL (optional)</label><input type="text" id="imageUrl">
       <div class="grid-2">
-        <div><label for="optionA">Option A</label><input type="text" id="optionA"></div>
-        <div><label for="optionB">Option B</label><input type="text" id="optionB"></div>
-        <div><label for="optionC">Option C</label><input type="text" id="optionC"></div>
-        <div><label for="optionD">Option D</label><input type="text" id="optionD"></div>
+        <div><label>Option A</label><input type="text" id="optionA"></div>
+        <div><label>Option B</label><input type="text" id="optionB"></div>
+        <div><label>Option C</label><input type="text" id="optionC"></div>
+        <div><label>Option D</label><input type="text" id="optionD"></div>
       </div>
-      <label for="correctAnswer">Correct Answer</label>
-      <select id="correctAnswer"><option value="">Select answer</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+      <label>Correct Answer</label>
+      <select id="correctAnswer"><option value="">Select answer</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
       <button class="success" id="addQuestionBtn" type="button">Add Question</button>
       <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
       <button class="muted hidden" id="cancelQuestionEditBtn" type="button">Cancel Edit</button>
@@ -140,12 +163,6 @@
     </div>
 
     <div class="card full">
-      <h2>Student Accounts List</h2>
-      <input type="text" id="accountSearch" class="search-input" placeholder="Search student accounts by name or username">
-      <div id="accountsListBox">Loading student accounts...</div>
-    </div>
-
-    <div class="card full">
       <h2>Questions</h2>
       <input type="text" id="questionSearch" class="search-input" placeholder="Search questions, options, answer">
       <div id="questionsBox">Loading questions...</div>
@@ -157,14 +174,14 @@
       <div class="item" style="margin-top:12px;">
         <h3 style="margin-top:0;">Edit / Invalidate / Reopen One Candidate</h3>
         <div class="grid-2">
-          <div><label for="resultRegId">Reg ID</label><input type="text" id="resultRegId" placeholder="Enter Reg ID"></div>
-          <div><label for="resultFullName">Full Name</label><input type="text" id="resultFullName" placeholder="Candidate full name"></div>
-          <div><label for="resultRawScore">Raw Score</label><input type="number" id="resultRawScore" min="0" placeholder="e.g. 12"></div>
-          <div><label for="resultTotalQuestions">Total Questions</label><input type="number" id="resultTotalQuestions" min="1" placeholder="e.g. 20"></div>
+          <div><label>Reg ID</label><input type="text" id="resultRegId"></div>
+          <div><label>Full Name</label><input type="text" id="resultFullName"></div>
+          <div><label>Raw Score</label><input type="number" id="resultRawScore" min="0"></div>
+          <div><label>Total Questions</label><input type="number" id="resultTotalQuestions" min="1"></div>
         </div>
-        <label for="resultPassedNos">Passed Question Nos</label><input type="text" id="resultPassedNos" placeholder="e.g. 1, 2, 5">
-        <label for="resultFailedNos">Failed Question Nos</label><input type="text" id="resultFailedNos" placeholder="e.g. 3, 4, 6">
-        <label for="resultReason">Reason (for invalidate/reopen)</label><input type="text" id="resultReason" placeholder="Optional reason">
+        <label>Passed Question Nos</label><input type="text" id="resultPassedNos">
+        <label>Failed Question Nos</label><input type="text" id="resultFailedNos">
+        <label>Reason (for invalidate/reopen)</label><input type="text" id="resultReason">
         <button class="warn" id="updateResultBtn" type="button">Save Result Changes</button>
         <button class="danger" id="invalidateResultBtn" type="button">Invalidate Submission</button>
         <button class="muted" id="reopenExamBtn" type="button">Reopen Exam For Candidate</button>
@@ -178,10 +195,13 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvrevelRolSpl_zRhmnoSHBMK_XlSFv62_GMUbpgrX_EcMHsej2ljtWNeg/exec";
+const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const TOKEN_KEY = "cbt_admin_token";
+const ROLE_KEY = "cbt_admin_role";
+const USER_KEY = "cbt_admin_username";
 
 let lastGeneratedCsv = "", lastGeneratedFilename = "student_accounts_passwords.csv";
-let candidatesData = [], questionsData = [], resultsData = [], accountsData = [];
+let candidatesData = [], questionsData = [], resultsData = [], accountsData = [], adminsData = [];
 
 const resultRegId=document.getElementById('resultRegId'),
       resultFullName=document.getElementById('resultFullName'),
@@ -189,129 +209,85 @@ const resultRegId=document.getElementById('resultRegId'),
       resultTotalQuestions=document.getElementById('resultTotalQuestions'),
       resultPassedNos=document.getElementById('resultPassedNos'),
       resultFailedNos=document.getElementById('resultFailedNos'),
-      resultReason=document.getElementById('resultReason');
+      resultReason=document.getElementById('resultReason'),
+      overlay=document.getElementById('loadingOverlay'),
+      loadingText=document.getElementById('loadingText');
 
-function getToken(){ return localStorage.getItem("cbt_auth_token") || ""; }
-function setAuth(data){
-  localStorage.setItem("cbt_auth_token", data.token);
-  localStorage.setItem("cbt_auth_role", data.role);
-  localStorage.setItem("cbt_auth_username", data.username);
+function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
+function getUsername(){ return localStorage.getItem(USER_KEY) || ""; }
+function setAuth(data){ localStorage.setItem(TOKEN_KEY, data.token); localStorage.setItem(ROLE_KEY, data.role); localStorage.setItem(USER_KEY, data.username); }
+function clearAuth(){ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(USER_KEY); }
+
+function showLoading(text){ loadingText.textContent = text || "Loading..."; overlay.classList.remove("hidden"); }
+function hideLoading(){ overlay.classList.add("hidden"); }
+
+function setButtonLoading(btn, isLoading, text){
+  if (!btn) return;
+  if (isLoading){
+    btn.dataset.original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="button-spinner"></span>' + (text || 'Processing...');
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.original) btn.innerHTML = btn.dataset.original;
+  }
 }
-function clearAuth(){
-  localStorage.removeItem("cbt_auth_token");
-  localStorage.removeItem("cbt_auth_role");
-  localStorage.removeItem("cbt_auth_username");
+
+async function withLoading(button, text, fn){
+  try{
+    setButtonLoading(button, true, text);
+    return await fn();
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
 async function apiRequest(action, payload=null, method="POST"){
   try{
     payload = payload || {};
-
-    if (!payload.token && action !== "login" && action !== "signup") {
-      payload.token = getToken();
-    }
+    if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
 
     let response;
-
     if (method === "GET"){
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
-
       Object.keys(payload).forEach((key) => {
         const value = payload[key];
         if (value !== undefined && value !== null) {
-          url.searchParams.set(
-            key,
-            typeof value === "object" ? JSON.stringify(value) : String(value)
-          );
+          url.searchParams.set(key, typeof value === "object" ? JSON.stringify(value) : String(value));
         }
       });
-
       response = await fetch(url.toString(), { method: "GET" });
     } else {
       const form = new URLSearchParams();
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
-
       response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        },
+        headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
         body: form.toString()
       });
     }
 
     const text = await response.text();
-
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      return {
-        ok:false,
-        message:"Server returned non-JSON response.",
-        raw:text
-      };
-    }
+    try { return JSON.parse(text); }
+    catch (err){ return {ok:false, message:"Server returned non-JSON response.", raw:text}; }
   }catch(error){
-    return {
-      ok:false,
-      message:error.message || "Failed to fetch."
-    };
+    return {ok:false, message:error.message || "Failed to fetch."};
   }
 }
 
-function setStatus(id, message, ok=false){
-  const el=document.getElementById(id);
-  if(!el) return;
-  el.className="status "+(ok?"ok":"error");
-  el.textContent=message||"";
-}
-
-function downloadText(filename, text){
-  const blob=new Blob([text], {type:"text/csv;charset=utf-8"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function splitCsvLine(line){
-  const result=[]; let current="", inQuotes=false;
-  for(let i=0;i<line.length;i++){
-    const ch=line[i];
-    if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; }
-    if(ch==='"'){ inQuotes=!inQuotes; continue; }
-    if(ch===',' && !inQuotes){ result.push(current); current=""; continue; }
-    current+=ch;
-  }
-  result.push(current);
-  return result;
-}
-
-function parseCsv(text){
-  const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim());
-  if(!lines.length) return [];
-  const rows=lines.map(splitCsvLine);
-  const headers=rows[0].map(h=>h.trim());
-  return rows.slice(1).map(cols=>{
-    const obj={};
-    headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim());
-    return obj;
-  });
-}
-
+function setStatus(id, message, ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
+function downloadText(filename, text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
+function splitCsvLine(line){ const result=[]; let current="", inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; } if(ch==='"'){ inQuotes=!inQuotes; continue; } if(ch===',' && !inQuotes){ result.push(current); current=""; continue; } current+=ch; } result.push(current); return result; }
+function parseCsv(text){ const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim()); if(!lines.length) return []; const rows=lines.map(splitCsvLine); const headers=rows[0].map(h=>h.trim()); return rows.slice(1).map(cols=>{ const obj={}; headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim()); return obj; }); }
 async function fileToText(file){ return await file.text(); }
 
 async function validatePortal(role){
   const token=getToken();
   if(!token) return false;
-  const res=await apiRequest("validateSession", {token}, "POST");
-  if(!res.ok || !res.data || res.data.role!==role){
-    clearAuth();
-    return false;
-  }
+  const res=await apiRequest("validateSession",{token},"POST");
+  if(!res.ok || !res.data || res.data.role!==role){ clearAuth(); return false; }
   return true;
 }
 
@@ -319,37 +295,37 @@ async function showPortal(){
   authSection.classList.add("hidden");
   portalSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
-  await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadQuestions(), loadResults()]);
-}
-
-async function signupAdmin(){
-  const res=await apiRequest("signup", {
-    fullName:signupFullName.value.trim(),
-    username:signupUsername.value.trim(),
-    password:signupPassword.value,
-    adminKey:signupAdminKey.value,
-    role:"admin"
-  }, "POST");
-  setStatus("signupStatus", res.message, res.ok);
-}
-
-async function loginAdmin(){
-  const res=await apiRequest("login", {
-    username:loginUsername.value.trim(),
-    password:loginPassword.value,
-    role:"admin"
-  }, "POST");
-  setStatus("loginStatus", res.message, res.ok);
-  if(res.ok && res.data){
-    setAuth(res.data);
-    await showPortal();
+  showLoading("Loading dashboard...");
+  try{
+    await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadAdminAccounts(), loadQuestions(), loadResults()]);
+  } finally {
+    hideLoading();
   }
 }
 
+async function signupAdmin(){
+  await withLoading(signupBtn, "Signing up...", async () => {
+    const res=await apiRequest("signup", {fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value, role:"admin"}, "POST");
+    setStatus("signupStatus", res.message, res.ok);
+  });
+}
+
+async function loginAdmin(){
+  await withLoading(loginBtn, "Logging in...", async () => {
+    const res=await apiRequest("login", {username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"}, "POST");
+    setStatus("loginStatus", res.message, res.ok);
+    if(res.ok && res.data){ setAuth(res.data); await showPortal(); }
+  });
+}
+
 async function logoutCurrent(){
-  await apiRequest("logout", {token:getToken()}, "POST");
-  clearAuth();
-  location.reload();
+  showLoading("Logging out...");
+  try{
+    await apiRequest("logout", {token:getToken()}, "POST");
+  } finally {
+    clearAuth();
+    location.reload();
+  }
 }
 
 async function loadSettings(){
@@ -361,381 +337,87 @@ async function loadSettings(){
     portalNotice.value=res.data.portalNotice||"";
   }
 }
-
 async function saveSettings(){
-  const res=await apiRequest("saveSettings", {
-    examTitle:examTitle.value.trim(),
-    durationMinutes:durationMinutes.value.trim(),
-    portalLocked:portalLocked.checked,
-    portalNotice:portalNotice.value.trim()
-  }, "POST");
-  setStatus("settingsStatus", res.message, res.ok);
-}
-
-function resetCandidateForm(){
-  candidateFormTitle.textContent="Add Candidate Manually";
-  candidateOldRegId.value="";
-  candidateName.value="";
-  candidateRegId.value="";
-  addCandidateBtn.classList.remove("hidden");
-  updateCandidateBtn.classList.add("hidden");
-  cancelCandidateEditBtn.classList.add("hidden");
-}
-
-async function addCandidate(){
-  const res=await apiRequest("addCandidate", {
-    fullName:candidateName.value.trim(),
-    regId:candidateRegId.value.trim()
-  }, "POST");
-  setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){
-    resetCandidateForm();
-    loadCandidates();
-    loadStudentAccounts();
-  }
-}
-
-window.startCandidateEdit = function(regId){
-  const item=candidatesData.find(x=>String(x.regId)===String(regId));
-  if(!item) return;
-  candidateFormTitle.textContent="Edit Candidate";
-  candidateOldRegId.value=item.regId;
-  candidateName.value=item.fullName;
-  candidateRegId.value=item.regId;
-  addCandidateBtn.classList.add("hidden");
-  updateCandidateBtn.classList.remove("hidden");
-  cancelCandidateEditBtn.classList.remove("hidden");
-  window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
-}
-
-async function updateCandidate(){
-  const res=await apiRequest("updateCandidate", {
-    oldRegId:candidateOldRegId.value.trim(),
-    fullName:candidateName.value.trim(),
-    regId:candidateRegId.value.trim()
-  }, "POST");
-  setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){
-    resetCandidateForm();
-    loadCandidates();
-    loadStudentAccounts();
-    loadResults();
-  }
-}
-
-window.deleteCandidateItem = async function(regId){
-  if(!confirm(`Delete candidate ${regId}? This also removes the linked student account, but keeps any old results.`)) return;
-  const res=await apiRequest("deleteCandidate", {regId}, "POST");
-  setStatus("candidateStatus", res.message, res.ok);
-  if(res.ok){
-    loadCandidates();
-    loadStudentAccounts();
-  }
-}
-
-async function importCandidates(){
-  const file=candidateCsvFile.files[0];
-  if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first.");
-  const rows=parseCsv(await fileToText(file));
-  const res=await apiRequest("importCandidates", {rows}, "POST");
-  setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) loadCandidates();
-}
-
-async function loadCandidates(){
-  candidatesBox.innerHTML="Loading candidates...";
-  const res=await apiRequest("listCandidates", {}, "GET");
-  if(!res.ok){
-    candidatesBox.innerHTML=`<div class="error">${res.message}</div>`;
-    return;
-  }
-  candidatesData = res.data || [];
-  renderCandidates();
-}
-
-function renderCandidates(){
-  const q=(candidateSearch.value||"").trim().toLowerCase();
-  const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q));
-  if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>";
-  let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`;
-  list.forEach((item,i)=> {
-    const safeReg=String(item.regId).replace(/'/g, "&#39;");
-    html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger nowrap" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`;
+  await withLoading(saveSettingsBtn, "Saving...", async () => {
+    const res=await apiRequest("saveSettings", {examTitle:examTitle.value.trim(), durationMinutes:durationMinutes.value.trim(), portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()}, "POST");
+    setStatus("settingsStatus", res.message, res.ok);
   });
-  candidatesBox.innerHTML = html + "</tbody></table>";
 }
 
-async function loadStudentAccounts(){
-  accountsListBox.innerHTML="Loading student accounts...";
-  const res=await apiRequest("listStudentAccounts", {}, "GET");
-  if(!res.ok){
-    accountsListBox.innerHTML=`<div class="error">${res.message}</div>`;
-    return;
-  }
-  accountsData = res.data || [];
-  renderAccounts();
-}
+function resetCandidateForm(){ candidateFormTitle.textContent="Add Candidate"; candidateOldRegId.value=""; candidateName.value=""; candidateRegId.value=""; addCandidateBtn.classList.remove("hidden"); updateCandidateBtn.classList.add("hidden"); cancelCandidateEditBtn.classList.add("hidden"); }
+async function addCandidate(){ await withLoading(addCandidateBtn, "Adding...", async () => {
+  const res=await apiRequest("addCandidate", {fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST");
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){ resetCandidateForm(); await Promise.all([loadCandidates(), loadStudentAccounts()]); }
+});}
+window.startCandidateEdit = function(regId){ const item=candidatesData.find(x=>String(x.regId)===String(regId)); if(!item) return; candidateFormTitle.textContent="Edit Candidate"; candidateOldRegId.value=item.regId; candidateName.value=item.fullName; candidateRegId.value=item.regId; addCandidateBtn.classList.add("hidden"); updateCandidateBtn.classList.remove("hidden"); cancelCandidateEditBtn.classList.remove("hidden"); window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function updateCandidate(){ await withLoading(updateCandidateBtn, "Saving...", async () => {
+  const res=await apiRequest("updateCandidate", {oldRegId:candidateOldRegId.value.trim(), fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST");
+  setStatus("candidateStatus", res.message, res.ok);
+  if(res.ok){ resetCandidateForm(); await Promise.all([loadCandidates(), loadStudentAccounts(), loadResults()]); }
+});}
+window.deleteCandidateItem = async function(regId){ if(!confirm(`Delete candidate ${regId}?`)) return; showLoading("Deleting candidate..."); try{ const res=await apiRequest("deleteCandidate", {regId}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadCandidates(), loadStudentAccounts()]); } } finally{ hideLoading(); } }
+async function importCandidates(){ const file=candidateCsvFile.files[0]; if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first."); await withLoading(importCandidatesBtn, "Importing...", async () => {
+  const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importCandidates", {rows}, "POST");
+  setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
+  if(res.ok) await loadCandidates();
+});}
+async function loadCandidates(){ candidatesBox.innerHTML="Loading candidates..."; const res=await apiRequest("listCandidates", {}, "GET"); if(!res.ok){ candidatesBox.innerHTML=`<div class="error">${res.message}</div>`; return; } candidatesData = res.data || []; renderCandidates(); }
+function renderCandidates(){ const q=(candidateSearch.value||"").trim().toLowerCase(); const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q)); if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safeReg=String(item.regId).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`; }); candidatesBox.innerHTML = html + "</tbody></table>"; }
 
-function renderAccounts(){
-  const q=(accountSearch.value||"").trim().toLowerCase();
-  const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q));
-  if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>";
-  let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
-  list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td>${item.isActive ? 'Active' : 'Inactive'}</td><td><button type="button" class="muted nowrap" onclick="prefillReset('${String(item.username).replace(/'/g, "&#39;")}')">Use Username</button></td></tr>`);
-  accountsListBox.innerHTML = html + "</tbody></table>";
-}
-
-window.prefillReset = function(username){
-  resetUsername.value = username;
-  resetPassword.focus();
-  window.scrollTo({top: resetUsername.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
-}
-
-async function resetStudentPassword(){
-  const payload={
-    username:resetUsername.value.trim(),
-    newPassword:resetPassword.value.trim(),
-    autoGenerate: !resetPassword.value.trim(),
-    passwordLength: passwordLength.value
-  };
+async function loadStudentAccounts(){ accountsListBox.innerHTML="Loading student accounts..."; const res=await apiRequest("listStudentAccounts", {}, "GET"); if(!res.ok){ accountsListBox.innerHTML=`<div class="error">${res.message}</div>`; return; } accountsData = res.data || []; renderAccounts(); }
+function renderAccounts(){ const q=(accountSearch.value||"").trim().toLowerCase(); const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safe=String(item.username).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td><span class="pill ${item.isActive ? 'pill-on' : 'pill-off'}">${item.isActive ? 'Active' : 'Inactive'}</span></td><td><div class="action-row"><button type="button" class="muted" onclick="prefillReset('${safe}')">Reset Password</button><button type="button" class="${item.isActive ? 'warn' : 'success'}" onclick="toggleUserActive('${safe}', ${item.isActive ? 'false' : 'true'})">${item.isActive ? 'Deactivate' : 'Activate'}</button><button type="button" class="danger" onclick="deleteUserItem('${safe}')">Delete</button></div></td></tr>`; }); accountsListBox.innerHTML = html + "</tbody></table>"; }
+window.prefillReset = function(username){ resetUsername.value = username; resetPassword.focus(); }
+async function resetStudentPassword(){ await withLoading(resetPasswordBtn, "Resetting...", async () => {
+  const payload={username:resetUsername.value.trim(), newPassword:resetPassword.value.trim(), autoGenerate: !resetPassword.value.trim(), passwordLength: passwordLength.value};
   const res=await apiRequest("resetStudentPassword", payload, "POST");
-  if(res.ok && res.data){
-    const msg = `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`;
-    setStatus("resetPasswordStatus", msg, true);
-    resetPassword.value="";
-    resetUsername.value="";
-  } else {
-    setStatus("resetPasswordStatus", res.message, false);
-  }
-}
+  if(res.ok && res.data){ setStatus("resetPasswordStatus", `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`, true); resetPassword.value=""; resetUsername.value=""; } else { setStatus("resetPasswordStatus", res.message, false); }
+});}
 
-function resetQuestionForm(){
-  questionFormTitle.textContent="Add Question Manually";
-  questionId.value="";
-  [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value="");
-  correctAnswer.value="";
-  addQuestionBtn.classList.remove("hidden");
-  updateQuestionBtn.classList.add("hidden");
-  cancelQuestionEditBtn.classList.add("hidden");
-}
+async function loadAdminAccounts(){ adminsBox.innerHTML="Loading admins..."; const res=await apiRequest("listAdminAccounts", {}, "GET"); if(!res.ok){ adminsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } adminsData = res.data || []; renderAdmins(); }
+function renderAdmins(){ const q=(adminSearch.value||"").trim().toLowerCase(); const list = adminsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return adminsBox.innerHTML = q ? "<p>No matching admins found.</p>" : "<p>No admin accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safe=String(item.username).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}${item.isCurrent ? ' <strong>(You)</strong>' : ''}</td><td>${item.username}</td><td><span class="pill ${item.isActive ? 'pill-on' : 'pill-off'}">${item.isActive ? 'Active' : 'Inactive'}</span></td><td><div class="action-row"><button type="button" class="${item.isActive ? 'warn' : 'success'}" onclick="toggleUserActive('${safe}', ${item.isActive ? 'false' : 'true'})">${item.isActive ? 'Deactivate' : 'Activate'}</button><button type="button" class="danger" onclick="deleteUserItem('${safe}')">Delete</button></div></td></tr>`; }); adminsBox.innerHTML = html + "</tbody></table>"; }
+window.toggleUserActive = async function(username, active){ showLoading(active ? "Activating user..." : "Deactivating user..."); try{ const res=await apiRequest("setUserActive", {username, active}, "POST"); setStatus("accountsStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadAdminAccounts(), loadStudentAccounts()]); if(username === getUsername() && !active){ clearAuth(); location.reload(); } } } finally{ hideLoading(); } }
+window.deleteUserItem = async function(username){ if(!confirm(`Delete user ${username}?`)) return; showLoading("Deleting user..."); try{ const res=await apiRequest("deleteUser", {username}, "POST"); setStatus("accountsStatus", res.message, res.ok); if(res.ok){ await Promise.all([loadAdminAccounts(), loadStudentAccounts()]); if(username === getUsername()){ clearAuth(); location.reload(); } } } finally{ hideLoading(); } }
 
-async function addQuestion(){
-  const res=await apiRequest("addQuestion", {
-    question:questionText.value.trim(),
-    imageUrl:imageUrl.value.trim(),
-    optionA:optionA.value.trim(),
-    optionB:optionB.value.trim(),
-    optionC:optionC.value.trim(),
-    optionD:optionD.value.trim(),
-    answer:correctAnswer.value
-  }, "POST");
+function resetQuestionForm(){ questionFormTitle.textContent="Add Question"; questionId.value=""; [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value=""); correctAnswer.value=""; addQuestionBtn.classList.remove("hidden"); updateQuestionBtn.classList.add("hidden"); cancelQuestionEditBtn.classList.add("hidden"); }
+async function addQuestion(){ await withLoading(addQuestionBtn, "Adding...", async () => {
+  const res=await apiRequest("addQuestion", {question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST");
   setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){
-    resetQuestionForm();
-    loadQuestions();
-  }
-}
-
-window.startQuestionEdit = function(id){
-  const item=questionsData.find(x=>String(x.id)===String(id));
-  if(!item) return;
-  questionFormTitle.textContent="Edit Question";
-  questionId.value=item.id;
-  questionText.value=item.question||"";
-  imageUrl.value=item.imageUrl||"";
-  optionA.value=item.optionA||"";
-  optionB.value=item.optionB||"";
-  optionC.value=item.optionC||"";
-  optionD.value=item.optionD||"";
-  correctAnswer.value=item.answer||"";
-  addQuestionBtn.classList.add("hidden");
-  updateQuestionBtn.classList.remove("hidden");
-  cancelQuestionEditBtn.classList.remove("hidden");
-  window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
-}
-
-async function updateQuestion(){
-  const res=await apiRequest("updateQuestion", {
-    id:questionId.value.trim(),
-    question:questionText.value.trim(),
-    imageUrl:imageUrl.value.trim(),
-    optionA:optionA.value.trim(),
-    optionB:optionB.value.trim(),
-    optionC:optionC.value.trim(),
-    optionD:optionD.value.trim(),
-    answer:correctAnswer.value
-  }, "POST");
+  if(res.ok){ resetQuestionForm(); await loadQuestions(); }
+});}
+window.startQuestionEdit = function(id){ const item=questionsData.find(x=>String(x.id)===String(id)); if(!item) return; questionFormTitle.textContent="Edit Question"; questionId.value=item.id; questionText.value=item.question||""; imageUrl.value=item.imageUrl||""; optionA.value=item.optionA||""; optionB.value=item.optionB||""; optionC.value=item.optionC||""; optionD.value=item.optionD||""; correctAnswer.value=item.answer||""; addQuestionBtn.classList.add("hidden"); updateQuestionBtn.classList.remove("hidden"); cancelQuestionEditBtn.classList.remove("hidden"); window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function updateQuestion(){ await withLoading(updateQuestionBtn, "Saving...", async () => {
+  const res=await apiRequest("updateQuestion", {id:questionId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST");
   setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){
-    resetQuestionForm();
-    loadQuestions();
-  }
-}
-
-window.deleteQuestionItem = async function(id){
-  if(!confirm("Delete this question?")) return;
-  const res=await apiRequest("deleteQuestion", {id}, "POST");
-  setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){
-    loadQuestions();
-  }
-}
-
-async function importQuestions(){
-  const file=questionCsvFile.files[0];
-  if(!file) return setStatus("questionImportStatus", "Choose a CSV file first.");
-  const rows=parseCsv(await fileToText(file));
-  const res=await apiRequest("importQuestions", {rows}, "POST");
+  if(res.ok){ resetQuestionForm(); await loadQuestions(); }
+});}
+window.deleteQuestionItem = async function(id){ if(!confirm("Delete this question?")) return; showLoading("Deleting question..."); try{ const res=await apiRequest("deleteQuestion", {id}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok) await loadQuestions(); } finally{ hideLoading(); } }
+async function importQuestions(){ const file=questionCsvFile.files[0]; if(!file) return setStatus("questionImportStatus", "Choose a CSV file first."); await withLoading(importQuestionsBtn, "Importing...", async () => {
+  const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importQuestions", {rows}, "POST");
   setStatus("questionImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok);
-  if(res.ok) loadQuestions();
-}
+  if(res.ok) await loadQuestions();
+});}
+async function clearQuestions(){ if(!confirm("Delete all questions?")) return; showLoading("Clearing questions..."); try{ const res=await apiRequest("clearQuestions", {}, "POST"); setStatus("questionStatus", res.message, res.ok); await loadQuestions(); } finally{ hideLoading(); } }
+async function loadQuestions(){ questionsBox.innerHTML="Loading questions..."; const res=await apiRequest("listQuestions", {}, "GET"); if(!res.ok){ questionsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } questionsData = res.data || []; renderQuestions(); }
+function renderQuestions(){ const q=(questionSearch.value||"").trim().toLowerCase(); const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q)); if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>"; questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join(""); }
 
-async function clearQuestions(){
-  if(!confirm("Delete all questions?")) return;
-  const res=await apiRequest("clearQuestions", {}, "POST");
-  setStatus("questionStatus", res.message, res.ok);
-  loadQuestions();
-}
-
-async function loadQuestions(){
-  questionsBox.innerHTML="Loading questions...";
-  const res=await apiRequest("listQuestions", {}, "GET");
-  if(!res.ok){
-    questionsBox.innerHTML=`<div class="error">${res.message}</div>`;
-    return;
-  }
-  questionsData = res.data || [];
-  renderQuestions();
-}
-
-function renderQuestions(){
-  const q=(questionSearch.value||"").trim().toLowerCase();
-  const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
-  if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>";
-  questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join("");
-}
-
-function resetResultForm(){
-  [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value='');
-}
-
-async function loadResults(){
-  resultsBox.innerHTML="Loading results...";
-  const res=await apiRequest("listResults", {}, "GET");
-  if(!res.ok){
-    resultsBox.innerHTML=`<div class="error">${res.message}</div>`;
-    return;
-  }
-  resultsData = res.data || [];
-  renderResults();
-}
-
-function renderResults(){
-  const q=(resultsSearch.value||"").trim().toLowerCase();
-  const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q));
-  if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>";
-  let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`;
-  list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger nowrap" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted nowrap" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`);
-  resultsBox.innerHTML = html + "</tbody></table>";
-}
-
-window.startResultEdit = function(regId){
-  const item=resultsData.find(x=>String(x.regId)===String(regId));
-  if(!item) return;
-  resultRegId.value=item.regId||'';
-  resultFullName.value=item.fullName||'';
-  resultRawScore.value=item.rawScore||0;
-  resultTotalQuestions.value=item.totalQuestions||0;
-  resultPassedNos.value=item.passedNos||'';
-  resultFailedNos.value=item.failedNos||'';
-  resultReason.value='';
-  window.scrollTo({top: resultRegId.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'});
-}
-
-async function updateResult(){
-  const res=await apiRequest('updateResult', {
-    regId:resultRegId.value.trim(),
-    fullName:resultFullName.value.trim(),
-    rawScore:resultRawScore.value,
-    totalQuestions:resultTotalQuestions.value,
-    passedNos:resultPassedNos.value.trim(),
-    failedNos:resultFailedNos.value.trim()
-  }, 'POST');
+function resetResultForm(){ [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value=''); }
+async function loadResults(){ resultsBox.innerHTML="Loading results..."; const res=await apiRequest("listResults", {}, "GET"); if(!res.ok){ resultsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } resultsData = res.data || []; renderResults(); }
+function renderResults(){ const q=(resultsSearch.value||"").trim().toLowerCase(); const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q)); if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`); resultsBox.innerHTML = html + "</tbody></table>"; }
+window.startResultEdit = function(regId){ const item=resultsData.find(x=>String(x.regId)===String(regId)); if(!item) return; resultRegId.value=item.regId||''; resultFullName.value=item.fullName||''; resultRawScore.value=item.rawScore||0; resultTotalQuestions.value=item.totalQuestions||0; resultPassedNos.value=item.passedNos||''; resultFailedNos.value=item.failedNos||''; resultReason.value=''; }
+async function updateResult(){ await withLoading(updateResultBtn, "Saving...", async () => {
+  const res=await apiRequest('updateResult', {regId:resultRegId.value.trim(), fullName:resultFullName.value.trim(), rawScore:resultRawScore.value, totalQuestions:resultTotalQuestions.value, passedNos:resultPassedNos.value.trim(), failedNos:resultFailedNos.value.trim()}, 'POST');
   setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){
-    resetResultForm();
-    loadResults();
-  }
-}
-
-window.invalidateResultItem = async function(regId){
-  const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || '';
-  const res=await apiRequest('invalidateResult', {regId, reason}, 'POST');
-  setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){
-    if(resultRegId.value===regId) resetResultForm();
-    loadResults();
-  }
-}
-
-async function invalidateResult(){
-  if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.');
-  const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST');
-  setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){
-    resetResultForm();
-    loadResults();
-  }
-}
-
-window.reopenCandidateItem = async function(regId){
-  const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || '';
-  const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST');
-  setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){
-    if(resultRegId.value===regId) resetResultForm();
-    loadResults();
-  }
-}
-
-async function reopenCandidateExam(){
-  if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.');
-  const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST');
-  setStatus('resultsStatus', res.message, res.ok);
-  if(res.ok){
-    resetResultForm();
-    loadResults();
-  }
-}
-
-async function clearResults(){
-  if(!confirm("Clear all results?")) return;
-  const res=await apiRequest("clearResults", {}, "POST");
-  setStatus("resultsStatus", res.message, res.ok);
-  loadResults();
-}
-
-async function exportResults(){
-  const res=await apiRequest("exportResults", {}, "POST");
-  setStatus("resultsStatus", res.message, res.ok);
-  if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv);
-}
-
-async function generateAccounts(){
-  const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST");
-  setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok);
-  if(res.ok && res.data && res.data.csv){
-    lastGeneratedCsv=res.data.csv;
-    lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv";
-    downloadText(lastGeneratedFilename, lastGeneratedCsv);
-    loadStudentAccounts();
-  }
-}
-
-function downloadLastGenerated(){
-  if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet.");
-  downloadText(lastGeneratedFilename, lastGeneratedCsv);
-}
+  if(res.ok){ resetResultForm(); await loadResults(); }
+});}
+window.invalidateResultItem = async function(regId){ const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || ''; showLoading("Invalidating result..."); try{ const res=await apiRequest('invalidateResult', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); await loadResults(); } } finally { hideLoading(); } }
+async function invalidateResult(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); await withLoading(invalidateResultBtn, "Invalidating...", async () => { const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); await loadResults(); } });}
+window.reopenCandidateItem = async function(regId){ const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || ''; showLoading("Reopening exam..."); try{ const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); await loadResults(); } } finally { hideLoading(); } }
+async function reopenCandidateExam(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); await withLoading(reopenExamBtn, "Reopening...", async () => { const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); await loadResults(); } });}
+async function clearResults(){ if(!confirm("Clear all results?")) return; showLoading("Clearing results..."); try{ const res=await apiRequest("clearResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); await loadResults(); } finally{ hideLoading(); } }
+async function exportResults(){ await withLoading(exportResultsBtn, "Exporting...", async () => { const res=await apiRequest("exportResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv); });}
+async function generateAccounts(){ await withLoading(generateAccountsBtn, "Generating...", async () => { const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST"); setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok); if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv"; downloadText(lastGeneratedFilename, lastGeneratedCsv); await loadStudentAccounts(); } });}
+function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet."); downloadText(lastGeneratedFilename, lastGeneratedCsv); }
 
 signupBtn.addEventListener("click", signupAdmin);
 loginBtn.addEventListener("click", loginAdmin);
@@ -757,6 +439,7 @@ downloadGeneratedBtn.addEventListener("click", downloadLastGenerated);
 resetPasswordBtn.addEventListener("click", resetStudentPassword);
 candidateSearch.addEventListener("input", renderCandidates);
 accountSearch.addEventListener("input", renderAccounts);
+adminSearch.addEventListener("input", renderAdmins);
 questionSearch.addEventListener("input", renderQuestions);
 resultsSearch.addEventListener("input", renderResults);
 updateResultBtn.addEventListener("click", updateResult);
@@ -765,7 +448,12 @@ reopenExamBtn.addEventListener("click", reopenCandidateExam);
 cancelResultEditBtn.addEventListener("click", resetResultForm);
 
 (async function init(){
-  if(await validatePortal("admin")) await showPortal();
+  showLoading("Checking session...");
+  try{
+    if(await validatePortal("admin")) await showPortal();
+  } finally {
+    hideLoading();
+  }
 })();
 </script>
 </body>
