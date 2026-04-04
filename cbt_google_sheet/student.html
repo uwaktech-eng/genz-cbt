@@ -95,7 +95,7 @@ button{
   margin-bottom:8px;
   background:linear-gradient(135deg,var(--primary),var(--primary-2));
   color:#fff;
-  transition:.2s transform,.2s opacity;
+  transition:.2s transform,.2s opacity,.2s box-shadow;
 }
 button:hover{transform:translateY(-1px)}
 .success{background:var(--success)}
@@ -329,25 +329,25 @@ button:hover{transform:translateY(-1px)}
   position:fixed;
   top:86px;
   left:50%;
-  transform:translateX(-50%) translateY(-14px);
-  width:min(92vw,520px);
+  transform:translateX(-50%) translateY(-30px) scale(.94);
+  width:min(92vw,540px);
   z-index:10000;
   opacity:0;
   pointer-events:none;
-  transition:.25s ease;
+  transition:opacity .35s ease, transform .38s cubic-bezier(.2,.8,.2,1);
 }
 .violation-float.show{
   opacity:1;
-  transform:translateX(-50%) translateY(0);
+  transform:translateX(-50%) translateY(0) scale(1);
 }
 .violation-card{
-  background:rgba(127,29,29,.96);
+  background:rgba(127,29,29,.97);
   color:#fff;
   border:1px solid rgba(255,255,255,.16);
   border-radius:18px;
   box-shadow:0 20px 48px rgba(0,0,0,.30);
   padding:14px 16px;
-  backdrop-filter:blur(8px);
+  backdrop-filter:blur(10px);
 }
 .violation-title{
   font-size:15px;
@@ -371,6 +371,7 @@ button:hover{transform:translateY(-1px)}
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#facc15,#fb7185);
+  transition:width .2s linear;
 }
 .camera-help{
   font-size:12px;
@@ -568,6 +569,8 @@ let protectionArmed = false;
 let pendingUnlockData = null;
 let violationToastTimer = null;
 let violationProgressTimer = null;
+let pendingViolationReason = "";
+let pendingViolationCount = 0;
 
 function showLoader(text = "Loading...") {
   loaderText.textContent = text;
@@ -825,28 +828,36 @@ function hideWarningOverlay() {
   $("warningOverlay").classList.remove("show");
 }
 
-function showViolationFloat(reason) {
+function showViolationFloat(reason, count) {
   clearTimeout(violationToastTimer);
   clearInterval(violationProgressTimer);
 
-  const remaining = Math.max(0, 4 - violationCount);
-  $("violationTitle").textContent = `Warning ${violationCount}/4`;
+  const remaining = Math.max(0, 4 - count);
+  $("violationTitle").textContent = `Warning ${count}/4`;
   $("violationText").textContent = `${reason}. ${remaining} ${remaining === 1 ? "chance" : "chances"} left before auto-submission.`;
+
   const progress = $("violationProgressBar");
-  progress.style.width = `${Math.min(100, (violationCount / 4) * 100)}%`;
+  progress.style.width = `${Math.min(100, (count / 4) * 100)}%`;
 
   $("violationFloat").classList.add("show");
 
-  let visual = (violationCount / 4) * 100;
+  let visual = (count / 4) * 100;
   violationProgressTimer = setInterval(() => {
-    visual = Math.min(100, visual + 1.2);
+    visual = Math.min(100, visual + 1.1);
     progress.style.width = `${visual}%`;
-  }, 30);
+  }, 35);
 
   violationToastTimer = setTimeout(() => {
     $("violationFloat").classList.remove("show");
     clearInterval(violationProgressTimer);
-  }, 5200);
+  }, 6000);
+}
+
+function showPendingViolationIfAny() {
+  if (!pendingViolationReason || !pendingViolationCount) return;
+  showViolationFloat(pendingViolationReason, pendingViolationCount);
+  pendingViolationReason = "";
+  pendingViolationCount = 0;
 }
 
 function hideViolationFloat() {
@@ -945,12 +956,20 @@ function blockExamKeys(e) {
 
 function registerViolation(reason) {
   if (!examStarted || !protectionArmed) return;
+
   const now = Date.now();
   if (now - lastViolationAt < 1500) return;
   lastViolationAt = now;
+
   violationCount++;
   showProctorAlert(`Warning ${violationCount}/4: ${reason}. After 4 violations, your exam will be submitted automatically.`);
-  showViolationFloat(reason);
+
+  pendingViolationReason = reason;
+  pendingViolationCount = violationCount;
+
+  if (!document.hidden && document.hasFocus()) {
+    showPendingViolationIfAny();
+  }
 
   if (violationCount >= 4) {
     setStatus("submitStatus", "4 tab/minimize violations detected. Auto-submitting exam...");
@@ -959,7 +978,11 @@ function registerViolation(reason) {
 }
 
 function handleVisibilityViolation() {
-  if (document.hidden) registerViolation("You switched tabs or minimized the page");
+  if (document.hidden) {
+    registerViolation("You switched tabs or minimized the page");
+  } else {
+    showPendingViolationIfAny();
+  }
 }
 
 function handleBlurViolation() {
@@ -967,10 +990,18 @@ function handleBlurViolation() {
   registerViolation("You moved away from the exam window");
 }
 
+function handleFocusReturn() {
+  if (!examStarted) return;
+  showPendingViolationIfAny();
+}
+
 function armExamProtection() {
   protectionArmed = true;
   violationCount = 0;
   lastViolationAt = 0;
+  pendingViolationReason = "";
+  pendingViolationCount = 0;
+
   document.body.classList.add("exam-protected");
   document.addEventListener("contextmenu", blockExamInteraction);
   document.addEventListener("copy", blockExamInteraction);
@@ -981,12 +1012,16 @@ function armExamProtection() {
   document.addEventListener("keydown", blockExamKeys);
   document.addEventListener("visibilitychange", handleVisibilityViolation);
   window.addEventListener("blur", handleBlurViolation);
+  window.addEventListener("focus", handleFocusReturn);
 }
 
 function disarmExamProtection() {
   protectionArmed = false;
   violationCount = 0;
   lastViolationAt = 0;
+  pendingViolationReason = "";
+  pendingViolationCount = 0;
+
   document.body.classList.remove("exam-protected");
   document.removeEventListener("contextmenu", blockExamInteraction);
   document.removeEventListener("copy", blockExamInteraction);
@@ -997,6 +1032,8 @@ function disarmExamProtection() {
   document.removeEventListener("keydown", blockExamKeys);
   document.removeEventListener("visibilitychange", handleVisibilityViolation);
   window.removeEventListener("blur", handleBlurViolation);
+  window.removeEventListener("focus", handleFocusReturn);
+
   clearProctorAlert();
   hideViolationFloat();
 }
@@ -1163,7 +1200,7 @@ $("logoutBtn").addEventListener("click", logoutCurrent);
 $("verifyBtn").addEventListener("click", verifyCandidate);
 $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
-$("cancelStartBtn").addEventListener("click", function(){
+$("cancelStartBtn").addEventListener("click", function() {
   hideWarningOverlay();
   pendingUnlockData = null;
 });
