@@ -58,6 +58,7 @@ th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size
 @media (max-width:1080px){.card{grid-column:1/-1}}
 @media (max-width:780px){.row{grid-template-columns:1fr}.auth-shell{grid-template-columns:1fr}.wrap{padding:14px}.card{padding:16px;border-radius:16px}}
 @media (max-width:520px){.actions{flex-direction:column}.actions>*{width:100%}table{min-width:660px}}
+button[disabled]{transform:none!important;box-shadow:none!important}
 
 /* dashboard cleanup */
 .card.collapsible{padding:0;overflow:hidden;position:relative}
@@ -88,7 +89,7 @@ th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size
     <div class="brand">
       <div class="badge"></div>
       <div>
-        <h1>Genz CBT Admin Dashboard</h1>
+        <h1>CBT Admin Dashboard</h1>
         <div class="muted">Exams, settings, candidates, results, review access, pass mark and result checker</div>
       </div>
     </div>
@@ -126,8 +127,8 @@ th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size
   <div class="wrap">
     <div class="grid">
       <div class="dashboard-banner">
-        <h2 style="margin:0 0 6px">Genz Edutech Innovations</h2>
-        <div style="opacity:.92;max-width:860px">Clean and Organized CBT Structure</div>
+        <h2 style="margin:0 0 6px">Cleaner Admin Workspace</h2>
+        <div style="opacity:.92;max-width:860px">Sections below can now be expanded only when you need them, so the dashboard stays neat on both desktop and mobile.</div>
         <div class="quick-pills">
           <div class="pill">Core setup</div>
           <div class="pill">Exam management</div>
@@ -827,11 +828,11 @@ function renderUserTable(data){
   if(!data.length) return '<div class="muted">No users.</div>';
   let html=`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
   data.forEach(u=>{
-    const badge = u.isActive ? '<span class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</span>' : '<span class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Inactive</span>';
+    const isActive = !!u.isActive;
+    const badge = isActive ? '<span class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</span>' : '<span class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Inactive</span>';
     html += `<tr><td>${esc(u.fullName)}</td><td>${esc(u.username)}</td><td>${badge}</td><td><div class="actions">
-      ${u.isActive
-        ? `<button class="small-btn warn" type="button" onclick="toggleUser('${esc(u.username)}', false)">Deactivate</button>`
-        : `<button class="small-btn success" type="button" onclick="toggleUser('${esc(u.username)}', true)">Activate</button>`}
+      <button class="small-btn warn" type="button" onclick="toggleUser('${esc(u.username)}', false)" ${isActive ? '' : 'disabled style="opacity:.55;cursor:not-allowed"'}>Deactivate</button>
+      <button class="small-btn success" type="button" onclick="toggleUser('${esc(u.username)}', true)" ${isActive ? 'disabled style="opacity:.55;cursor:not-allowed"' : ''}>Activate</button>
       <button class="small-btn danger" type="button" onclick="deleteUser('${esc(u.username)}')">Delete</button>
     </div></td></tr>`;
   });
