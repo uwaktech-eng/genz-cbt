@@ -49,16 +49,8 @@ header{
   gap:12px;
   flex-wrap:wrap;
 }
-.head a{
-  color:#facc15;
-  text-decoration:none;
-  font-weight:700;
-}
-.container{
-  max-width:980px;
-  margin:24px auto;
-  padding:0 16px 40px;
-}
+.head a{color:#facc15;text-decoration:none;font-weight:700}
+.container{max-width:980px;margin:24px auto;padding:0 16px 40px}
 .card{
   background:var(--panel);
   border-radius:18px;
@@ -69,12 +61,7 @@ header{
   margin-bottom:18px;
   min-width:0;
 }
-label{
-  display:block;
-  font-weight:700;
-  margin-bottom:6px;
-  font-size:14px;
-}
+label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}
 input[type="text"],input[type="password"]{
   width:100%;
   padding:12px 14px;
@@ -85,17 +72,9 @@ input[type="text"],input[type="password"]{
   background:rgba(255,255,255,.95);
 }
 button{
-  border:none;
-  border-radius:12px;
-  min-height:44px;
-  padding:0 16px;
-  font-weight:700;
-  cursor:pointer;
-  margin-right:8px;
-  margin-bottom:8px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-2));
-  color:#fff;
-  transition:.2s transform,.2s opacity,.2s box-shadow;
+  border:none;border-radius:12px;min-height:44px;padding:0 16px;font-weight:700;cursor:pointer;
+  margin-right:8px;margin-bottom:8px;background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color:#fff;transition:.2s transform,.2s opacity,.2s box-shadow;
 }
 button:hover{transform:translateY(-1px)}
 .success{background:var(--success)}
@@ -105,321 +84,114 @@ button:hover{transform:translateY(-1px)}
 .error{color:#b91c1c}
 .ok{color:#166534}
 .timer{
-  position:sticky;
-  top:78px;
-  z-index:10;
-  font-size:18px;
-  font-weight:800;
-  color:#dc2626;
-  background:#fff7f7;
-  border:1px solid #fecaca;
-  border-radius:14px;
-  padding:12px 14px;
-  margin-bottom:16px;
+  position:sticky;top:78px;z-index:10;font-size:18px;font-weight:800;color:#dc2626;background:#fff7f7;
+  border:1px solid #fecaca;border-radius:14px;padding:12px 14px;margin-bottom:16px;
 }
-.question-shell{
-  display:grid;
-  gap:16px;
-}
+.question-shell{display:grid;gap:16px}
 .question-nav{
-  position:sticky;
-  top:134px;
-  z-index:9;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  padding:12px;
-  background:rgba(255,255,255,.92);
-  border:1px solid var(--line);
-  border-radius:16px;
-  backdrop-filter:blur(8px);
+  position:sticky;top:134px;z-index:9;display:flex;flex-wrap:wrap;gap:8px;padding:12px;
+  background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(8px);
 }
-.qnum{
-  min-width:40px;height:40px;border:none;border-radius:10px;
-  background:#eef2ff;color:#1e293b;font-weight:800;cursor:pointer;
-}
+.qnum{min-width:40px;height:40px;border:none;border-radius:10px;background:#eef2ff;color:#1e293b;font-weight:800;cursor:pointer}
 .qnum.answered{background:#dcfce7;color:#166534}
 .qnum.active{outline:2px solid #4338ca}
 .question-block{
-  border:1px solid #e2e8f0;
-  border-radius:16px;
-  background:rgba(248,250,252,.92);
-  padding:16px;
+  border:1px solid #e2e8f0;border-radius:16px;background:rgba(248,250,252,.92);padding:16px;
 }
-.question-title{
-  font-weight:700;
-  margin-bottom:12px;
-  line-height:1.6;
-}
+.question-title{font-weight:700;margin-bottom:12px;line-height:1.6}
 .question-image{
-  max-width:100%;
-  width:auto;
-  max-height:280px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  display:block;
-  margin:12px auto;
-  background:#fff;
+  max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff;
 }
 .option{
-  display:block;
-  padding:12px;
-  margin-bottom:10px;
-  background:#fff;
-  border:1px solid #cbd5e1;
-  border-radius:10px;
-  cursor:pointer;
-  line-height:1.5;
+  display:block;padding:12px;margin-bottom:10px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer;line-height:1.5;
 }
 .option input{margin-right:8px}
 .result-box{line-height:1.9;font-size:16px}
 .auth-wrap{
-  max-width:860px;
-  margin:30px auto;
-  padding:0 16px;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
+  max-width:860px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;
 }
 .notice{
-  background:#fff7ed;
-  border:1px solid #fdba74;
-  color:var(--warning);
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:16px;
+  background:#fff7ed;border:1px solid #fdba74;color:var(--warning);padding:12px 14px;border-radius:12px;margin-bottom:16px;
 }
 .info{
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
-  color:#1d4ed8;
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:14px;
+  background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:12px 14px;border-radius:12px;margin-bottom:14px;
 }
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
 .loader-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(7,17,34,.35);
-  backdrop-filter:blur(4px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-  padding:16px;
+  position:fixed;inset:0;background:rgba(7,17,34,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999;padding:16px;
 }
 .loader-overlay.show{display:flex}
 .loader-card{
-  width:min(100%,340px);
-  background:#fff;
-  padding:18px 20px;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border:1px solid var(--line);
-  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  width:min(100%,340px);background:#fff;padding:18px 20px;border-radius:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12);
 }
 .spinner{
-  width:20px;height:20px;
-  border:3px solid #dbe5f4;
-  border-top-color:#4338ca;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
+  width:20px;height:20px;border:3px solid #dbe5f4;border-top-color:#4338ca;border-radius:50%;animation:spin 1s linear infinite;
 }
-.exam-protected,
-.exam-protected *{
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  user-select:none;
+.exam-protected,.exam-protected *{
+  -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
 }
 .camera-monitor{
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  width:170px;
-  background:rgba(15,23,42,.94);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:16px;
-  overflow:hidden;
-  z-index:9998;
-  box-shadow:0 18px 40px rgba(0,0,0,.28);
-  backdrop-filter:blur(8px);
+  position:fixed;right:14px;bottom:14px;width:170px;background:rgba(15,23,42,.94);color:#fff;border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;overflow:hidden;z-index:9998;box-shadow:0 18px 40px rgba(0,0,0,.28);backdrop-filter:blur(8px);
 }
 .camera-monitor video{
-  width:100%;
-  height:128px;
-  object-fit:cover;
-  display:block;
-  background:#000;
-  transform:scaleX(-1);
+  width:100%;height:128px;object-fit:cover;display:block;background:#000;transform:scaleX(-1);
 }
 .camera-head{
-  padding:8px 10px;
-  font-size:12px;
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
+  padding:8px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
 .camera-dot{
-  width:8px;
-  height:8px;
-  border-radius:999px;
-  background:#22c55e;
-  box-shadow:0 0 10px rgba(34,197,94,.9);
+  width:8px;height:8px;border-radius:999px;background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,.9);
 }
 .proctor-alert{
-  margin-top:10px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid #fecaca;
-  background:#fff1f2;
-  color:#b91c1c;
-  font-size:13px;
+  margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid #fecaca;background:#fff1f2;color:#b91c1c;font-size:13px;
 }
 .warning-overlay{
-  position:fixed;
-  inset:0;
-  z-index:9997;
-  background:rgba(15,23,42,.55);
-  backdrop-filter:blur(6px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
+  position:fixed;inset:0;z-index:9997;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;
 }
 .warning-overlay.show{display:flex}
 .warning-card{
-  width:min(100%,560px);
-  background:rgba(255,255,255,.96);
-  border:1px solid rgba(255,255,255,.75);
-  border-radius:22px;
-  box-shadow:0 24px 60px rgba(0,0,0,.22);
-  padding:22px;
+  width:min(100%,560px);background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.75);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.22);padding:22px;
 }
-.warning-card h3{
-  margin:0 0 10px;
-  font-size:1.2rem;
-}
-.warning-list{
-  margin:12px 0 18px;
-  padding-left:20px;
-  color:#334155;
-  line-height:1.7;
-}
+.warning-card h3{margin:0 0 10px;font-size:1.2rem}
+.warning-list{margin:12px 0 18px;padding-left:20px;color:#334155;line-height:1.7}
 .warning-banner{
-  padding:12px 14px;
-  border-radius:14px;
-  background:#fff7ed;
-  border:1px solid #fdba74;
-  color:#9a3412;
-  font-size:14px;
-  margin-bottom:14px;
+  padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;font-size:14px;margin-bottom:14px;
 }
 .violation-float{
-  position:fixed;
-  top:86px;
-  left:50%;
-  transform:translateX(-50%) translateY(-30px) scale(.94);
-  width:min(92vw,540px);
-  z-index:10000;
-  opacity:0;
-  pointer-events:none;
+  position:fixed;top:86px;left:50%;transform:translateX(-50%) translateY(-30px) scale(.94);
+  width:min(92vw,540px);z-index:10000;opacity:0;pointer-events:none;
   transition:opacity .35s ease, transform .38s cubic-bezier(.2,.8,.2,1);
 }
-.violation-float.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0) scale(1);
-}
+.violation-float.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 .violation-card{
-  background:rgba(127,29,29,.97);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:18px;
-  box-shadow:0 20px 48px rgba(0,0,0,.30);
-  padding:14px 16px;
-  backdrop-filter:blur(10px);
+  background:rgba(127,29,29,.97);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:18px;box-shadow:0 20px 48px rgba(0,0,0,.30);padding:14px 16px;backdrop-filter:blur(10px);
 }
-.violation-title{
-  font-size:15px;
-  font-weight:800;
-  margin-bottom:6px;
-}
-.violation-text{
-  font-size:13px;
-  line-height:1.6;
-  color:rgba(255,255,255,.92);
-}
+.violation-title{font-size:15px;font-weight:800;margin-bottom:6px}
+.violation-text{font-size:13px;line-height:1.6;color:rgba(255,255,255,.92)}
 .violation-progress{
-  margin-top:10px;
-  height:8px;
-  background:rgba(255,255,255,.16);
-  border-radius:999px;
-  overflow:hidden;
+  margin-top:10px;height:8px;background:rgba(255,255,255,.16);border-radius:999px;overflow:hidden;
 }
 .violation-progress > span{
-  display:block;
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#facc15,#fb7185);
-  transition:width .2s linear;
+  display:block;height:100%;width:0%;background:linear-gradient(90deg,#facc15,#fb7185);transition:width .2s linear;
 }
-.camera-help{
-  font-size:12px;
-  color:#475569;
-  margin-top:8px;
-}
+.camera-help{font-size:12px;color:#475569;margin-top:8px}
 .resume-note{
-  margin-top:10px;
-  padding:10px 12px;
-  border-radius:12px;
-  background:#ecfeff;
-  border:1px solid #a5f3fc;
-  color:#155e75;
-  font-size:13px;
+  margin-top:10px;padding:10px 12px;border-radius:12px;background:#ecfeff;border:1px solid #a5f3fc;color:#155e75;font-size:13px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-@media (max-width:900px){
-  .auth-wrap{grid-template-columns:1fr}
-}
+@media (max-width:900px){.auth-wrap{grid-template-columns:1fr}}
 @media (max-width:640px){
-  .container{padding:0 12px 28px}
-  .auth-wrap{padding:0 12px}
-  .card{padding:16px;border-radius:16px}
-  .head{padding:12px}
-  .timer{top:70px}
-  .question-nav{top:124px}
-  .actions{flex-direction:column}
-  .actions > *{width:100%;margin-right:0}
-  .qnum{min-width:36px;height:36px}
-  .camera-monitor{
-    width:118px;
-    right:10px;
-    bottom:10px;
-  }
-  .camera-monitor video{
-    height:88px;
-  }
-  .warning-card{padding:18px}
-  .violation-float{top:76px}
+  .container{padding:0 12px 28px}.auth-wrap{padding:0 12px}.card{padding:16px;border-radius:16px}.head{padding:12px}
+  .timer{top:70px}.question-nav{top:124px}.actions{flex-direction:column}.actions > *{width:100%;margin-right:0}
+  .qnum{min-width:36px;height:36px}.camera-monitor{width:118px;right:10px;bottom:10px}.camera-monitor video{height:88px}
+  .warning-card{padding:18px}.violation-float{top:76px}
 }
 </style>
 </head>
 <body>
 <div class="loader-overlay" id="loader">
-  <div class="loader-card">
-    <div class="spinner"></div>
-    <div id="loaderText">Loading...</div>
-  </div>
+  <div class="loader-card"><div class="spinner"></div><div id="loaderText">Loading...</div></div>
 </div>
 
 <header>
@@ -446,9 +218,7 @@ button:hover{transform:translateY(-1px)}
 
     <div class="card">
       <h2>Student Signup</h2>
-      <p style="margin-top:0;color:#475569;font-size:14px;">
-        Use this only if your system allows students to create their own accounts. If the admin generated accounts, log in with the username and password given.
-      </p>
+      <p style="margin-top:0;color:#475569;font-size:14px;">Use this only if your system allows students to create their own accounts. If the admin generated accounts, log in with the username and password given.</p>
       <label>Full Name</label>
       <input type="text" id="signupFullName">
       <label>Username</label>
@@ -467,16 +237,11 @@ button:hover{transform:translateY(-1px)}
 
     <div class="card" id="verifyCard">
       <h2>Candidate Verification</h2>
-      <div class="info">
-        Enter your registered details first. Your admin or supervisor will give you the correct exam code when it is time to start.
-      </div>
-
+      <div class="info">Enter your registered details first. Your admin or supervisor will give you the correct exam code when it is time to start.</div>
       <label for="fullName">Full Name</label>
       <input type="text" id="fullName" placeholder="Enter your registered full name">
-
       <label for="regId">Registration ID</label>
       <input type="text" id="regId" placeholder="Enter your registration ID">
-
       <button id="verifyBtn" type="button">Verify</button>
       <div id="verifyStatus" class="status"></div>
     </div>
@@ -484,24 +249,14 @@ button:hover{transform:translateY(-1px)}
     <div class="card hidden" id="unlockCard">
       <h2>Unlock CBT</h2>
       <p>Enter the exam code given to you by the admin or invigilator.</p>
-
       <label for="unlockRegId">Registration ID</label>
       <input type="text" id="unlockRegId">
-
       <label for="examCodeInput">Exam Code</label>
       <input type="text" id="examCodeInput" placeholder="Enter the exam code given to you">
-
       <label for="permissionCode">Permission Code (optional for rewrite)</label>
       <input type="text" id="permissionCode" placeholder="Enter admin permission code if given">
-
-      <div class="camera-help">
-        Camera access is compulsory before the exam starts.
-      </div>
-
-      <div id="resumeNoteBox" class="resume-note hidden">
-        We found your saved exam session. Once you unlock, the system will restore where you stopped.
-      </div>
-
+      <div class="camera-help">Camera access is compulsory before the exam starts.</div>
+      <div id="resumeNoteBox" class="resume-note hidden">We found your saved exam session. The system is preparing to continue from where you stopped.</div>
       <button id="unlockBtn" type="button">Unlock Exam</button>
       <div id="unlockStatus" class="status"></div>
     </div>
@@ -534,9 +289,7 @@ button:hover{transform:translateY(-1px)}
 <div id="warningOverlay" class="warning-overlay">
   <div class="warning-card">
     <h3>Exam Instructions & Consequences</h3>
-    <div class="warning-banner">
-      Camera access is compulsory. Your face must remain visible during the exam.
-    </div>
+    <div class="warning-banner">Camera access is compulsory. Your face must remain visible during the exam.</div>
     <ul class="warning-list">
       <li>Right-click, copy, cut, paste, drag, and text selection are disabled during the exam.</li>
       <li>If you switch tabs, minimize the page, or move away from the exam window <strong>4 times</strong>, the exam will be submitted automatically.</li>
@@ -564,7 +317,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvreve
 const TOKEN_KEY = "cbt_auth_token";
 const ROLE_KEY = "cbt_auth_role";
 const USERNAME_KEY = "cbt_auth_username";
-const STUDENT_STATE_KEY = "cbt_student_resume_state_v1";
+const STUDENT_STATE_KEY = "cbt_student_resume_state_v2";
 
 const $ = id => document.getElementById(id);
 const loader = $("loader");
@@ -586,60 +339,56 @@ let violationProgressTimer = null;
 let pendingViolationReason = "";
 let pendingViolationCount = 0;
 
-function showLoader(text = "Loading...") {
-  loaderText.textContent = text;
-  loader.classList.add("show");
-}
-function hideLoader() {
-  loader.classList.remove("show");
-}
+function showLoader(text = "Loading..."){ loaderText.textContent = text; loader.classList.add("show"); }
+function hideLoader(){ loader.classList.remove("show"); }
 
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
-}
-function setAuth(data) {
+function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
+function setAuth(data){
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(ROLE_KEY, data.role);
   localStorage.setItem(USERNAME_KEY, data.username);
 }
-function clearAuth() {
+function clearAuth(){
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ROLE_KEY);
   localStorage.removeItem(USERNAME_KEY);
 }
-function esc(value) {
+function esc(value){
   return String(value == null ? "" : value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-function getStudentState() {
-  try {
-    return JSON.parse(localStorage.getItem(STUDENT_STATE_KEY) || "{}");
-  } catch (err) {
-    return {};
-  }
+function getStudentState(){
+  try{ return JSON.parse(localStorage.getItem(STUDENT_STATE_KEY) || "{}"); }catch(err){ return {}; }
 }
-
-function saveStudentState(patch = {}) {
+function saveStudentState(patch = {}){
   const current = getStudentState();
   const merged = Object.assign({}, current, patch);
   localStorage.setItem(STUDENT_STATE_KEY, JSON.stringify(merged));
 }
+function clearStudentState(){ localStorage.removeItem(STUDENT_STATE_KEY); }
 
-function clearStudentState() {
-  localStorage.removeItem(STUDENT_STATE_KEY);
+function snapshotLocalExamState(){
+  return {
+    verifiedCandidate: verifiedCandidate,
+    examCode: $("examCodeInput").value.trim(),
+    permissionCode: $("permissionCode").value.trim(),
+    examStarted: examStarted,
+    currentQuestions: currentQuestions,
+    remainingSeconds: timeRemaining,
+    answers: collectAnswers(),
+    violationCount: violationCount,
+    pendingViolationReason: pendingViolationReason,
+    pendingViolationCount: pendingViolationCount
+  };
 }
 
-function populateFromSavedState() {
+function populateFromSavedState(){
   const state = getStudentState();
   if (!state || !state.verifiedCandidate) return false;
 
   verifiedCandidate = state.verifiedCandidate;
-
   $("fullName").value = state.verifiedCandidate.fullName || "";
   $("regId").value = state.verifiedCandidate.regId || "";
   $("unlockRegId").value = state.verifiedCandidate.regId || "";
@@ -651,15 +400,13 @@ function populateFromSavedState() {
   return true;
 }
 
-async function apiRequest(action, payload = null, method = "POST") {
-  try {
+async function apiRequest(action, payload = null, method = "POST"){
+  try{
     payload = payload || {};
-    if (!payload.token && action !== "login" && action !== "signup") {
-      payload.token = getToken();
-    }
+    if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
 
     let response;
-    if (method === "GET") {
+    if (method === "GET"){
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set("action", action);
       Object.keys(payload).forEach((key) => {
@@ -674,51 +421,46 @@ async function apiRequest(action, payload = null, method = "POST") {
       form.set("action", action);
       form.set("payload", JSON.stringify(payload));
       response = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: form.toString()
+        method:"POST",
+        headers:{ "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8" },
+        body:form.toString()
       });
     }
 
     const text = await response.text();
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      return { ok:false, message:"Server returned non-JSON response.", raw:text };
-    }
-  } catch (error) {
+    try{ return JSON.parse(text); }catch(err){ return { ok:false, message:"Server returned non-JSON response.", raw:text }; }
+  }catch(error){
     return { ok:false, message:error.message || "Failed to fetch." };
   }
 }
 
-function setStatus(id, message, ok = false) {
+function setStatus(id, message, ok = false){
   const el = $(id);
   if (!el) return;
   el.className = "status " + (ok ? "ok" : "error");
   el.textContent = message || "";
 }
 
-async function validatePortal(role) {
+async function validatePortal(role){
   const token = getToken();
   if (!token) return false;
   const res = await apiRequest("validateSession", { token }, "POST");
-  if (!res.ok || !res.data || res.data.role !== role) {
+  if (!res.ok || !res.data || res.data.role !== role){
     clearAuth();
-    clearStudentState();
     return false;
   }
   return true;
 }
 
-function formatTime(seconds) {
+function formatTime(seconds){
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
 }
 
-async function loadPublicState() {
+async function loadPublicState(){
   const res = await apiRequest("getSettings", {}, "GET");
-  if (res.ok && res.data && res.data.portalLocked) {
+  if (res.ok && res.data && res.data.portalLocked){
     $("portalNoticeBox").textContent = res.data.portalNotice || "CBT is currently locked.";
     $("portalNoticeBox").classList.remove("hidden");
   } else {
@@ -727,96 +469,35 @@ async function loadPublicState() {
   }
 }
 
-async function showPortal() {
+async function showPortal(){
   $("authSection").classList.add("hidden");
   $("portalSection").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
   await loadPublicState();
 }
 
-async function tryAutoResumeFromSavedState() {
-  const state = getStudentState();
-  if (!state || !state.verifiedCandidate || !state.examCode || !state.examStarted) return false;
-
-  verifiedCandidate = state.verifiedCandidate;
-  $("fullName").value = state.verifiedCandidate.fullName || "";
-  $("regId").value = state.verifiedCandidate.regId || "";
-  $("unlockRegId").value = state.verifiedCandidate.regId || "";
-  $("examCodeInput").value = state.examCode || "";
-  $("permissionCode").value = state.permissionCode || "";
-
-  showLoader("Restoring your exam...");
-  const res = await apiRequest("unlockExam", {
-    regId: state.verifiedCandidate.regId,
-    examCode: state.examCode,
-    permissionCode: state.permissionCode || ""
-  }, "POST");
-
-  if (!res.ok || !res.data) {
-    hideLoader();
-    $("unlockCard").classList.remove("hidden");
-    $("resumeNoteBox").classList.remove("hidden");
-    setStatus("unlockStatus", "We found your saved session. Please unlock again to continue.");
-    return false;
-  }
-
-  pendingUnlockData = { examCode: state.examCode, response: res, autoResume: true };
-  hideLoader();
-
-  showLoader("Reconnecting camera...");
-  const cameraOk = await startCameraMonitor();
-  hideLoader();
-
-  if (!cameraOk) {
-    $("unlockCard").classList.remove("hidden");
-    $("resumeNoteBox").classList.remove("hidden");
-    setStatus("unlockStatus", "Saved exam found. Please allow camera and unlock again to continue.");
-    return false;
-  }
-
-  const examCode = state.examCode;
-  currentQuestions = res.data.questions || [];
-  timeRemaining = Number(res.data.durationMinutes || 20) * 60;
-  $("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
-
-  renderQuestions(currentQuestions);
-  $("examCard").classList.remove("hidden");
-  examStarted = true;
-
-  const resumed = await resumeSavedProgress(examCode);
-  if (!resumed) {
-    $("timeLeft").textContent = formatTime(timeRemaining);
-  }
-
-  armExamProtection();
-  startTimer();
-  jumpToQuestion(0);
-  saveStudentState({ examStarted: true });
-  return true;
-}
-
-async function signupStudent() {
+async function signupStudent(){
   showLoader("Creating account...");
   const res = await apiRequest("signup", {
-    fullName: $("signupFullName").value.trim(),
-    username: $("signupUsername").value.trim(),
-    password: $("signupPassword").value,
-    role: "student"
+    fullName:$("signupFullName").value.trim(),
+    username:$("signupUsername").value.trim(),
+    password:$("signupPassword").value,
+    role:"student"
   }, "POST");
   hideLoader();
   setStatus("signupStatus", res.message, res.ok);
 }
 
-async function loginStudent() {
+async function loginStudent(){
   showLoader("Signing in...");
   const res = await apiRequest("login", {
-    username: $("loginUsername").value.trim(),
-    password: $("loginPassword").value,
-    role: "student"
+    username:$("loginUsername").value.trim(),
+    password:$("loginPassword").value,
+    role:"student"
   }, "POST");
   hideLoader();
   setStatus("loginStatus", res.message, res.ok);
-  if (res.ok && res.data) {
+  if (res.ok && res.data){
     setAuth(res.data);
     await showPortal();
     populateFromSavedState();
@@ -824,47 +505,49 @@ async function loginStudent() {
   }
 }
 
-async function verifyCandidate() {
+async function verifyCandidate(){
   showLoader("Verifying candidate...");
   const payload = {
-    fullName: $("fullName").value.trim(),
-    regId: $("regId").value.trim()
+    fullName:$("fullName").value.trim(),
+    regId:$("regId").value.trim()
   };
   const res = await apiRequest("verifyCandidate", payload, "POST");
   hideLoader();
   setStatus("verifyStatus", res.message, res.ok);
 
-  if (res.ok && res.data) {
+  if (res.ok && res.data){
     verifiedCandidate = {
-      fullName: res.data.fullName || payload.fullName,
-      regId: res.data.regId || payload.regId
+      fullName:res.data.fullName || payload.fullName,
+      regId:res.data.regId || payload.regId
     };
     $("unlockRegId").value = verifiedCandidate.regId;
     $("unlockCard").classList.remove("hidden");
     $("resumeNoteBox").classList.add("hidden");
-
     saveStudentState({
       verifiedCandidate: verifiedCandidate,
       examCode: "",
       permissionCode: "",
-      examStarted: false
+      examStarted: false,
+      currentQuestions: [],
+      remainingSeconds: 0,
+      answers: [],
+      violationCount: 0,
+      pendingViolationReason: "",
+      pendingViolationCount: 0
     });
   } else {
     await loadPublicState();
   }
 }
 
-function collectAnswers() {
+function collectAnswers(){
   return currentQuestions.map((q, index) => {
     const selected = document.querySelector(`input[name="question_${index}"]:checked`);
-    return {
-      questionId: q.id,
-      selected: selected ? selected.value : ""
-    };
+    return { questionId:q.id, selected:selected ? selected.value : "" };
   });
 }
 
-function applySavedAnswers(savedAnswers) {
+function applySavedAnswers(savedAnswers){
   if (!Array.isArray(savedAnswers) || !savedAnswers.length) return;
   const byId = {};
   savedAnswers.forEach(a => { byId[String(a.questionId || "")] = String(a.selected || ""); });
@@ -876,14 +559,14 @@ function applySavedAnswers(savedAnswers) {
   });
 }
 
-function renderQuestionNav() {
+function renderQuestionNav(){
   $("questionNavigator").innerHTML = currentQuestions.map((q, index) => `
     <button type="button" class="qnum" id="qnav_${index}" onclick="jumpToQuestion(${index})">${index + 1}</button>
   `).join("");
   updateQuestionNavState();
 }
 
-function updateQuestionNavState() {
+function updateQuestionNavState(){
   currentQuestions.forEach((q, index) => {
     const btn = $("qnav_" + index);
     if (!btn) return;
@@ -892,7 +575,7 @@ function updateQuestionNavState() {
   });
 }
 
-function jumpToQuestion(index) {
+function jumpToQuestion(index){
   const target = $("qblock_" + index);
   if (!target) return;
   document.querySelectorAll(".qnum").forEach(el => el.classList.remove("active"));
@@ -901,7 +584,7 @@ function jumpToQuestion(index) {
   target.scrollIntoView({ behavior:"smooth", block:"start" });
 }
 
-function renderQuestions(questions) {
+function renderQuestions(questions){
   $("examForm").innerHTML = questions.map((q, index) => `
     <div class="question-block" id="qblock_${index}">
       <div class="question-title">${index + 1}. ${esc(q.question)}</div>
@@ -914,20 +597,23 @@ function renderQuestions(questions) {
   `).join("");
 
   document.querySelectorAll('#examForm input[type="radio"]').forEach(input => {
-    input.addEventListener("change", updateQuestionNavState);
+    input.addEventListener("change", () => {
+      updateQuestionNavState();
+      saveStudentState(snapshotLocalExamState());
+    });
   });
 
   renderQuestionNav();
 }
 
-function stopTimers() {
+function stopTimers(){
   clearInterval(timer);
   clearInterval(autosaveTimer);
 }
 
-function showProctorAlert(message) {
+function showProctorAlert(message){
   let box = $("proctorAlertBox");
-  if (!box) {
+  if (!box){
     box = document.createElement("div");
     box.id = "proctorAlertBox";
     box.className = "proctor-alert";
@@ -937,19 +623,15 @@ function showProctorAlert(message) {
   box.textContent = message;
 }
 
-function clearProctorAlert() {
+function clearProctorAlert(){
   const box = $("proctorAlertBox");
   if (box) box.remove();
 }
 
-function showWarningOverlay() {
-  $("warningOverlay").classList.add("show");
-}
-function hideWarningOverlay() {
-  $("warningOverlay").classList.remove("show");
-}
+function showWarningOverlay(){ $("warningOverlay").classList.add("show"); }
+function hideWarningOverlay(){ $("warningOverlay").classList.remove("show"); }
 
-function showViolationFloat(reason, count) {
+function showViolationFloat(reason, count){
   clearTimeout(violationToastTimer);
   clearInterval(violationProgressTimer);
 
@@ -959,7 +641,6 @@ function showViolationFloat(reason, count) {
 
   const progress = $("violationProgressBar");
   progress.style.width = `${Math.min(100, (count / 4) * 100)}%`;
-
   $("violationFloat").classList.add("show");
 
   let visual = (count / 4) * 100;
@@ -974,81 +655,79 @@ function showViolationFloat(reason, count) {
   }, 6000);
 }
 
-function showPendingViolationIfAny() {
+function showPendingViolationIfAny(){
   if (!pendingViolationReason || !pendingViolationCount) return;
   showViolationFloat(pendingViolationReason, pendingViolationCount);
   pendingViolationReason = "";
   pendingViolationCount = 0;
 }
 
-function hideViolationFloat() {
+function hideViolationFloat(){
   clearTimeout(violationToastTimer);
   clearInterval(violationProgressTimer);
   $("violationFloat").classList.remove("show");
 }
 
-async function attachVideoStream(stream) {
+async function attachVideoStream(stream){
   const video = $("cameraFeed");
   video.srcObject = stream;
-  try {
-    await video.play();
-  } catch (err) {}
+  try{ await video.play(); }catch(err){}
   $("cameraMonitor").classList.remove("hidden");
   return true;
 }
 
-async function startCameraMonitor() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+async function startCameraMonitor(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     setStatus("unlockStatus", "This browser does not support camera access.");
     return false;
   }
 
   const baseTries = [
-    { video: { facingMode: { ideal: "user" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
-    { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
-    { video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
-    { video: true, audio: false }
+    { video:{ facingMode:{ ideal:"user" }, width:{ ideal:1280 }, height:{ ideal:720 } }, audio:false },
+    { video:{ width:{ ideal:1280 }, height:{ ideal:720 } }, audio:false },
+    { video:{ width:{ ideal:640 }, height:{ ideal:480 } }, audio:false },
+    { video:true, audio:false }
   ];
 
-  for (const constraints of baseTries) {
-    try {
+  for (const constraints of baseTries){
+    try{
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       cameraStream = stream;
       await attachVideoStream(stream);
       return true;
-    } catch (error) {}
+    }catch(error){}
   }
 
-  try {
-    const temp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  try{
+    const temp = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
     temp.getTracks().forEach(t => t.stop());
 
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(d => d.kind === "videoinput");
 
-    for (const device of videoDevices) {
-      try {
+    for (const device of videoDevices){
+      try{
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: { exact: device.deviceId },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+          video:{
+            deviceId:{ exact:device.deviceId },
+            width:{ ideal:1280 },
+            height:{ ideal:720 }
           },
-          audio: false
+          audio:false
         });
         cameraStream = stream;
         await attachVideoStream(stream);
         return true;
-      } catch (error) {}
+      }catch(error){}
     }
-  } catch (error) {}
+  }catch(error){}
 
   setStatus("unlockStatus", "Camera permission is required before the exam can start.");
   return false;
 }
 
-function stopCameraMonitor() {
-  if (cameraStream) {
+function stopCameraMonitor(){
+  if (cameraStream){
     cameraStream.getTracks().forEach(track => track.stop());
     cameraStream = null;
   }
@@ -1057,7 +736,7 @@ function stopCameraMonitor() {
   $("cameraMonitor").classList.add("hidden");
 }
 
-function blockExamInteraction(e) {
+function blockExamInteraction(e){
   if (!examStarted) return;
   const examCard = $("examCard");
   if (!examCard || !examCard.contains(e.target)) return;
@@ -1065,17 +744,17 @@ function blockExamInteraction(e) {
   showProctorAlert("Right-click, copy, cut, paste, drag, and text selection are disabled during the exam.");
 }
 
-function blockExamKeys(e) {
+function blockExamKeys(e){
   if (!examStarted) return;
   const key = (e.key || "").toLowerCase();
   const ctrlLike = e.ctrlKey || e.metaKey;
-  if (ctrlLike && ["c", "v", "x", "a", "s", "p", "u"].includes(key)) {
+  if (ctrlLike && ["c","v","x","a","s","p","u"].includes(key)){
     e.preventDefault();
     showProctorAlert("Copy, paste, and shortcut actions are disabled during the exam.");
   }
 }
 
-function registerViolation(reason) {
+function registerViolation(reason){
   if (!examStarted || !protectionArmed) return;
 
   const now = Date.now();
@@ -1088,40 +767,37 @@ function registerViolation(reason) {
   pendingViolationReason = reason;
   pendingViolationCount = violationCount;
 
-  if (!document.hidden && document.hasFocus()) {
-    showPendingViolationIfAny();
-  }
+  saveStudentState(snapshotLocalExamState());
 
-  if (violationCount >= 4) {
+  if (!document.hidden && document.hasFocus()) showPendingViolationIfAny();
+
+  if (violationCount >= 4){
     setStatus("submitStatus", "4 tab/minimize violations detected. Auto-submitting exam...");
     submitExam(true);
   }
 }
 
-function handleVisibilityViolation() {
-  if (document.hidden) {
-    registerViolation("You switched tabs or minimized the page");
-  } else {
-    showPendingViolationIfAny();
-  }
+function handleVisibilityViolation(){
+  if (document.hidden) registerViolation("You switched tabs or minimized the page");
+  else showPendingViolationIfAny();
 }
 
-function handleBlurViolation() {
+function handleBlurViolation(){
   if (!examStarted) return;
   registerViolation("You moved away from the exam window");
 }
 
-function handleFocusReturn() {
+function handleFocusReturn(){
   if (!examStarted) return;
   showPendingViolationIfAny();
 }
 
-function armExamProtection() {
+function armExamProtection(restored = {}){
   protectionArmed = true;
-  violationCount = 0;
+  violationCount = Number(restored.violationCount || 0);
   lastViolationAt = 0;
-  pendingViolationReason = "";
-  pendingViolationCount = 0;
+  pendingViolationReason = restored.pendingViolationReason || "";
+  pendingViolationCount = Number(restored.pendingViolationCount || 0);
 
   document.body.classList.add("exam-protected");
   document.addEventListener("contextmenu", blockExamInteraction);
@@ -1136,7 +812,7 @@ function armExamProtection() {
   window.addEventListener("focus", handleFocusReturn);
 }
 
-function disarmExamProtection() {
+function disarmExamProtection(){
   protectionArmed = false;
   violationCount = 0;
   lastViolationAt = 0;
@@ -1159,14 +835,15 @@ function disarmExamProtection() {
   hideViolationFloat();
 }
 
-function startTimer() {
+function startTimer(){
   stopTimers();
   $("timeLeft").textContent = formatTime(timeRemaining);
 
   timer = setInterval(() => {
     timeRemaining = Math.max(0, timeRemaining - 1);
     $("timeLeft").textContent = formatTime(timeRemaining);
-    if (timeRemaining <= 0) {
+    saveStudentState(snapshotLocalExamState());
+    if (timeRemaining <= 0){
       stopTimers();
       submitExam();
     }
@@ -1177,34 +854,36 @@ function startTimer() {
   }, 15000);
 }
 
-async function autosaveProgress() {
+async function autosaveProgress(){
   if (!verifiedCandidate || !$("examCodeInput").value.trim()) return;
-
-  saveStudentState({
-    verifiedCandidate: verifiedCandidate,
-    examCode: $("examCodeInput").value.trim(),
-    permissionCode: $("permissionCode").value.trim(),
-    examStarted: examStarted
-  });
+  saveStudentState(snapshotLocalExamState());
 
   if (!examStarted) return;
 
   await apiRequest("autosaveProgress", {
-    examCode: $("examCodeInput").value.trim(),
-    regId: verifiedCandidate.regId,
-    fullName: verifiedCandidate.fullName,
-    remainingSeconds: timeRemaining,
-    answers: collectAnswers()
+    examCode:$("examCodeInput").value.trim(),
+    regId:verifiedCandidate.regId,
+    fullName:verifiedCandidate.fullName,
+    remainingSeconds:timeRemaining,
+    answers:collectAnswers()
   }, "POST");
 }
 
-async function resumeSavedProgress(examCode) {
+async function resumeSavedProgress(examCode){
+  const local = getStudentState();
+  if (local && Array.isArray(local.answers) && local.answers.length){
+    timeRemaining = Number(local.remainingSeconds || timeRemaining || 0);
+    applySavedAnswers(local.answers);
+    updateQuestionNavState();
+  }
+
   const res = await apiRequest("resumeProgress", {
     examCode,
-    regId: verifiedCandidate.regId
+    regId:verifiedCandidate.regId
   }, "POST");
 
   if (!res.ok || !res.data || !res.data.found) return false;
+
   const remaining = Number(res.data.remainingSeconds || 0);
   if (remaining <= 0) return false;
 
@@ -1214,7 +893,100 @@ async function resumeSavedProgress(examCode) {
   return true;
 }
 
-async function unlockExam() {
+async function startExamSessionFromResponse(res, examCode, options = {}){
+  currentQuestions = res.data.questions || [];
+  $("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
+
+  if (!currentQuestions.length){
+    setStatus("unlockStatus", "No questions available for this exam.");
+    return false;
+  }
+
+  const local = getStudentState();
+
+  renderQuestions(currentQuestions);
+  $("examCard").classList.remove("hidden");
+  $("unlockCard").classList.add("hidden");
+  $("verifyCard").classList.add("hidden");
+  examStarted = true;
+
+  timeRemaining = Number(res.data.durationMinutes || 20) * 60;
+  const resumed = await resumeSavedProgress(examCode);
+
+  if (!resumed){
+    const localRemaining = Number(local.remainingSeconds || 0);
+    if (localRemaining > 0) timeRemaining = localRemaining;
+    $("timeLeft").textContent = formatTime(timeRemaining);
+    if (local && Array.isArray(local.answers)) applySavedAnswers(local.answers);
+    updateQuestionNavState();
+  }
+
+  armExamProtection({
+    violationCount: Number(local.violationCount || 0),
+    pendingViolationReason: local.pendingViolationReason || "",
+    pendingViolationCount: Number(local.pendingViolationCount || 0)
+  });
+
+  startTimer();
+  jumpToQuestion(0);
+
+  saveStudentState({
+    verifiedCandidate: verifiedCandidate,
+    examCode: examCode,
+    permissionCode: $("permissionCode").value.trim(),
+    examStarted: true,
+    currentQuestions: currentQuestions,
+    remainingSeconds: timeRemaining,
+    answers: collectAnswers(),
+    violationCount: violationCount,
+    pendingViolationReason: pendingViolationReason,
+    pendingViolationCount: pendingViolationCount
+  });
+
+  return true;
+}
+
+async function tryAutoResumeFromSavedState(){
+  const state = getStudentState();
+  if (!state || !state.verifiedCandidate || !state.examCode || !state.examStarted) return false;
+
+  verifiedCandidate = state.verifiedCandidate;
+  $("fullName").value = state.verifiedCandidate.fullName || "";
+  $("regId").value = state.verifiedCandidate.regId || "";
+  $("unlockRegId").value = state.verifiedCandidate.regId || "";
+  $("examCodeInput").value = state.examCode || "";
+  $("permissionCode").value = state.permissionCode || "";
+
+  $("unlockCard").classList.remove("hidden");
+  $("resumeNoteBox").classList.remove("hidden");
+
+  showLoader("Restoring your exam...");
+  const cameraOk = await startCameraMonitor();
+  if (!cameraOk){
+    hideLoader();
+    setStatus("unlockStatus", "Saved exam found. Please allow camera and unlock again to continue.");
+    return false;
+  }
+
+  const res = await apiRequest("unlockExam", {
+    regId: state.verifiedCandidate.regId,
+    examCode: state.examCode,
+    permissionCode: state.permissionCode || ""
+  }, "POST");
+
+  if (!res.ok || !res.data){
+    hideLoader();
+    stopCameraMonitor();
+    setStatus("unlockStatus", "We found your saved session. Please unlock again to continue.");
+    return false;
+  }
+
+  await startExamSessionFromResponse(res, state.examCode, { autoResume:true });
+  hideLoader();
+  return true;
+}
+
+async function unlockExam(){
   const entered = $("unlockRegId").value.trim();
   const examCode = $("examCodeInput").value.trim();
 
@@ -1224,14 +996,14 @@ async function unlockExam() {
 
   showLoader("Checking exam access...");
   const res = await apiRequest("unlockExam", {
-    regId: entered,
-    examCode: examCode,
-    permissionCode: $("permissionCode").value.trim()
+    regId:entered,
+    examCode:examCode,
+    permissionCode:$("permissionCode").value.trim()
   }, "POST");
   hideLoader();
 
   setStatus("unlockStatus", res.message, res.ok);
-  if (!res.ok) {
+  if (!res.ok){
     await loadPublicState();
     return;
   }
@@ -1241,73 +1013,56 @@ async function unlockExam() {
     verifiedCandidate: verifiedCandidate,
     examCode: examCode,
     permissionCode: $("permissionCode").value.trim(),
-    examStarted: false
+    examStarted: false,
+    currentQuestions: [],
+    remainingSeconds: 0,
+    answers: [],
+    violationCount: Number(getStudentState().violationCount || 0),
+    pendingViolationReason: getStudentState().pendingViolationReason || "",
+    pendingViolationCount: Number(getStudentState().pendingViolationCount || 0)
   });
   showWarningOverlay();
 }
 
-async function proceedStartExam() {
+async function proceedStartExam(){
   if (!pendingUnlockData || !pendingUnlockData.response || !pendingUnlockData.response.data) return;
 
   hideWarningOverlay();
   showLoader("Starting camera...");
   const cameraOk = await startCameraMonitor();
-  hideLoader();
-
-  if (!cameraOk) return;
+  if (!cameraOk){
+    hideLoader();
+    return;
+  }
 
   const res = pendingUnlockData.response;
   const examCode = pendingUnlockData.examCode;
 
-  currentQuestions = res.data.questions || [];
-  timeRemaining = Number(res.data.durationMinutes || 20) * 60;
-  $("examTitleHeader").textContent = res.data.examTitle || "CBT Examination";
-
-  renderQuestions(currentQuestions);
-  $("examCard").classList.remove("hidden");
-  examStarted = true;
-
-  const resumed = await resumeSavedProgress(examCode);
-  if (!resumed) $("timeLeft").textContent = formatTime(timeRemaining);
-
-  armExamProtection();
-  startTimer();
-  jumpToQuestion(0);
-
-  saveStudentState({
-    verifiedCandidate: verifiedCandidate,
-    examCode: examCode,
-    permissionCode: $("permissionCode").value.trim(),
-    examStarted: true
-  });
+  await startExamSessionFromResponse(res, examCode, { autoResume:false });
+  hideLoader();
 }
 
-async function submitExam(isAuto = false) {
+async function submitExam(isAuto = false){
   if (!examStarted || !verifiedCandidate) return;
   stopTimers();
   examStarted = false;
 
   showLoader(isAuto ? "Auto-submitting exam..." : "Submitting exam...");
   const res = await apiRequest("submitExam", {
-    examCode: $("examCodeInput").value.trim(),
-    fullName: verifiedCandidate.fullName,
-    regId: verifiedCandidate.regId,
-    permissionCode: $("permissionCode").value.trim(),
-    answers: collectAnswers()
+    examCode:$("examCodeInput").value.trim(),
+    fullName:verifiedCandidate.fullName,
+    regId:verifiedCandidate.regId,
+    permissionCode:$("permissionCode").value.trim(),
+    answers:collectAnswers()
   }, "POST");
   hideLoader();
 
   setStatus("submitStatus", res.message, res.ok);
 
-  if (!res.ok) {
+  if (!res.ok){
     examStarted = true;
     startTimer();
-    saveStudentState({
-      verifiedCandidate: verifiedCandidate,
-      examCode: $("examCodeInput").value.trim(),
-      permissionCode: $("permissionCode").value.trim(),
-      examStarted: true
-    });
+    saveStudentState(snapshotLocalExamState());
     return;
   }
 
@@ -1332,8 +1087,8 @@ async function submitExam(isAuto = false) {
   clearStudentState();
 }
 
-async function logoutCurrent() {
-  await apiRequest("logout", { token: getToken() }, "POST");
+async function logoutCurrent(){
+  await apiRequest("logout", { token:getToken() }, "POST");
   stopTimers();
   disarmExamProtection();
   stopCameraMonitor();
@@ -1342,7 +1097,8 @@ async function logoutCurrent() {
   location.reload();
 }
 
-window.addEventListener("beforeunload", function() {
+window.addEventListener("beforeunload", function(){
+  saveStudentState(snapshotLocalExamState());
   autosaveProgress();
 });
 
@@ -1352,14 +1108,14 @@ $("logoutBtn").addEventListener("click", logoutCurrent);
 $("verifyBtn").addEventListener("click", verifyCandidate);
 $("unlockBtn").addEventListener("click", unlockExam);
 $("submitBtn").addEventListener("click", submitExam);
-$("cancelStartBtn").addEventListener("click", function() {
+$("cancelStartBtn").addEventListener("click", function(){
   hideWarningOverlay();
   pendingUnlockData = null;
 });
 $("continueStartBtn").addEventListener("click", proceedStartExam);
 
-(async function init() {
-  if (await validatePortal("student")) {
+(async function init(){
+  if (await validatePortal("student")){
     await showPortal();
     populateFromSavedState();
     await tryAutoResumeFromSavedState();
