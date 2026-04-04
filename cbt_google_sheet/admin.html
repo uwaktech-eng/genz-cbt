@@ -1,83 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CBT Portal</title>
+  <title>CBT Admin Portal</title>
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      padding: 20px;
-    }
-    .wrap {
-      width: 100%;
-      max-width: 900px;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 12px;
-      font-size: 2.4rem;
-    }
-    p {
-      color: #cbd5e1;
-      margin-bottom: 30px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 28px 22px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 12px;
-    }
-    .card p {
-      margin-bottom: 20px;
-    }
-    .btn {
-      display: inline-block;
-      text-decoration: none;
-      background: #facc15;
-      color: #111827;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-    .btn:hover { background: #eab308; }
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:#f8fafc;color:#0f172a}
+    header{background:#0f172a;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    header a{color:#facc15;text-decoration:none;font-weight:bold}
+    .container{max-width:1220px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,.08)}
+    .full{grid-column:1/-1}
+    label{display:block;font-weight:bold;margin-bottom:6px;font-size:14px}
+    input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:14px;font-size:15px}
+    textarea{min-height:90px;resize:vertical}
+    button{border:none;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-right:8px;margin-bottom:8px;background:#0f172a;color:#fff}
+    .danger{background:#dc2626}.success{background:#15803d}.muted{background:#475569}.warn{background:#b45309}
+    .item{background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0f172a;border-radius:10px;padding:12px;margin-bottom:12px}
+    .question-image-preview{max-width:220px;max-height:160px;display:block;margin:10px 0;border:1px solid #ddd;border-radius:8px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border:1px solid #cbd5e1;padding:10px;text-align:left;font-size:14px;vertical-align:top}
+    th{background:#e2e8f0}
+    .status{font-size:14px;margin-top:8px}.error{color:#b91c1c}.ok{color:#166534}.hidden{display:none}
+    .auth-wrap{max-width:820px;margin:30px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .info-box{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .search-input{max-width:420px}
+    .nowrap{white-space:nowrap}
+    .action-row{display:flex;gap:8px;flex-wrap:wrap}
+    @media (max-width:900px){.container,.auth-wrap,.grid-2{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>CBT Examination Portal</h1>
-    <p>Select the portal you want to enter.</p>
+<header>
+  <h1 style="margin:0;">CBT Admin Portal</h1>
+  <div><a href="index.html">← Back Home</a><button id="logoutBtn" class="hidden" type="button">Logout</button></div>
+</header>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Student Portal</h2>
-        <p>Verify with full name and Reg ID, unlock the CBT, take the exam, and submit online.</p>
-        <a href="student.html" class="btn">Open Student Portal</a>
-      </div>
-
-      <div class="card">
-        <h2>Admin Portal</h2>
-        <p>Manage settings, candidates, questions, image links, and results summary.</p>
-        <a href="admin.html" class="btn">Open Admin Portal</a>
-      </div>
+<div id="authSection">
+  <div class="auth-wrap">
+    <div class="card">
+      <h2>Admin Login</h2>
+      <label>Username</label><input type="text" id="loginUsername">
+      <label>Password</label><input type="password" id="loginPassword">
+      <button class="success" id="loginBtn" type="button">Login</button>
+      <div id="loginStatus" class="status"></div>
+    </div>
+    <div class="card">
+      <h2>Admin Signup</h2>
+      <label>Full Name</label><input type="text" id="signupFullName">
+      <label>Username</label><input type="text" id="signupUsername">
+      <label>Password</label><input type="password" id="signupPassword">
+      <label>Admin Signup Key</label><input type="password" id="signupAdminKey">
+      <button class="success" id="signupBtn" type="button">Sign Up</button>
+      <div id="signupStatus" class="status"></div>
     </div>
   </div>
+</div>
+
+<div id="portalSection" class="hidden">
+  <div class="container">
+    <div class="card">
+      <h2>Exam Settings</h2>
+      <label for="examTitle">Exam Title</label><input type="text" id="examTitle">
+      <label for="durationMinutes">Duration (Minutes)</label><input type="number" id="durationMinutes" min="1" value="20">
+      <label><input type="checkbox" id="portalLocked" style="width:auto;margin-right:8px;"> Lock CBT Portal</label>
+      <label for="portalNotice">Lock Notice</label><textarea id="portalNotice" placeholder="Type notice students will see when portal is locked"></textarea>
+      <button class="success" id="saveSettingsBtn" type="button">Save Settings</button>
+      <div id="settingsStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Student Accounts</h2>
+      <div class="info-box">Bulk account generation uses Username = Reg ID. You can also reset an individual student password below.</div>
+      <label for="passwordLength">Generated Password Length</label><input type="number" id="passwordLength" min="6" value="8">
+      <button class="success" id="generateAccountsBtn" type="button">Generate Student Passwords</button>
+      <button class="muted" id="downloadGeneratedBtn" type="button">Download Last Generated CSV</button>
+      <div id="accountsStatus" class="status"></div>
+      <hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0;">
+      <label for="resetUsername">Student Username / Reg ID</label><input type="text" id="resetUsername" placeholder="Enter student username or Reg ID">
+      <label for="resetPassword">New Password (leave blank to auto-generate)</label><input type="text" id="resetPassword" placeholder="Optional manual new password">
+      <button class="success" id="resetPasswordBtn" type="button">Reset Student Password</button>
+      <div id="resetPasswordStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="candidateFormTitle">Add Candidate Manually</h2>
+      <label for="candidateName">Full Name</label><input type="text" id="candidateName" placeholder="Enter candidate full name">
+      <label for="candidateRegId">Reg ID</label><input type="text" id="candidateRegId" placeholder="Enter registration ID">
+      <input type="hidden" id="candidateOldRegId">
+      <button class="success" id="addCandidateBtn" type="button">Add Candidate</button>
+      <button class="warn hidden" id="updateCandidateBtn" type="button">Save Candidate Changes</button>
+      <button class="muted hidden" id="cancelCandidateEditBtn" type="button">Cancel Edit</button>
+      <div id="candidateStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Import Candidates CSV</h2>
+      <div class="info-box">CSV headers: <strong>fullName,regId</strong></div>
+      <input type="file" id="candidateCsvFile" accept=".csv">
+      <button class="success" id="importCandidatesBtn" type="button">Import Candidates CSV</button>
+      <div id="candidateImportStatus" class="status"></div>
+    </div>
+
+    <div class="card full">
+      <h2 id="questionFormTitle">Add Question Manually</h2>
+      <div class="info-box">Image URL is optional. If you add an image link, the Questions sheet supports the Image URL column automatically.</div>
+      <input type="hidden" id="questionId">
+      <label for="questionText">Question</label><textarea id="questionText" placeholder="Enter question"></textarea>
+      <label for="imageUrl">Image URL (optional)</label><input type="text" id="imageUrl" placeholder="Paste direct image URL here">
+      <div class="grid-2">
+        <div><label for="optionA">Option A</label><input type="text" id="optionA"></div>
+        <div><label for="optionB">Option B</label><input type="text" id="optionB"></div>
+        <div><label for="optionC">Option C</label><input type="text" id="optionC"></div>
+        <div><label for="optionD">Option D</label><input type="text" id="optionD"></div>
+      </div>
+      <label for="correctAnswer">Correct Answer</label>
+      <select id="correctAnswer"><option value="">Select answer</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+      <button class="success" id="addQuestionBtn" type="button">Add Question</button>
+      <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
+      <button class="muted hidden" id="cancelQuestionEditBtn" type="button">Cancel Edit</button>
+      <button class="danger" id="clearQuestionsBtn" type="button">Clear All Questions</button>
+      <div id="questionStatus" class="status"></div>
+    </div>
+
+    <div class="card full">
+      <h2>Import Questions CSV</h2>
+      <div class="info-box">CSV headers: <strong>question,imageUrl,optionA,optionB,optionC,optionD,answer</strong></div>
+      <input type="file" id="questionCsvFile" accept=".csv">
+      <button class="success" id="importQuestionsBtn" type="button">Import Questions CSV</button>
+      <div id="questionImportStatus" class="status"></div>
+    </div>
+
+    <div class="card full">
+      <h2>Candidates</h2>
+      <input type="text" id="candidateSearch" class="search-input" placeholder="Search candidates by name or Reg ID">
+      <div id="candidatesBox">Loading candidates...</div>
+    </div>
+
+    <div class="card full">
+      <h2>Student Accounts List</h2>
+      <input type="text" id="accountSearch" class="search-input" placeholder="Search student accounts by name or username">
+      <div id="accountsListBox">Loading student accounts...</div>
+    </div>
+
+    <div class="card full">
+      <h2>Questions</h2>
+      <input type="text" id="questionSearch" class="search-input" placeholder="Search questions, options, answer">
+      <div id="questionsBox">Loading questions...</div>
+    </div>
+
+    <div class="card full">
+      <h2>Results Summary</h2>
+      <input type="text" id="resultsSearch" class="search-input" placeholder="Search results by name, Reg ID, score, percentage, ranking">
+      <div class="item" style="margin-top:12px;">
+        <h3 style="margin-top:0;">Edit / Invalidate / Reopen One Candidate</h3>
+        <div class="grid-2">
+          <div><label for="resultRegId">Reg ID</label><input type="text" id="resultRegId" placeholder="Enter Reg ID"></div>
+          <div><label for="resultFullName">Full Name</label><input type="text" id="resultFullName" placeholder="Candidate full name"></div>
+          <div><label for="resultRawScore">Raw Score</label><input type="number" id="resultRawScore" min="0" placeholder="e.g. 12"></div>
+          <div><label for="resultTotalQuestions">Total Questions</label><input type="number" id="resultTotalQuestions" min="1" placeholder="e.g. 20"></div>
+        </div>
+        <label for="resultPassedNos">Passed Question Nos</label><input type="text" id="resultPassedNos" placeholder="e.g. 1, 2, 5">
+        <label for="resultFailedNos">Failed Question Nos</label><input type="text" id="resultFailedNos" placeholder="e.g. 3, 4, 6">
+        <label for="resultReason">Reason (for invalidate/reopen)</label><input type="text" id="resultReason" placeholder="Optional reason">
+        <button class="warn" id="updateResultBtn" type="button">Save Result Changes</button>
+        <button class="danger" id="invalidateResultBtn" type="button">Invalidate Submission</button>
+        <button class="muted" id="reopenExamBtn" type="button">Reopen Exam For Candidate</button>
+        <button class="muted" id="cancelResultEditBtn" type="button">Clear Result Form</button>
+      </div>
+      <div style="margin-top:10px;"><button class="danger" id="clearResultsBtn" type="button">Clear Results</button><button class="success" id="exportResultsBtn" type="button">Export Results CSV</button></div>
+      <div id="resultsStatus" class="status"></div>
+      <div id="resultsBox">Loading results...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+let lastGeneratedCsv = "", lastGeneratedFilename = "student_accounts_passwords.csv";
+let candidatesData = [], questionsData = [], resultsData = [], accountsData = [];
+const resultRegId=document.getElementById('resultRegId'), resultFullName=document.getElementById('resultFullName'), resultRawScore=document.getElementById('resultRawScore'), resultTotalQuestions=document.getElementById('resultTotalQuestions'), resultPassedNos=document.getElementById('resultPassedNos'), resultFailedNos=document.getElementById('resultFailedNos'), resultReason=document.getElementById('resultReason');
+function getToken(){ return localStorage.getItem("cbt_auth_token") || ""; }
+function setAuth(data){ localStorage.setItem("cbt_auth_token", data.token); localStorage.setItem("cbt_auth_role", data.role); localStorage.setItem("cbt_auth_username", data.username); }
+function clearAuth(){ localStorage.removeItem("cbt_auth_token"); localStorage.removeItem("cbt_auth_role"); localStorage.removeItem("cbt_auth_username"); }
+async function apiRequest(action, payload=null, method="POST"){
+  try{
+    payload = payload || {};
+    if (!payload.token && action !== "login" && action !== "signup") payload.token = getToken();
+    if (method === "GET"){
+      const url = new URL(APPS_SCRIPT_URL);
+      url.searchParams.set("action", action);
+      url.searchParams.set("payload", JSON.stringify(payload));
+      const res = await fetch(url.toString());
+      return await res.json();
+    }
+    const res = await fetch(APPS_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action, payload})});
+    return await res.json();
+  }catch(error){ return {ok:false, message:error.message || "Network error."}; }
+}
+function setStatus(id, message, ok=false){ const el=document.getElementById(id); if(!el) return; el.className="status "+(ok?"ok":"error"); el.textContent=message||""; }
+function downloadText(filename, text){ const blob=new Blob([text], {type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
+function splitCsvLine(line){ const result=[]; let current="", inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"' && line[i+1]==='"'){ current+='"'; i++; continue; } if(ch==='"'){ inQuotes=!inQuotes; continue; } if(ch===',' && !inQuotes){ result.push(current); current=""; continue; } current+=ch; } result.push(current); return result; }
+function parseCsv(text){ const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim()); if(!lines.length) return []; const rows=lines.map(splitCsvLine); const headers=rows[0].map(h=>h.trim()); return rows.slice(1).map(cols=>{ const obj={}; headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim()); return obj; }); }
+async function fileToText(file){ return await file.text(); }
+async function validatePortal(role){ const token=getToken(); if(!token) return false; const res=await apiRequest("validateSession", {token}, "POST"); if(!res.ok || !res.data || res.data.role!==role){ clearAuth(); return false; } return true; }
+async function showPortal(){ authSection.classList.add("hidden"); portalSection.classList.remove("hidden"); logoutBtn.classList.remove("hidden"); await Promise.all([loadSettings(), loadCandidates(), loadStudentAccounts(), loadQuestions(), loadResults()]); }
+async function signupAdmin(){ const res=await apiRequest("signup", {fullName:signupFullName.value.trim(), username:signupUsername.value.trim(), password:signupPassword.value, adminKey:signupAdminKey.value, role:"admin"}, "POST"); setStatus("signupStatus", res.message, res.ok); }
+async function loginAdmin(){ const res=await apiRequest("login", {username:loginUsername.value.trim(), password:loginPassword.value, role:"admin"}, "POST"); setStatus("loginStatus", res.message, res.ok); if(res.ok && res.data){ setAuth(res.data); await showPortal(); } }
+async function logoutCurrent(){ await apiRequest("logout", {token:getToken()}, "POST"); clearAuth(); location.reload(); }
+async function loadSettings(){ const res=await apiRequest("getSettings", {}, "GET"); if(res.ok && res.data){ examTitle.value=res.data.examTitle||""; durationMinutes.value=res.data.durationMinutes||20; portalLocked.checked=!!res.data.portalLocked; portalNotice.value=res.data.portalNotice||""; } }
+async function saveSettings(){ const res=await apiRequest("saveSettings", {examTitle:examTitle.value.trim(), durationMinutes:durationMinutes.value.trim(), portalLocked:portalLocked.checked, portalNotice:portalNotice.value.trim()}, "POST"); setStatus("settingsStatus", res.message, res.ok); }
+
+function resetCandidateForm(){ candidateFormTitle.textContent="Add Candidate Manually"; candidateOldRegId.value=""; candidateName.value=""; candidateRegId.value=""; addCandidateBtn.classList.remove("hidden"); updateCandidateBtn.classList.add("hidden"); cancelCandidateEditBtn.classList.add("hidden"); }
+async function addCandidate(){ const res=await apiRequest("addCandidate", {fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ resetCandidateForm(); loadCandidates(); loadStudentAccounts(); } }
+window.startCandidateEdit = function(regId){ const item=candidatesData.find(x=>String(x.regId)===String(regId)); if(!item) return; candidateFormTitle.textContent="Edit Candidate"; candidateOldRegId.value=item.regId; candidateName.value=item.fullName; candidateRegId.value=item.regId; addCandidateBtn.classList.add("hidden"); updateCandidateBtn.classList.remove("hidden"); cancelCandidateEditBtn.classList.remove("hidden"); window.scrollTo({top:candidateFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function updateCandidate(){ const res=await apiRequest("updateCandidate", {oldRegId:candidateOldRegId.value.trim(), fullName:candidateName.value.trim(), regId:candidateRegId.value.trim()}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ resetCandidateForm(); loadCandidates(); loadStudentAccounts(); loadResults(); } }
+window.deleteCandidateItem = async function(regId){ if(!confirm(`Delete candidate ${regId}? This also removes the linked student account, but keeps any old results.`)) return; const res=await apiRequest("deleteCandidate", {regId}, "POST"); setStatus("candidateStatus", res.message, res.ok); if(res.ok){ loadCandidates(); loadStudentAccounts(); } }
+async function importCandidates(){ const file=candidateCsvFile.files[0]; if(!file) return setStatus("candidateImportStatus", "Choose a CSV file first."); const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importCandidates", {rows}, "POST"); setStatus("candidateImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok); if(res.ok) loadCandidates(); }
+async function loadCandidates(){ candidatesBox.innerHTML="Loading candidates..."; const res=await apiRequest("listCandidates", {}, "GET"); if(!res.ok){ candidatesBox.innerHTML=`<div class="error">${res.message}</div>`; return; } candidatesData = res.data || []; renderCandidates(); }
+function renderCandidates(){ const q=(candidateSearch.value||"").trim().toLowerCase(); const list = candidatesData.filter(item => !q || `${item.fullName} ${item.regId}`.toLowerCase().includes(q)); if(!list.length) return candidatesBox.innerHTML = q ? "<p>No matching candidates found.</p>" : "<p>No candidates added yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Reg ID</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> { const safeReg=String(item.regId).replace(/'/g, "&#39;"); html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.regId}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startCandidateEdit('${safeReg}')">Edit</button><button type="button" class="danger nowrap" onclick="deleteCandidateItem('${safeReg}')">Delete</button></div></td></tr>`; }); candidatesBox.innerHTML = html + "</tbody></table>"; }
+
+async function loadStudentAccounts(){ accountsListBox.innerHTML="Loading student accounts..."; const res=await apiRequest("listStudentAccounts", {}, "GET"); if(!res.ok){ accountsListBox.innerHTML=`<div class="error">${res.message}</div>`; return; } accountsData = res.data || []; renderAccounts(); }
+function renderAccounts(){ const q=(accountSearch.value||"").trim().toLowerCase(); const list = accountsData.filter(item => !q || `${item.fullName} ${item.username}`.toLowerCase().includes(q)); if(!list.length) return accountsListBox.innerHTML = q ? "<p>No matching student accounts found.</p>" : "<p>No student accounts yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Full Name</th><th>Username</th><th>Status</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.fullName}</td><td>${item.username}</td><td>${item.isActive ? 'Active' : 'Inactive'}</td><td><button type="button" class="muted nowrap" onclick="prefillReset('${String(item.username).replace(/'/g, "&#39;")}')">Use Username</button></td></tr>`); accountsListBox.innerHTML = html + "</tbody></table>"; }
+window.prefillReset = function(username){ resetUsername.value = username; resetPassword.focus(); window.scrollTo({top: resetUsername.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function resetStudentPassword(){ const payload={username:resetUsername.value.trim(), newPassword:resetPassword.value.trim(), autoGenerate: !resetPassword.value.trim(), passwordLength: passwordLength.value}; const res=await apiRequest("resetStudentPassword", payload, "POST"); if(res.ok && res.data){ const msg = `${res.message} Username: ${res.data.username} | New Password: ${res.data.password}`; setStatus("resetPasswordStatus", msg, true); resetPassword.value=""; resetUsername.value=""; } else { setStatus("resetPasswordStatus", res.message, false); } }
+
+function resetQuestionForm(){ questionFormTitle.textContent="Add Question Manually"; questionId.value=""; [questionText,imageUrl,optionA,optionB,optionC,optionD].forEach(el=>el.value=""); correctAnswer.value=""; addQuestionBtn.classList.remove("hidden"); updateQuestionBtn.classList.add("hidden"); cancelQuestionEditBtn.classList.add("hidden"); }
+async function addQuestion(){ const res=await apiRequest("addQuestion", {question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ resetQuestionForm(); loadQuestions(); } }
+window.startQuestionEdit = function(id){ const item=questionsData.find(x=>String(x.id)===String(id)); if(!item) return; questionFormTitle.textContent="Edit Question"; questionId.value=item.id; questionText.value=item.question||""; imageUrl.value=item.imageUrl||""; optionA.value=item.optionA||""; optionB.value=item.optionB||""; optionC.value=item.optionC||""; optionD.value=item.optionD||""; correctAnswer.value=item.answer||""; addQuestionBtn.classList.add("hidden"); updateQuestionBtn.classList.remove("hidden"); cancelQuestionEditBtn.classList.remove("hidden"); window.scrollTo({top:questionFormTitle.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function updateQuestion(){ const res=await apiRequest("updateQuestion", {id:questionId.value.trim(), question:questionText.value.trim(), imageUrl:imageUrl.value.trim(), optionA:optionA.value.trim(), optionB:optionB.value.trim(), optionC:optionC.value.trim(), optionD:optionD.value.trim(), answer:correctAnswer.value}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ resetQuestionForm(); loadQuestions(); } }
+window.deleteQuestionItem = async function(id){ if(!confirm("Delete this question?")) return; const res=await apiRequest("deleteQuestion", {id}, "POST"); setStatus("questionStatus", res.message, res.ok); if(res.ok){ loadQuestions(); } }
+async function importQuestions(){ const file=questionCsvFile.files[0]; if(!file) return setStatus("questionImportStatus", "Choose a CSV file first."); const rows=parseCsv(await fileToText(file)); const res=await apiRequest("importQuestions", {rows}, "POST"); setStatus("questionImportStatus", res.ok ? `${res.message} Added: ${res.data.added}, Skipped: ${res.data.skipped}` : res.message, res.ok); if(res.ok) loadQuestions(); }
+async function clearQuestions(){ if(!confirm("Delete all questions?")) return; const res=await apiRequest("clearQuestions", {}, "POST"); setStatus("questionStatus", res.message, res.ok); loadQuestions(); }
+async function loadQuestions(){ questionsBox.innerHTML="Loading questions..."; const res=await apiRequest("listQuestions", {}, "GET"); if(!res.ok){ questionsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } questionsData = res.data || []; renderQuestions(); }
+function renderQuestions(){ const q=(questionSearch.value||"").trim().toLowerCase(); const list = questionsData.filter(item => !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q)); if(!list.length) return questionsBox.innerHTML = q ? "<p>No matching questions found.</p>" : "<p>No questions added yet.</p>"; questionsBox.innerHTML = list.map((item,i)=>`<div class="item"><strong>Question ${i+1}:</strong> ${item.question}<br>${item.imageUrl ? `<img src="${item.imageUrl}" alt="Question image" class="question-image-preview">` : ""}<strong>A:</strong> ${item.optionA}<br><strong>B:</strong> ${item.optionB}<br><strong>C:</strong> ${item.optionC}<br><strong>D:</strong> ${item.optionD}<br><strong>Correct Answer:</strong> ${item.answer}<div class="action-row" style="margin-top:10px;"><button type="button" class="warn" onclick="startQuestionEdit('${String(item.id).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger" onclick="deleteQuestionItem('${String(item.id).replace(/'/g, "&#39;")}')">Delete</button></div></div>`).join(""); }
+
+function resetResultForm(){ [resultRegId,resultFullName,resultRawScore,resultTotalQuestions,resultPassedNos,resultFailedNos,resultReason].forEach(el=>el.value=''); }
+async function loadResults(){ resultsBox.innerHTML="Loading results..."; const res=await apiRequest("listResults", {}, "GET"); if(!res.ok){ resultsBox.innerHTML=`<div class="error">${res.message}</div>`; return; } resultsData = res.data || []; renderResults(); }
+function renderResults(){ const q=(resultsSearch.value||"").trim().toLowerCase(); const list = resultsData.filter(item => !q || `${item.fullName} ${item.regId} ${item.score} ${item.percentage} ${item.ranking}`.toLowerCase().includes(q)); if(!list.length) return resultsBox.innerHTML = q ? "<p>No matching results found.</p>" : "<p>No results yet.</p>"; let html=`<table><thead><tr><th>S/N</th><th>Timestamp</th><th>Full Name</th><th>Reg ID</th><th>Score</th><th>Percentage</th><th>Ranking</th><th>Action</th></tr></thead><tbody>`; list.forEach((item,i)=> html += `<tr><td>${i+1}</td><td>${item.timestamp}</td><td>${item.fullName}</td><td>${item.regId}</td><td>${item.score}</td><td>${item.percentage}%</td><td>${item.ranking}</td><td><div class="action-row"><button type="button" class="warn nowrap" onclick="startResultEdit('${String(item.regId).replace(/'/g, "&#39;")}')">Edit</button><button type="button" class="danger nowrap" onclick="invalidateResultItem('${String(item.regId).replace(/'/g, "&#39;")}')">Invalidate</button><button type="button" class="muted nowrap" onclick="reopenCandidateItem('${String(item.regId).replace(/'/g, "&#39;")}')">Reopen</button></div></td></tr>`); resultsBox.innerHTML = html + "</tbody></table>"; }
+window.startResultEdit = function(regId){ const item=resultsData.find(x=>String(x.regId)===String(regId)); if(!item) return; resultRegId.value=item.regId||''; resultFullName.value=item.fullName||''; resultRawScore.value=item.rawScore||0; resultTotalQuestions.value=item.totalQuestions||0; resultPassedNos.value=item.passedNos||''; resultFailedNos.value=item.failedNos||''; resultReason.value=''; window.scrollTo({top: resultRegId.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }
+async function updateResult(){ const res=await apiRequest('updateResult', {regId:resultRegId.value.trim(), fullName:resultFullName.value.trim(), rawScore:resultRawScore.value, totalQuestions:resultTotalQuestions.value, passedNos:resultPassedNos.value.trim(), failedNos:resultFailedNos.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
+window.invalidateResultItem = async function(regId){ const reason = prompt('Reason for invalidating this submission:', 'Invalidated by admin') || ''; const res=await apiRequest('invalidateResult', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); loadResults(); } }
+async function invalidateResult(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); const res=await apiRequest('invalidateResult', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
+window.reopenCandidateItem = async function(regId){ const reason = prompt('Reason for reopening this exam:', 'Exam reopened by admin') || ''; const res=await apiRequest('reopenCandidateExam', {regId, reason}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ if(resultRegId.value===regId) resetResultForm(); loadResults(); } }
+async function reopenCandidateExam(){ if(!resultRegId.value.trim()) return setStatus('resultsStatus', 'Enter or select a Reg ID first.'); const res=await apiRequest('reopenCandidateExam', {regId:resultRegId.value.trim(), reason:resultReason.value.trim()}, 'POST'); setStatus('resultsStatus', res.message, res.ok); if(res.ok){ resetResultForm(); loadResults(); } }
+async function clearResults(){ if(!confirm("Clear all results?")) return; const res=await apiRequest("clearResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); loadResults(); }
+async function exportResults(){ const res=await apiRequest("exportResults", {}, "POST"); setStatus("resultsStatus", res.message, res.ok); if(res.ok && res.data && res.data.csv) downloadText(res.data.filename || "cbt_results_export.csv", res.data.csv); }
+async function generateAccounts(){ const res=await apiRequest("generateStudentAccounts", {passwordLength: passwordLength.value}, "POST"); setStatus("accountsStatus", res.ok ? `${res.message} Created: ${res.data.createdCount}, Skipped: ${res.data.skippedCount}` : res.message, res.ok); if(res.ok && res.data && res.data.csv){ lastGeneratedCsv=res.data.csv; lastGeneratedFilename=res.data.filename || "student_accounts_passwords.csv"; downloadText(lastGeneratedFilename, lastGeneratedCsv); loadStudentAccounts(); } }
+function downloadLastGenerated(){ if(!lastGeneratedCsv) return setStatus("accountsStatus", "No generated password CSV in this session yet."); downloadText(lastGeneratedFilename, lastGeneratedCsv); }
+
+signupBtn.addEventListener("click", signupAdmin); loginBtn.addEventListener("click", loginAdmin); logoutBtn.addEventListener("click", logoutCurrent); saveSettingsBtn.addEventListener("click", saveSettings); addCandidateBtn.addEventListener("click", addCandidate); updateCandidateBtn.addEventListener("click", updateCandidate); cancelCandidateEditBtn.addEventListener("click", resetCandidateForm); importCandidatesBtn.addEventListener("click", importCandidates); addQuestionBtn.addEventListener("click", addQuestion); updateQuestionBtn.addEventListener("click", updateQuestion); cancelQuestionEditBtn.addEventListener("click", resetQuestionForm); importQuestionsBtn.addEventListener("click", importQuestions); clearQuestionsBtn.addEventListener("click", clearQuestions); clearResultsBtn.addEventListener("click", clearResults); exportResultsBtn.addEventListener("click", exportResults); generateAccountsBtn.addEventListener("click", generateAccounts); downloadGeneratedBtn.addEventListener("click", downloadLastGenerated); resetPasswordBtn.addEventListener("click", resetStudentPassword); candidateSearch.addEventListener("input", renderCandidates); accountSearch.addEventListener("input", renderAccounts); questionSearch.addEventListener("input", renderQuestions); resultsSearch.addEventListener("input", renderResults); updateResultBtn.addEventListener("click", updateResult); invalidateResultBtn.addEventListener("click", invalidateResult); reopenExamBtn.addEventListener("click", reopenCandidateExam); cancelResultEditBtn.addEventListener("click", resetResultForm);
+(async function init(){ if(await validatePortal("admin")) await showPortal(); })();
+</script>
 </body>
 </html>
