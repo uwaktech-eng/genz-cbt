@@ -356,7 +356,7 @@ let collapsibleCardsReady = false;
 function getCardSummary_(title){
   const map = {
     'Portal Settings':'Lock or reopen the full portal and update the notice students will see.',
-    'Create New Exam':'Create a fresh exam with pass mark, result visibility and review settings.',
+    'Create New Exam':'Create a fresh exam, then activate it when students should be allowed to use its exam code.',
     'Exam Result & Review Settings':'Fine-tune what students can see after submitting each exam.',
     'Result Checker Link':'Generate the student result-checker link for the selected exam.',
     'Exams':'Manage active, archived and deleted exams from one place.',
@@ -609,7 +609,7 @@ async function loadExams(){
 }
 function renderExamSelects(questionExam="", configExam="", linkExam=""){
   const availableExams = examsData.filter(e => !e.isDeleted);
-  const current = availableExams.find(e => e.isCurrent);
+  const current = availableExams.find(e => e.isActive || e.isCurrent);
   const defaultExam = current ? current.examCode : (availableExams[0]?.examCode || "");
   const makeOptions = () => ['<option value="">Select exam</option>'].concat(availableExams.map(e => `<option value="${esc(e.examCode)}">${esc(e.examCode)} — ${esc(e.title)}</option>`)).join("");
 
@@ -627,28 +627,35 @@ function renderExamSelects(questionExam="", configExam="", linkExam=""){
   loadSelectedExamConfig();
   generateResultCheckerLink(false);
 }
+
 function renderExams(){
   if(!examsData.length){ $("examsBox").innerHTML='<div class="muted">No exams created yet.</div>'; return; }
 
-  const activeExams = examsData.filter(e => !e.isDeleted);
+  const activeExams = examsData.filter(e => !e.isDeleted && (e.isActive || e.isCurrent));
+  const inactiveExams = examsData.filter(e => !e.isDeleted && !(e.isActive || e.isCurrent));
   const deletedExams = examsData.filter(e => e.isDeleted);
 
-  const buildTable = (list, deletedSection=false) => {
+  const buildTable = (list, type='active') => {
     if(!list.length){
-      return `<div class="muted" style="padding:14px 2px">${deletedSection ? 'No deleted exams yet.' : 'No active exams available.'}</div>`;
+      const msg = type === 'deleted' ? 'No deleted exams yet.' : (type === 'inactive' ? 'No inactive exams available.' : 'No active exams available.');
+      return `<div class="muted" style="padding:14px 2px">${msg}</div>`;
     }
 
     let html = `<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Summary</th><th>Review</th><th>Pass Mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
 
     list.forEach(e => {
-      const status = deletedSection
+      const isActive = !!(e.isActive || e.isCurrent);
+      const status = type === 'deleted'
         ? 'Deleted'
-        : `${e.isCurrent ? 'Current' : 'Not Current'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
+        : `${isActive ? 'Active' : 'Inactive'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
 
-      const actions = deletedSection
+      const activateBtn = isActive
+        ? `<button class="small-btn warn" type="button" onclick="toggleExamActive('${esc(e.examCode)}', false)">Deactivate</button>`
+        : `<button class="small-btn success" type="button" onclick="toggleExamActive('${esc(e.examCode)}', true)">Activate</button>`;
+
+      const actions = type === 'deleted'
         ? `<button class="small-btn success" type="button" onclick="restoreExamItem('${esc(e.examCode)}')">Restore Exam</button>`
-        : `
-          <button class="small-btn primary" type="button" onclick="setCurrentExam('${esc(e.examCode)}')">Set Current</button>
+        : `${activateBtn}
           <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${esc(e.examCode)}')">Use In Builder</button>
           <button class="small-btn ghost" type="button" onclick="loadExamIntoConfig('${esc(e.examCode)}')">Load In Settings</button>
           <button class="small-btn ${e.examLocked ? 'success' : 'warn'}" type="button" onclick="toggleExamLock('${esc(e.examCode)}', ${e.examLocked ? 'false':'true'})">${e.examLocked ? 'Unlock' : 'Lock'}</button>
@@ -676,11 +683,22 @@ function renderExams(){
       <div class="actions" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
         <div>
           <h3 style="margin:0">Active Exams</h3>
-          <div class="muted" style="margin-top:4px">These exams are available for normal management and student use.</div>
+          <div class="muted" style="margin-top:4px">Students can unlock any exam in this section using its exam code.</div>
         </div>
         <div class="pill">${activeExams.length} active</div>
       </div>
-      ${buildTable(activeExams, false)}
+      ${buildTable(activeExams, 'active')}
+    </div>
+
+    <div class="card" style="margin-top:16px;padding:16px;border-radius:16px;background:#f8fbff;box-shadow:none">
+      <div class="actions" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+        <div>
+          <h3 style="margin:0">Inactive Exams</h3>
+          <div class="muted" style="margin-top:4px">These exams exist in the system but are not open for students yet.</div>
+        </div>
+        <div class="pill">${inactiveExams.length} inactive</div>
+      </div>
+      ${buildTable(inactiveExams, 'inactive')}
     </div>
 
     <div class="card" style="margin-top:16px;padding:16px;border-radius:16px;background:#fffaf5;box-shadow:none;border-style:dashed">
@@ -691,7 +709,7 @@ function renderExams(){
         </div>
         <div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">${deletedExams.length} deleted</div>
       </div>
-      ${buildTable(deletedExams, true)}
+      ${buildTable(deletedExams, 'deleted')}
     </div>`;
 }
 function loadSelectedExamConfig(){
@@ -723,11 +741,16 @@ async function saveExamOptions(){
   setStatus("examOptionsStatus", res.message, res.ok);
   if(res.ok) await loadExams();
 }
-async function setCurrentExam(examCode){
-  showLoader("Switching current exam...");
-  const res=await apiRequest("setCurrentExam",{examCode},"POST");
-  hideLoader(); if(!res.ok) return alert(res.message);
+async function toggleExamActive(examCode, active){
+  showLoader(active ? 'Activating exam...' : 'Deactivating exam...');
+  const res = await apiRequest('setExamActive',{examCode, active},'POST');
+  hideLoader();
+  if(!res.ok) return alert(res.message);
   await loadExams();
+}
+
+async function setCurrentExam(examCode){
+  return toggleExamActive(examCode, true);
 }
 function pickExamForQuestions(examCode){
   $("questionExamSelect").value = examCode;
