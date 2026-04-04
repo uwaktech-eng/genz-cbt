@@ -58,6 +58,25 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
 @media (max-width:1080px){.card{grid-column:1/-1}}
 @media (max-width:780px){.row{grid-template-columns:1fr}.auth-shell{grid-template-columns:1fr}.wrap{padding:14px}.card{padding:16px;border-radius:16px}}
 @media (max-width:520px){.actions{flex-direction:column}.actions>*{width:100%}table{min-width:660px}}
+
+/* dashboard cleanup */
+.card.collapsible{padding:0;overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f8fbff)}
+.card-head h2{font-size:1rem}
+.card-head .muted{font-size:13px}
+.card-toggle{min-height:38px;padding:0 14px;border-radius:10px;flex:0 0 auto}
+.card-toggle .toggle-icon{font-size:16px;transition:transform .2s ease}
+.card-body{padding:18px}
+.card.collapsible.is-collapsed .card-body{display:none}
+.card.collapsible:not(.is-collapsed) .card-toggle .toggle-icon{transform:rotate(180deg)}
+.card-summary{margin-top:4px;font-size:13px;color:var(--muted)}
+.dashboard-banner{grid-column:1/-1;background:linear-gradient(135deg,#141b34,#2d3f86 52%,#4f8cff);color:#fff;border:none;border-radius:24px;padding:20px;box-shadow:0 18px 40px rgba(15,23,42,.18)}
+.dashboard-banner .actions .ghost{background:rgba(255,255,255,.14);color:#fff}
+.dashboard-banner .actions .ghost:hover{background:rgba(255,255,255,.2)}
+.quick-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.quick-pills .pill{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.18);color:#fff}
+@media (max-width:520px){.card-head{padding:14px 16px}.card-body{padding:16px}}
+
 </style>
 </head>
 <body>
@@ -105,6 +124,17 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
 <section id="portalSection" class="hidden">
   <div class="wrap">
     <div class="grid">
+      <div class="dashboard-banner">
+        <h2 style="margin:0 0 6px">Cleaner Admin Workspace</h2>
+        <div style="opacity:.92;max-width:860px">Sections below can now be expanded only when you need them, so the dashboard stays neat on both desktop and mobile.</div>
+        <div class="quick-pills">
+          <div class="pill">Core setup</div>
+          <div class="pill">Exam management</div>
+          <div class="pill">Questions</div>
+          <div class="pill">Candidates & users</div>
+          <div class="pill">Results & permissions</div>
+        </div>
+      </div>
       <div class="card">
         <h2>Portal Settings</h2>
         <div class="info" style="margin:10px 0 14px">Portal lock affects every student.</div>
@@ -231,7 +261,9 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
           <button class="warn hidden" id="updateQuestionBtn" type="button">Save Question Changes</button>
           <button class="ghost hidden" id="cancelQuestionEditBtn" type="button">Cancel Edit</button>
           <button class="ghost" id="importQuestionsBtn" type="button">Import Questions CSV</button>
-          <button class="danger" id="clearQuestionsBtn" type="button">Clear Questions For Selected Exam</button>
+          <button class="danger" id="deleteSelectedQuestionsBtn" type="button">Delete Selected</button>
+          <button class="success" id="restoreSelectedQuestionsBtn" type="button">Restore Selected</button>
+          <button class="danger" id="clearQuestionsBtn" type="button">Delete All Active Questions</button>
         </div>
         <div id="questionStatus" class="status"></div>
       </div>
@@ -239,8 +271,13 @@ th{background:#f8fbff;position:sticky;top:0;z-index:1}
       <div class="card full">
         <div class="actions" style="justify-content:space-between;align-items:center">
           <h2>Questions In Selected Exam</h2>
-          <input id="questionSearch" class="search" type="text" placeholder="Search current exam questions">
+          <div class="actions">
+            <input id="questionSearch" class="search" type="text" placeholder="Search current exam questions">
+            <label class="pill" style="cursor:pointer"><input id="questionShowDeleted" type="checkbox" style="margin:0 6px 0 0"> Show deleted</label>
+            <button class="ghost" id="selectAllQuestionsBtn" type="button">Select All Visible</button>
+          </div>
         </div>
+        <div id="questionsSelectionInfo" class="muted" style="margin-top:8px"></div>
         <div id="questionsBox"></div>
       </div>
 
@@ -305,6 +342,80 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJFyczjmLvreve
 const ADMIN_TOKEN_KEY = "cbt_admin_token_v2";
 
 let examsData=[], questionsData=[], resultsData=[], candidatesData=[], adminsData=[], studentsData=[], lastGeneratedCsv="", lastGeneratedFilename="student_passwords.csv";
+let selectedQuestionIds = new Set();
+
+let collapsibleCardsReady = false;
+function getCardSummary_(title){
+  const map = {
+    'Portal Settings':'Lock or reopen the full portal and update the notice students will see.',
+    'Create New Exam':'Create a fresh exam with pass mark, result visibility and review settings.',
+    'Exam Result & Review Settings':'Fine-tune what students can see after submitting each exam.',
+    'Result Checker Link':'Generate the student result-checker link for the selected exam.',
+    'Exams':'Manage active, archived and deleted exams from one place.',
+    'Add Candidates':'Add students one by one or prepare for bulk upload.',
+    'Student Accounts':'Generate passwords and export the latest student login sheet.',
+    'Question Builder':'Add, import, edit or bulk-manage questions for the selected exam.',
+    'Questions In Selected Exam':'View, search, select and restore questions for the selected exam.',
+    'Permission Code':'Generate rewrite permission codes for specific students.',
+    'Results By Exam':'Load and export result sheets in CSV or PDF.',
+    'Candidates':'Search the full student list and export it to PDF.',
+    'Users':'Manage admin and student access with activate or deactivate actions.',
+    'Permission Codes':'Review all rewrite permission codes in one table.',
+    'Results Table':'See the most recently loaded result data.'
+  };
+  return map[title] || 'Open this section when you need it.';
+}
+function initCollapsibleCards(){
+  if(collapsibleCardsReady) return;
+  collapsibleCardsReady = true;
+  const keepOpen = new Set(['Exams','Question Builder']);
+  document.querySelectorAll('#portalSection .grid > .card').forEach(card => {
+    const first = card.firstElementChild;
+    if(!first) return;
+    let titleEl = null;
+    if(first.tagName === 'H2') titleEl = first;
+    else titleEl = first.querySelector('h2');
+    if(!titleEl) return;
+    const title = titleEl.textContent.trim();
+    card.classList.add('collapsible');
+    const header = document.createElement('div');
+    header.className = 'card-head';
+    const titleWrap = document.createElement('div');
+    const h = document.createElement('h2');
+    h.textContent = title;
+    const s = document.createElement('div');
+    s.className = 'card-summary';
+    s.textContent = getCardSummary_(title);
+    titleWrap.appendChild(h);
+    titleWrap.appendChild(s);
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'card-toggle ghost';
+    toggle.innerHTML = '<span>Reveal</span> <span class="toggle-icon">▾</span>';
+    header.appendChild(titleWrap);
+    header.appendChild(toggle);
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    const nodes = Array.from(card.childNodes);
+    nodes.forEach((node, index) => {
+      if(index === 0) return;
+      body.appendChild(node);
+    });
+    if(first.tagName !== 'H2') body.insertBefore(first, body.firstChild);
+    card.innerHTML = '';
+    card.appendChild(header);
+    card.appendChild(body);
+    const open = keepOpen.has(title);
+    card.classList.toggle('is-collapsed', !open);
+    toggle.querySelector('span').textContent = open ? 'Hide' : 'Reveal';
+    toggle.addEventListener('click', () => {
+      const collapsed = card.classList.toggle('is-collapsed');
+      toggle.querySelector('span').textContent = collapsed ? 'Reveal' : 'Hide';
+    });
+  });
+}
+
 const $ = id => document.getElementById(id);
 const loader = $("loader"), loaderText = $("loaderText");
 
@@ -394,6 +505,7 @@ async function showPortal(){
   $("authSection").classList.add("hidden");
   $("portalSection").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
+  initCollapsibleCards();
   await refreshAll();
 }
 async function refreshAll(){
@@ -442,48 +554,91 @@ async function loadExams(){
   renderExams();
 }
 function renderExamSelects(questionExam="", configExam="", linkExam=""){
-  const current = examsData.find(e => e.isCurrent);
-  const defaultExam = current ? current.examCode : (examsData[0]?.examCode || "");
-  const makeOptions = selected => ['<option value="">Select exam</option>'].concat(examsData.map(e => `<option value="${esc(e.examCode)}">${esc(e.examCode)} — ${esc(e.title)}</option>`)).join("");
+  const availableExams = examsData.filter(e => !e.isDeleted);
+  const current = availableExams.find(e => e.isCurrent);
+  const defaultExam = current ? current.examCode : (availableExams[0]?.examCode || "");
+  const makeOptions = () => ['<option value="">Select exam</option>'].concat(availableExams.map(e => `<option value="${esc(e.examCode)}">${esc(e.examCode)} — ${esc(e.title)}</option>`)).join("");
 
-  $("questionExamSelect").innerHTML = makeOptions(questionExam);
-  $("examConfigSelect").innerHTML = makeOptions(configExam);
-  $("resultLinkExamSelect").innerHTML = makeOptions(linkExam);
+  $("questionExamSelect").innerHTML = makeOptions();
+  $("examConfigSelect").innerHTML = makeOptions();
+  $("resultLinkExamSelect").innerHTML = makeOptions();
 
-  $("questionExamSelect").value = questionExam || defaultExam;
-  $("examConfigSelect").value = configExam || defaultExam;
-  $("resultLinkExamSelect").value = linkExam || defaultExam;
+  $("questionExamSelect").value = availableExams.some(e => e.examCode === questionExam) ? questionExam : defaultExam;
+  $("examConfigSelect").value = availableExams.some(e => e.examCode === configExam) ? configExam : defaultExam;
+  $("resultLinkExamSelect").value = availableExams.some(e => e.examCode === linkExam) ? linkExam : defaultExam;
 
   $("selectedExamBadge").textContent = $("questionExamSelect").value || "None";
-  if(!$("permExamCode").value && defaultExam) $("permExamCode").value = defaultExam;
-  if(!$("resultsExamCode").value && defaultExam) $("resultsExamCode").value = defaultExam;
+  if((!$("permExamCode").value || !availableExams.some(e => e.examCode === $("permExamCode").value)) && defaultExam) $("permExamCode").value = defaultExam;
+  if((!$("resultsExamCode").value || !availableExams.some(e => e.examCode === $("resultsExamCode").value)) && defaultExam) $("resultsExamCode").value = defaultExam;
   loadSelectedExamConfig();
   generateResultCheckerLink(false);
 }
 function renderExams(){
   if(!examsData.length){ $("examsBox").innerHTML='<div class="muted">No exams created yet.</div>'; return; }
-  let html=`<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Summary</th><th>Review</th><th>Pass Mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
-  examsData.forEach(e=>{
-    const status = `${e.isCurrent ? 'Current' : 'Not Current'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
-    html += `<tr>
-      <td><span class="code">${esc(e.examCode)}</span></td>
-      <td>${esc(e.title)}</td>
-      <td>${esc(e.durationMinutes)} mins</td>
-      <td>${boolText(e.showScoreSummary)}</td>
-      <td>${boolText(e.allowReview)}</td>
-      <td>${esc(e.passMark)}%</td>
-      <td>${esc(status)}</td>
-      <td><div class="actions">
-        <button class="small-btn primary" type="button" onclick="setCurrentExam('${esc(e.examCode)}')">Set Current</button>
-        <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${esc(e.examCode)}')">Use In Builder</button>
-        <button class="small-btn ghost" type="button" onclick="loadExamIntoConfig('${esc(e.examCode)}')">Load In Settings</button>
-        <button class="small-btn ${e.examLocked ? 'success' : 'warn'}" type="button" onclick="toggleExamLock('${esc(e.examCode)}', ${e.examLocked ? 'false':'true'})">${e.examLocked ? 'Unlock' : 'Lock'}</button>
-        <button class="small-btn warn" type="button" onclick="duplicateExamPrompt('${esc(e.examCode)}')">Duplicate</button>
-        <button class="small-btn danger" type="button" onclick="toggleArchiveExam('${esc(e.examCode)}', ${e.isArchived ? 'false':'true'})">${e.isArchived ? 'Restore':'Archive'}</button>
-      </div></td>
-    </tr>`;
-  });
-  $("examsBox").innerHTML = html + '</tbody></table></div>';
+
+  const activeExams = examsData.filter(e => !e.isDeleted);
+  const deletedExams = examsData.filter(e => e.isDeleted);
+
+  const buildTable = (list, deletedSection=false) => {
+    if(!list.length){
+      return `<div class="muted" style="padding:14px 2px">${deletedSection ? 'No deleted exams yet.' : 'No active exams available.'}</div>`;
+    }
+
+    let html = `<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Summary</th><th>Review</th><th>Pass Mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+
+    list.forEach(e => {
+      const status = deletedSection
+        ? 'Deleted'
+        : `${e.isCurrent ? 'Current' : 'Not Current'} • ${e.isArchived ? 'Archived' : 'Live'} • ${e.examLocked ? 'Locked' : 'Open'}`;
+
+      const actions = deletedSection
+        ? `<button class="small-btn success" type="button" onclick="restoreExamItem('${esc(e.examCode)}')">Restore Exam</button>`
+        : `
+          <button class="small-btn primary" type="button" onclick="setCurrentExam('${esc(e.examCode)}')">Set Current</button>
+          <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${esc(e.examCode)}')">Use In Builder</button>
+          <button class="small-btn ghost" type="button" onclick="loadExamIntoConfig('${esc(e.examCode)}')">Load In Settings</button>
+          <button class="small-btn ${e.examLocked ? 'success' : 'warn'}" type="button" onclick="toggleExamLock('${esc(e.examCode)}', ${e.examLocked ? 'false':'true'})">${e.examLocked ? 'Unlock' : 'Lock'}</button>
+          <button class="small-btn warn" type="button" onclick="duplicateExamPrompt('${esc(e.examCode)}')">Duplicate</button>
+          <button class="small-btn ${e.isArchived ? 'success':'danger'}" type="button" onclick="toggleArchiveExam('${esc(e.examCode)}', ${e.isArchived ? 'false':'true'})">${e.isArchived ? 'Restore Archive':'Archive'}</button>
+          <button class="small-btn danger" type="button" onclick="deleteExamItem('${esc(e.examCode)}')">Delete Exam</button>`;
+
+      html += `<tr>
+        <td><span class="code">${esc(e.examCode)}</span></td>
+        <td>${esc(e.title)}</td>
+        <td>${esc(e.durationMinutes)} mins</td>
+        <td>${boolText(e.showScoreSummary)}</td>
+        <td>${boolText(e.allowReview)}</td>
+        <td>${esc(e.passMark)}%</td>
+        <td>${esc(status)}</td>
+        <td><div class="actions">${actions}</div></td>
+      </tr>`;
+    });
+
+    return html + '</tbody></table></div>';
+  };
+
+  $("examsBox").innerHTML = `
+    <div class="card" style="margin-top:12px;padding:16px;border-radius:16px;background:#fcfdff;box-shadow:none">
+      <div class="actions" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+        <div>
+          <h3 style="margin:0">Active Exams</h3>
+          <div class="muted" style="margin-top:4px">These exams are available for normal management and student use.</div>
+        </div>
+        <div class="pill">${activeExams.length} active</div>
+      </div>
+      ${buildTable(activeExams, false)}
+    </div>
+
+    <div class="card" style="margin-top:16px;padding:16px;border-radius:16px;background:#fffaf5;box-shadow:none;border-style:dashed">
+      <div class="actions" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+        <div>
+          <h3 style="margin:0">Deleted Exams</h3>
+          <div class="muted" style="margin-top:4px">Deleted exams stay here until restored.</div>
+        </div>
+        <div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">${deletedExams.length} deleted</div>
+      </div>
+      ${buildTable(deletedExams, true)}
+    </div>`;
 }
 function loadSelectedExamConfig(){
   const examCode = $("examConfigSelect").value;
@@ -533,6 +688,21 @@ async function toggleArchiveExam(examCode, archived){
   const res=await apiRequest("archiveExam",{examCode, archived},"POST");
   hideLoader(); if(!res.ok) return alert(res.message);
   await loadExams();
+}
+async function deleteExamItem(examCode){
+  if(!confirm("Delete this exam? You can restore it later.")) return;
+  showLoader("Deleting exam...");
+  const res=await apiRequest("deleteExam",{examCode},"POST");
+  hideLoader();
+  alert(res.message);
+  if(res.ok) await loadExams();
+}
+async function restoreExamItem(examCode){
+  showLoader("Restoring exam...");
+  const res=await apiRequest("restoreExam",{examCode},"POST");
+  hideLoader();
+  alert(res.message);
+  if(res.ok) await loadExams();
 }
 async function toggleExamLock(examCode, locked){
   const notice = locked ? (prompt("Lock notice students should see for this exam:", "This exam is currently locked.") || "") : "";
@@ -666,7 +836,15 @@ async function deleteQuestionItem(questionId){
   showLoader("Deleting question...");
   const res=await apiRequest("deleteQuestionByExam",{examCode, questionId},"POST");
   hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok){ if($("questionEditId").value===String(questionId)) resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+  if(res.ok){ selectedQuestionIds.delete(String(questionId)); if($("questionEditId").value===String(questionId)) resetQuestionForm(); await loadQuestionsForSelectedExam(); }
+}
+async function restoreQuestionItem(questionId){
+  const examCode=$("questionExamSelect").value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  showLoader("Restoring question...");
+  const res=await apiRequest("restoreQuestionByExam",{examCode, questionId},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ await loadQuestionsForSelectedExam(); }
 }
 async function importQuestions(){
   const examCode=$("questionExamSelect").value.trim(), file=$("questionCsvFile").files[0];
@@ -681,28 +859,72 @@ async function importQuestions(){
 async function clearQuestionsByExam(){
   const examCode=$("questionExamSelect").value.trim();
   if(!examCode) return setStatus("questionStatus","Select an exam first.");
-  if(!confirm("Clear all questions for this exam?")) return;
-  showLoader("Clearing questions...");
+  if(!confirm("Delete all active questions for this exam? You can restore them later.")) return;
+  showLoader("Deleting questions...");
   const res=await apiRequest("clearQuestionsByExam",{examCode},"POST");
   hideLoader(); setStatus("questionStatus", res.message, res.ok);
-  if(res.ok) await loadQuestionsForSelectedExam();
+  if(res.ok){ selectedQuestionIds.clear(); await loadQuestionsForSelectedExam(); }
+}
+function getVisibleQuestions(){
+  const q=($("questionSearch").value||"").trim().toLowerCase();
+  const showDeleted = $("questionShowDeleted").checked;
+  return questionsData.filter(item=>{
+    if(item.isDeleted && !showDeleted) return false;
+    return !q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q);
+  });
+}
+function toggleQuestionSelection(questionId, checked){
+  const key = String(questionId);
+  if(checked) selectedQuestionIds.add(key); else selectedQuestionIds.delete(key);
+  updateQuestionsSelectionInfo();
+}
+function updateQuestionsSelectionInfo(){
+  $("questionsSelectionInfo").textContent = selectedQuestionIds.size ? `${selectedQuestionIds.size} question(s) selected.` : "No question selected.";
+}
+function selectAllVisibleQuestions(){
+  const list = getVisibleQuestions();
+  if(!list.length) return;
+  list.forEach(item => selectedQuestionIds.add(String(item.id)));
+  renderQuestions();
+}
+async function bulkDeleteSelectedQuestions(){
+  const examCode=$("questionExamSelect").value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  const ids = Array.from(selectedQuestionIds);
+  if(!ids.length) return setStatus("questionStatus","Select at least one question.");
+  if(!confirm(`Delete ${ids.length} selected question(s)?`)) return;
+  showLoader("Deleting selected questions...");
+  const res=await apiRequest("bulkDeleteQuestionsByExam",{examCode, questionIds: ids},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ selectedQuestionIds.clear(); await loadQuestionsForSelectedExam(); }
+}
+async function bulkRestoreSelectedQuestions(){
+  const examCode=$("questionExamSelect").value.trim();
+  if(!examCode) return setStatus("questionStatus","Select an exam first.");
+  const ids = Array.from(selectedQuestionIds);
+  if(!ids.length) return setStatus("questionStatus","Select at least one question.");
+  showLoader("Restoring selected questions...");
+  const res=await apiRequest("bulkRestoreQuestionsByExam",{examCode, questionIds: ids},"POST");
+  hideLoader(); setStatus("questionStatus", res.message, res.ok);
+  if(res.ok){ selectedQuestionIds.clear(); await loadQuestionsForSelectedExam(); }
 }
 async function loadQuestionsForSelectedExam(){
   const examCode=$("questionExamSelect").value.trim();
   $("selectedExamBadge").textContent = examCode || 'None';
+  selectedQuestionIds.clear();
   if(!examCode){ questionsData=[]; renderQuestions(); return; }
   showLoader("Loading questions...");
-  const res=await apiRequest("listQuestionsByExam",{examCode},"POST");
+  const res=await apiRequest("listQuestionsByExam",{examCode, includeDeleted:true},"POST");
   hideLoader();
   if(!res.ok){ $("questionsBox").innerHTML=`<div class="status error">${esc(res.message)}</div>`; return; }
   questionsData=res.data||[];
   renderQuestions();
 }
 function renderQuestions(){
-  const q=($("questionSearch").value||"").trim().toLowerCase();
-  const list=questionsData.filter(item=>!q || `${item.question} ${item.optionA} ${item.optionB} ${item.optionC} ${item.optionD} ${item.answer}`.toLowerCase().includes(q));
+  const list=getVisibleQuestions();
+  updateQuestionsSelectionInfo();
   if(!list.length){ $("questionsBox").innerHTML='<div class="muted" style="margin-top:12px">No questions found for this exam.</div>'; return; }
-  $("questionsBox").innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px"><div class="actions" style="justify-content:space-between;align-items:center"><div class="pill">Question ${i+1}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${esc(String(item.id))}')">Edit</button><button class="small-btn danger" type="button" onclick="deleteQuestionItem('${esc(String(item.id))}')">Delete</button></div></div><h3 style="margin:10px 0 8px;font-size:1rem">${esc(item.question)}</h3>${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="Question image" style="max-width:100%;max-height:240px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${esc(item.optionA)}<br>B. ${esc(item.optionB)}<br>C. ${esc(item.optionC)}<br>D. ${esc(item.optionD)}<br><b>Answer:</b> ${esc(item.answer)}</div></div>`).join('');
+  $("questionsBox").innerHTML = list.map((item,i)=>`<div class="card" style="margin-top:12px;padding:16px;${item.isDeleted ? 'opacity:.72;border-style:dashed;' : ''}"><div class="actions" style="justify-content:space-between;align-items:center"><div class="actions" style="align-items:center"><label class="pill" style="cursor:pointer"><input type="checkbox" ${selectedQuestionIds.has(String(item.id)) ? 'checked' : ''} onchange="toggleQuestionSelection('${esc(String(item.id))}', this.checked)" style="margin:0 6px 0 0">Select</label><div class="pill">Question ${i+1}</div>${item.isDeleted ? '<div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">Deleted</div>' : '<div class="pill" style="background:#ecfdf5;color:#166534;border-color:#bbf7d0">Active</div>'}</div><div class="actions"><button class="small-btn warn" type="button" onclick="startQuestionEdit('${esc(String(item.id))}')">Edit</button>${item.isDeleted ? `<button class="small-btn success" type="button" onclick="restoreQuestionItem('${esc(String(item.id))}')">Restore</button>` : `<button class="small-btn danger" type="button" onclick="deleteQuestionItem('${esc(String(item.id))}')">Delete</button>`}</div></div><h3 style="margin:10px 0 8px;font-size:1rem">${esc(item.question)}</h3>${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="Question image" style="max-width:100%;max-height:240px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px">` : ''}<div class="muted">A. ${esc(item.optionA)}<br>B. ${esc(item.optionB)}<br>C. ${esc(item.optionC)}<br>D. ${esc(item.optionD)}<br><b>Answer:</b> ${esc(item.answer)}</div></div>`).join('');
 }
 async function createPermissionCode(){
   showLoader("Creating permission code...");
@@ -788,10 +1010,14 @@ $("exportCandidatesPdfBtn").addEventListener("click", exportCandidatesPdf);
 $("generateAccountsBtn").addEventListener("click", generateAccounts);
 $("downloadGeneratedBtn").addEventListener("click", downloadLastGenerated);
 $("questionExamSelect").addEventListener("change", function(){ resetQuestionForm(); loadQuestionsForSelectedExam(); });
+$("questionShowDeleted").addEventListener("change", renderQuestions);
+$("selectAllQuestionsBtn").addEventListener("click", selectAllVisibleQuestions);
 $("addQuestionBtn").addEventListener("click", addQuestion);
 $("updateQuestionBtn").addEventListener("click", updateQuestion);
 $("cancelQuestionEditBtn").addEventListener("click", resetQuestionForm);
 $("importQuestionsBtn").addEventListener("click", importQuestions);
+$("deleteSelectedQuestionsBtn").addEventListener("click", bulkDeleteSelectedQuestions);
+$("restoreSelectedQuestionsBtn").addEventListener("click", bulkRestoreSelectedQuestions);
 $("clearQuestionsBtn").addEventListener("click", clearQuestionsByExam);
 $("createPermissionBtn").addEventListener("click", createPermissionCode);
 $("loadResultsBtn").addEventListener("click", loadResultsByExam);
