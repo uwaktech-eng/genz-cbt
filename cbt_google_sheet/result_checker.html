@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CBT Result Checker</title>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{--bg:#eef2ff;--bg2:#f8fbff;--panel:#fff;--line:#dbe4f3;--text:#0f172a;--muted:#64748b;--primary:#1e3a8a;--primary2:#4338ca;--accent:#0ea5e9;--shadow:0 16px 40px rgba(15,23,42,.10)}
 *{box-sizing:border-box}
@@ -30,13 +32,13 @@ button.ghost{background:#eef2ff;color:#243b67}
 .report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
 .report-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
 .report-item-label{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:4px}
-.report-item-value{font-weight:800;font-size:1rem;color:var(--text)}
-.report-message{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:14px;margin-top:10px;line-height:1.7}
+.report-item-value{font-weight:800;font-size:1rem;color:var(--text);word-break:break-word}
+.report-message{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:14px;margin-top:10px;line-height:1.7;word-break:break-word}
 .review-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:12px}
 .pass{color:#166534;font-weight:700}.fail{color:#b91c1c;font-weight:700}
 .question-image{max-width:100%;width:auto;max-height:280px;border:1px solid #ddd;border-radius:10px;display:block;margin:12px auto;background:#fff}
 .note{font-size:13px;color:var(--muted);margin-top:-6px;margin-bottom:12px}
-@media (max-width:640px){.container{padding:0 12px 28px}.head{padding:12px}.report-grid{grid-template-columns:1fr}.actions{flex-direction:column}.actions>*{width:100%}}
+@media (max-width:768px){.container{padding:0 12px 28px}.head{padding:12px;align-items:flex-start}.head h1{font-size:1rem}.card{padding:15px;border-radius:16px}.report-grid{grid-template-columns:1fr}.actions{flex-direction:column}.actions>*{width:100%}.report-head{padding:18px 14px}.report-body{padding:14px}.report-brand{font-size:1rem}}
 </style>
 </head>
 <body>
@@ -50,9 +52,9 @@ button.ghost{background:#eef2ff;color:#243b67}
 <div class="container">
   <div class="card">
     <h2>Check Your Result</h2>
-    <div id="examInfo" class="info">Enter your Registration ID and student password to check your result.</div>
-    <label>Exam Code</label>
-    <input id="examCode" type="text" placeholder="Exam code">
+    <div id="examInfo" class="info">Enter your Registration ID and student password to check your result. You can leave the exam code blank to fetch your latest result.</div>
+    <label>Exam Code <span style="color:#64748b;font-weight:600">(optional)</span></label>
+    <input id="examCode" type="text" placeholder="Leave blank to fetch latest result">
     <label>Registration ID</label>
     <input id="regId" type="text" placeholder="Registration ID">
     <label>Student Password</label>
@@ -60,7 +62,7 @@ button.ghost{background:#eef2ff;color:#243b67}
     <div class="note">For generated student accounts, the password is the one created by the admin. For self-created accounts, use your account password.</div>
     <div class="actions">
       <button id="checkBtn" type="button">Check Result</button>
-      <button id="printBtn" type="button" class="ghost">Print Report</button>
+      <button id="downloadPdfBtn" type="button" class="ghost">Download Result PDF</button>
     </div>
     <div id="checkStatus" class="status"></div>
   </div>
@@ -117,12 +119,87 @@ function renderReview(review){
       <div><strong>Correct Answer:</strong> ${esc(item.correct)}</div>
     </div>`).join("");
 }
+
+function pdfReady(){ return window.jspdf && window.jspdf.jsPDF; }
+function downloadResultPdf(){
+  if($("resultCard").style.display === "none") return setStatus("checkStatus", "Check a result first.");
+  if(!pdfReady()) return setStatus("checkStatus", "PDF library did not load. Refresh and try again.");
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
+  const data = $("resultCard").dataset.result ? JSON.parse($("resultCard").dataset.result) : null;
+  if(!data) return setStatus("checkStatus", "No result data found.");
+
+  doc.setFillColor(30,58,138);
+  doc.rect(0,0,595,110,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(20);
+  doc.text('Genz Edutech Innovation', 40, 42);
+  doc.setFontSize(11);
+  doc.setFont('helvetica','normal');
+  doc.text('Official Student Result Report', 40, 62);
+  doc.setTextColor(15,23,42);
+  doc.setFontSize(11);
+  doc.text(`Status: ${data.passedStatus || ''}`, 40, 138);
+
+  doc.autoTable({
+    startY: 155,
+    theme: 'grid',
+    styles: {fontSize: 10, cellPadding: 7, overflow:'linebreak'},
+    headStyles: {fillColor: [30,58,138]},
+    body: [
+      ['Student Name', data.fullName || '', 'Registration ID', data.regId || ''],
+      ['Username', data.username || '', 'Exam Title', data.examTitle || ''],
+      ['Exam Code', data.examCode || '', 'Attempt', String(data.attemptNo || '')],
+      ['Score', data.score || '', 'Percentage', `${data.percentage || 0}%`],
+      ['Pass Mark', `${data.passMark || 0}%`, 'Ranking', data.ranking || '—'],
+      ['Passed Questions', data.passedNos || 'None', 'Failed Questions', data.failedNos || 'None']
+    ]
+  });
+
+  let y = doc.lastAutoTable.finalY + 18;
+  doc.setFont('helvetica','bold');
+  doc.text('Remark', 40, y);
+  y += 8;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(data.statusMessage || '', 515);
+  doc.text(lines, 40, y + 12);
+
+  if(data.allowReview && Array.isArray(data.review) && data.review.length){
+    y = y + 26 + (lines.length * 11);
+    doc.addPage();
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(14);
+    doc.text('Answer Review', 40, 40);
+    const reviewRows = data.review.map(item => [
+      String(item.qNo || ''),
+      item.status || '',
+      item.chosen || 'BLANK',
+      item.correct || '',
+      item.question || ''
+    ]);
+    doc.autoTable({
+      startY: 56,
+      head: [['Q No','Status','Your Answer','Correct','Question']],
+      body: reviewRows,
+      theme: 'grid',
+      styles: {fontSize: 9, cellPadding: 6, overflow:'linebreak'},
+      headStyles: {fillColor: [30,58,138]}
+    });
+  }
+
+  const safeReg = String(data.regId || 'student').replace(/[^a-z0-9_-]+/gi,'_');
+  const safeExam = String(data.examCode || 'result').replace(/[^a-z0-9_-]+/gi,'_');
+  doc.save(`result_${safeReg}_${safeExam}.pdf`);
+}
+
 async function loadPublicExamInfo(){
   const res = await apiRequest("getCurrentExamPublic", {}, "GET");
   if(res.ok && res.data && res.data.currentExam){
     const exam = res.data.currentExam;
     if(!$("examCode").value.trim()) $("examCode").value = exam.examCode;
-    $("examInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(exam.title)}<br><strong>Exam Code:</strong> ${esc(exam.examCode)}<br><strong>Pass Mark:</strong> ${esc(exam.passMark)}%<br><strong>Access:</strong> Use your Registration ID and student password.`;
+    $("examInfo").innerHTML = `<strong>Current Exam:</strong> ${esc(exam.title)}<br><strong>Exam Code:</strong> ${esc(exam.examCode)}<br><strong>Pass Mark:</strong> ${esc(exam.passMark)}%<br><strong>Access:</strong> Use your Registration ID and student password. Exam code is optional.`;
   }
 }
 async function checkResult(){
@@ -133,6 +210,7 @@ async function checkResult(){
   setStatus("checkStatus", res.message, res.ok);
   if(!res.ok){ $("resultCard").style.display = "none"; return; }
   const d = res.data || {};
+  $("resultCard").dataset.result = JSON.stringify(d);
   const passed = String(d.passedStatus || '').toUpperCase() === 'PASSED';
   $("resultCard").style.display = "block";
   $("resultBox").innerHTML = `
@@ -163,7 +241,7 @@ async function checkResult(){
   renderReview(d.allowReview ? (d.review || []) : []);
 }
 $("checkBtn").addEventListener("click", checkResult);
-$("printBtn").addEventListener("click", function(){ if($("resultCard").style.display !== "none") window.print(); });
+$("downloadPdfBtn").addEventListener("click", downloadResultPdf);
 (function init(){ const params = new URLSearchParams(location.search); const exam = params.get('exam'); if(exam) $("examCode").value = exam; loadPublicExamInfo(); })();
 </script>
 </body>
