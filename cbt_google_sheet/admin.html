@@ -351,7 +351,6 @@ const ADMIN_TOKEN_KEY = "cbt_admin_token_v2";
 
 let examsData=[], questionsData=[], resultsData=[], candidatesData=[], adminsData=[], studentsData=[], lastGeneratedCsv="", lastGeneratedFilename="student_passwords.csv";
 let selectedQuestionIds = new Set();
-let selectedDeletedExamCodes = new Set();
 
 let collapsibleCardsReady = false;
 function getCardSummary_(title){
@@ -599,7 +598,6 @@ async function createExam(){
   }
 }
 async function loadExams(){
-  selectedDeletedExamCodes.clear();
   const currentQuestionExam = $("questionExamSelect").value || "";
   const currentConfigExam = $("examConfigSelect").value || "";
   const currentLinkExam = $("resultLinkExamSelect").value || "";
@@ -643,7 +641,7 @@ function renderExams(){
       return `<div class="muted" style="padding:14px 2px">${msg}</div>`;
     }
 
-    let html = `<div class="table-wrap"><table><thead><tr>${type === 'deleted' ? '<th>Select</th>' : ''}<th>Exam Code</th><th>Title</th><th>Duration</th><th>Summary</th><th>Review</th><th>Pass Mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+    let html = `<div class="table-wrap"><table><thead><tr><th>Exam Code</th><th>Title</th><th>Duration</th><th>Summary</th><th>Review</th><th>Pass Mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
 
     list.forEach(e => {
       const isActive = !!(e.isActive || e.isCurrent);
@@ -667,7 +665,6 @@ function renderExams(){
           <button class="small-btn danger" type="button" onclick="deleteExamItem('${esc(e.examCode)}')">Delete Exam</button>`;
 
       html += `<tr>
-        ${type === 'deleted' ? `<td><label class="pill" style="cursor:pointer"><input type="checkbox" ${selectedDeletedExamCodes.has(String(e.examCode)) ? 'checked' : ''} onchange="toggleDeletedExamSelection('${esc(String(e.examCode))}', this.checked)" style="margin:0 6px 0 0">Select</label></td>` : ''}
         <td><span class="code">${esc(e.examCode)}</span></td>
         <td>${esc(e.title)}</td>
         <td>${esc(e.durationMinutes)} mins</td>
@@ -709,19 +706,12 @@ function renderExams(){
       <div class="actions" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
         <div>
           <h3 style="margin:0">Deleted Exams</h3>
-          <div class="muted" style="margin-top:4px">Deleted exams stay here until restored or permanently deleted.</div>
+          <div class="muted" style="margin-top:4px">Deleted exams stay here until restored.</div>
         </div>
-        <div class="actions">
-          <button class="ghost" type="button" onclick="selectAllDeletedExams()">Select All Deleted</button>
-          <button class="danger" type="button" onclick="hardDeleteSelectedDeletedExams()">Delete Selected Forever</button>
-          <div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">${deletedExams.length} deleted</div>
-        </div>
+        <div class="pill" style="background:#fff7ed;color:#b45309;border-color:#fed7aa">${deletedExams.length} deleted</div>
       </div>
-      <div id="deletedExamSelectionInfo" class="muted" style="margin-bottom:8px"></div>
       ${buildTable(deletedExams, 'deleted')}
     </div>`;
-
-  updateDeletedExamSelectionInfo();
 }
 function loadSelectedExamConfig(){
   const examCode = $("examConfigSelect").value;
@@ -792,44 +782,13 @@ async function restoreExamItem(examCode){
   alert(res.message);
   if(res.ok) await loadExams();
 }
-function updateDeletedExamSelectionInfo(){
-  const el = $("deletedExamSelectionInfo");
-  if(!el) return;
-  el.textContent = selectedDeletedExamCodes.size ? `${selectedDeletedExamCodes.size} deleted exam(s) selected.` : "No deleted exam selected.";
-}
 async function hardDeleteExamItem(examCode){
-  if(!confirm("Delete this exam forever? This will permanently remove the exam, its questions, results, progress, and permission codes.")) return;
+  if(!confirm("Delete this exam forever? This cannot be undone.")) return;
   showLoader("Deleting exam forever...");
-  const res=await apiRequest("hardDeleteExam",{examCode},"POST");
+  const res = await apiRequest("hardDeleteExam", { examCode }, "POST");
   hideLoader();
   alert(res.message);
-  if(res.ok){
-    selectedDeletedExamCodes.delete(String(examCode));
-    await loadExams();
-  }
-}
-function toggleDeletedExamSelection(examCode, checked){
-  const key = String(examCode);
-  if(checked) selectedDeletedExamCodes.add(key); else selectedDeletedExamCodes.delete(key);
-  updateDeletedExamSelectionInfo();
-}
-function selectAllDeletedExams(){
-  const deletedExams = examsData.filter(e => e.isDeleted);
-  deletedExams.forEach(e => selectedDeletedExamCodes.add(String(e.examCode)));
-  renderExams();
-}
-async function hardDeleteSelectedDeletedExams(){
-  const examCodes = Array.from(selectedDeletedExamCodes);
-  if(!examCodes.length) return alert("Select at least one deleted exam first.");
-  if(!confirm(`Delete ${examCodes.length} deleted exam(s) forever? This cannot be undone.`)) return;
-  showLoader("Deleting selected exams forever...");
-  const res=await apiRequest("bulkHardDeleteExams",{examCodes},"POST");
-  hideLoader();
-  alert(res.message);
-  if(res.ok){
-    selectedDeletedExamCodes.clear();
-    await loadExams();
-  }
+  if(res.ok) await loadExams();
 }
 async function toggleExamLock(examCode, locked){
   const notice = locked ? (prompt("Lock notice students should see for this exam:", "This exam is currently locked.") || "") : "";
