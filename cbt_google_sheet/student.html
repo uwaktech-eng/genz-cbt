@@ -338,8 +338,6 @@ let violationToastTimer = null;
 let violationProgressTimer = null;
 let pendingViolationReason = "";
 let pendingViolationCount = 0;
-let snapshotTimer = null;
-const SNAPSHOT_INTERVAL_MS = 3 * 60 * 1000;
 
 function showLoader(text = "Loading..."){ loaderText.textContent = text; loader.classList.add("show"); }
 function hideLoader(){ loader.classList.remove("show"); }
@@ -728,41 +726,7 @@ async function startCameraMonitor(){
   return false;
 }
 
-function startSnapshotUploads(){
-  clearInterval(snapshotTimer);
-  snapshotTimer = setInterval(captureAndUploadSnapshot, SNAPSHOT_INTERVAL_MS);
-}
-
-function stopSnapshotUploads(){
-  clearInterval(snapshotTimer);
-}
-
-async function captureAndUploadSnapshot(){
-  try{
-    if (!examStarted || !verifiedCandidate) return;
-    const video = $("cameraFeed");
-    if (!video || !video.videoWidth || !video.videoHeight) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const imageData = canvas.toDataURL("image/jpeg", 0.82);
-    await apiRequest("uploadSnapshot", {
-      examCode: $("examCodeInput").value.trim(),
-      regId: verifiedCandidate.regId,
-      fullName: verifiedCandidate.fullName,
-      imageData: imageData
-    }, "POST");
-  }catch(err){
-    // silent fail to avoid interrupting the exam flow
-  }
-}
-
 function stopCameraMonitor(){
-  stopSnapshotUploads();
   if (cameraStream){
     cameraStream.getTracks().forEach(track => track.stop());
     cameraStream = null;
@@ -1126,7 +1090,6 @@ async function submitExam(isAuto = false){
 async function logoutCurrent(){
   await apiRequest("logout", { token:getToken() }, "POST");
   stopTimers();
-  stopSnapshotUploads();
   disarmExamProtection();
   stopCameraMonitor();
   clearAuth();
