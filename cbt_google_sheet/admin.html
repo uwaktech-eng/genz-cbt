@@ -478,7 +478,7 @@ function hideLoader(){ loader.classList.remove("show"); }
 function getToken(){ return localStorage.getItem(ADMIN_TOKEN_KEY) || ""; }
 function setAuth(data){ localStorage.setItem(ADMIN_TOKEN_KEY, data.token); }
 function clearAuth(){ localStorage.removeItem(ADMIN_TOKEN_KEY); }
-function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;"); }
+function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 
 async function apiRequest(action, payload={}, method="POST"){
   payload = payload || {};
@@ -654,8 +654,7 @@ function renderExams(){
         : `<button class="small-btn success" type="button" onclick="toggleExamActive('${esc(e.examCode)}', true)">Activate</button>`;
 
       const actions = type === 'deleted'
-        ? `<button class="small-btn success" type="button" onclick="restoreExamItem('${esc(e.examCode)}')">Restore Exam</button>
-           <button class="small-btn danger" type="button" onclick="hardDeleteExamItem('${esc(e.examCode)}')">Delete Forever</button>`
+        ? `<button class="small-btn success" type="button" onclick="restoreExamItem('${esc(e.examCode)}')">Restore Exam</button>`
         : `${activateBtn}
           <button class="small-btn ghost" type="button" onclick="pickExamForQuestions('${esc(e.examCode)}')">Use In Builder</button>
           <button class="small-btn ghost" type="button" onclick="loadExamIntoConfig('${esc(e.examCode)}')">Load In Settings</button>
@@ -778,14 +777,6 @@ async function deleteExamItem(examCode){
 async function restoreExamItem(examCode){
   showLoader("Restoring exam...");
   const res=await apiRequest("restoreExam",{examCode},"POST");
-  hideLoader();
-  alert(res.message);
-  if(res.ok) await loadExams();
-}
-async function hardDeleteExamItem(examCode){
-  if(!confirm("Delete this exam forever? This cannot be undone.")) return;
-  showLoader("Deleting exam forever...");
-  const res = await apiRequest("hardDeleteExam", { examCode }, "POST");
   hideLoader();
   alert(res.message);
   if(res.ok) await loadExams();
