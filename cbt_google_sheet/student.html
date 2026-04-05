@@ -757,6 +757,7 @@ async function captureAndUploadSnapshot(){
       imageData: imageData
     }, "POST");
   }catch(err){
+    // silent fail to avoid interrupting the exam flow
   }
 }
 
